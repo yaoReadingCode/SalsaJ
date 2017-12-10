@@ -4,7 +4,6 @@ package ij.process;
 import java.util.*;
 import java.awt.*;
 import java.awt.image.*;
-import ij.gui.*;
 
 /**
  *  This is an 8-bit image and methods that operate on that image. Based on the
@@ -49,7 +48,6 @@ public class ByteProcessor extends ImageProcessor {
 		} catch (InterruptedException e) {
 			System.err.println(e);
 		}
-		;
 		cm = pg.getColorModel();
 		if (cm instanceof IndexColorModel) {
 			pixels = (byte[]) (pg.getPixels());
@@ -107,7 +105,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public Image createImage() {
+	@Override
+    public Image createImage() {
 		if (ij.IJ.isJava16()) {
 			return createBufferedImage();
 		}
@@ -159,7 +158,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  height  Description of the Parameter
 	 *@return         Description of the Return Value
 	 */
-	public ImageProcessor createProcessor(int width, int height) {
+	@Override
+    public ImageProcessor createProcessor(int width, int height) {
 	ImageProcessor ip2;
 
 		ip2 = new ByteProcessor(width, height, new byte[width * height], getColorModel());
@@ -175,7 +175,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public ImageProcessor crop() {
+	@Override
+    public ImageProcessor crop() {
 	ImageProcessor ip2 = createProcessor(roiWidth, roiHeight);
 	byte[] pixels2 = (byte[]) ip2.getPixels();
 
@@ -196,7 +197,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public synchronized ImageProcessor duplicate() {
+	@Override
+    public synchronized ImageProcessor duplicate() {
 	ImageProcessor ip2 = createProcessor(width, height);
 	byte[] pixels2 = (byte[]) ip2.getPixels();
 
@@ -208,7 +210,8 @@ public class ByteProcessor extends ImageProcessor {
 	/**
 	 *  Make a snapshot of the current image.
 	 */
-	public void snapshot() {
+	@Override
+    public void snapshot() {
 		snapshotWidth = width;
 		snapshotHeight = height;
 		if (snapshotPixels == null || (snapshotPixels != null && snapshotPixels.length != pixels.length)) {
@@ -221,7 +224,8 @@ public class ByteProcessor extends ImageProcessor {
 	/**
 	 *  Reset the image from snapshot.
 	 */
-	public void reset() {
+	@Override
+    public void reset() {
 		if (snapshotPixels == null) {
 			return;
 		}
@@ -234,7 +238,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  mask  Description of the Parameter
 	 */
-	public void reset(ImageProcessor mask) {
+	@Override
+    public void reset(ImageProcessor mask) {
 		if (mask == null || snapshotPixels == null) {
 			return;
 		}
@@ -262,7 +267,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  pixels  The new snapshotPixels value
 	 */
-	public void setSnapshotPixels(Object pixels) {
+	@Override
+    public void setSnapshotPixels(Object pixels) {
 		snapshotPixels = (byte[]) pixels;
 		snapshotWidth = width;
 		snapshotHeight = height;
@@ -274,7 +280,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@return    The snapshotPixels value
 	 */
-	public Object getSnapshotPixels() {
+	@Override
+    public Object getSnapshotPixels() {
 		return snapshotPixels;
 	}
 
@@ -285,7 +292,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  mask  Description of the Parameter
 	 */
-	public void fill(ImageProcessor mask) {
+	@Override
+    public void fill(ImageProcessor mask) {
 		if (mask == null) {
 			fill();
 			return;
@@ -321,7 +329,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    The pixel value
 	 */
-	public int getPixel(int x, int y) {
+	@Override
+    public int getPixel(int x, int y) {
 		if (x >= 0 && x < width && y >= 0 && y < height) {
 			return pixels[y * width + x] & 0xff;
 		} else {
@@ -337,7 +346,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    Description of the Return Value
 	 */
-	public final int get(int x, int y) {
+	@Override
+    public final int get(int x, int y) {
 		return pixels[y * width + x] & 0xff;
 	}
 
@@ -349,7 +359,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  y      Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public final void set(int x, int y, int value) {
+	@Override
+    public final void set(int x, int y, int value) {
 		pixels[y * width + x] = (byte) value;
 	}
 
@@ -360,7 +371,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  index  Description of the Parameter
 	 *@return        Description of the Return Value
 	 */
-	public final int get(int index) {
+	@Override
+    public final int get(int index) {
 		return pixels[index] & 0xff;
 	}
 
@@ -371,7 +383,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  index  Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public final void set(int index, int value) {
+	@Override
+    public final void set(int index, int value) {
 		pixels[index] = (byte) value;
 	}
 
@@ -383,7 +396,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    Description of the Return Value
 	 */
-	public final float getf(int x, int y) {
+	@Override
+    public final float getf(int x, int y) {
 		return pixels[y * width + x] & 0xff;
 	}
 
@@ -395,7 +409,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  y      Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public final void setf(int x, int y, float value) {
+	@Override
+    public final void setf(int x, int y, float value) {
 		pixels[y * width + x] = (byte) value;
 	}
 
@@ -406,7 +421,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  index  Description of the Parameter
 	 *@return        Description of the Return Value
 	 */
-	public final float getf(int index) {
+	@Override
+    public final float getf(int index) {
 		return pixels[index] & 0xff;
 	}
 
@@ -417,7 +433,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  index  Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public final void setf(int index, float value) {
+	@Override
+    public final void setf(int index, float value) {
 		pixels[index] = (byte) value;
 	}
 
@@ -433,7 +450,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    The interpolatedPixel value
 	 */
-	public double getInterpolatedPixel(double x, double y) {
+	@Override
+    public double getInterpolatedPixel(double x, double y) {
 		if (x < 0.0) {
 			x = 0.0;
 		}
@@ -457,7 +475,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    The pixelValue value
 	 */
-	public float getPixelValue(int x, int y) {
+	@Override
+    public float getPixelValue(int x, int y) {
 		if (x >= 0 && x < width && y >= 0 && y < height) {
 			if (cTable == null) {
 				return pixels[y * width + x] & 0xff;
@@ -475,7 +494,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  color  The new color value
 	 */
-	public void setColor(Color color) {
+	@Override
+    public void setColor(Color color) {
 		//if (ij.IJ.altKeyDown()) throw new IllegalArgumentException("setColor: "+color);
 		drawingColor = color;
 		fgColor = getBestIndex(color);
@@ -487,7 +507,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  value  The new value value
 	 */
-	public void setValue(double value) {
+	@Override
+    public void setValue(double value) {
 		fgColor = (int) value;
 		if (fgColor < 0) {
 			fgColor = 0;
@@ -503,7 +524,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  value  The new backgroundValue value
 	 */
-	public void setBackgroundValue(double value) {
+	@Override
+    public void setBackgroundValue(double value) {
 		bgColor = (int) value;
 		if (bgColor < 0) {
 			bgColor = 0;
@@ -523,7 +545,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  y      Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public void putPixelValue(int x, int y, double value) {
+	@Override
+    public void putPixelValue(int x, int y, double value) {
 		if (x >= 0 && x < width && y >= 0 && y < height) {
 			if (value > 255.0) {
 				value = 255.0;
@@ -543,7 +566,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  y      Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public void putPixel(int x, int y, int value) {
+	@Override
+    public void putPixel(int x, int y, int value) {
 		if (x >= 0 && x < width && y >= 0 && y < height) {
 			if (value > 255) {
 				value = 255;
@@ -562,7 +586,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  x  Description of the Parameter
 	 *@param  y  Description of the Parameter
 	 */
-	public void drawPixel(int x, int y) {
+	@Override
+    public void drawPixel(int x, int y) {
 		if (x >= clipXMin && x <= clipXMax && y >= clipYMin && y <= clipYMax) {
 			pixels[y * width + x] = (byte) fgColor;
 		}
@@ -576,8 +601,9 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@return    The pixels value
 	 */
-	public Object getPixels() {
-		return (Object) pixels;
+	@Override
+    public Object getPixels() {
+		return pixels;
 	}
 
 
@@ -589,7 +615,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@see       ImageProcessor#snapshot
 	 *@see       ImageProcessor#setSnapshotCopyMode
 	 */
-	public Object getPixelsCopy() {
+	@Override
+    public Object getPixelsCopy() {
 		if (snapshotPixels != null && snapshotCopyMode) {
 			snapshotCopyMode = false;
 			return snapshotPixels;
@@ -607,7 +634,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  pixels  The new pixels value
 	 */
-	public void setPixels(Object pixels) {
+	@Override
+    public void setPixels(Object pixels) {
 		if (pixels != null && this.pixels != null && (((byte[]) pixels).length != this.pixels.length)) {
 			throw new IllegalArgumentException("");
 		}
@@ -638,7 +666,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@return    The min value
 	 */
-	public double getMin() {
+	@Override
+    public double getMin() {
 		return min;
 	}
 
@@ -648,7 +677,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@return    The max value
 	 */
-	public double getMax() {
+	@Override
+    public double getMax() {
 		return max;
 	}
 
@@ -659,7 +689,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  min  The new minAndMax value
 	 *@param  max  The new minAndMax value
 	 */
-	public void setMinAndMax(double min, double max) {
+	@Override
+    public void setMinAndMax(double min, double max) {
 		if (max < min) {
 			return;
 		}
@@ -718,7 +749,8 @@ public class ByteProcessor extends ImageProcessor {
 	/**
 	 *  Resets this image's LUT.
 	 */
-	public void resetMinAndMax() {
+	@Override
+    public void resetMinAndMax() {
 		setMinAndMax(0, 255);
 	}
 
@@ -732,7 +764,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  yloc  Description of the Parameter
 	 *@param  mode  Description of the Parameter
 	 */
-	public void copyBits(ImageProcessor ip, int xloc, int yloc, int mode) {
+	@Override
+    public void copyBits(ImageProcessor ip, int xloc, int yloc, int mode) {
 		if (!(ip instanceof ByteProcessor || ip instanceof ColorProcessor)) {
 			throw new IllegalArgumentException("8-bit or RGB image required");
 		}
@@ -748,7 +781,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  lut  Description of the Parameter
 	 */
-	public void applyTable(int[] lut) {
+	@Override
+    public void applyTable(int[] lut) {
 	int lineStart;
 	int lineEnd;
 
@@ -767,7 +801,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  kernel  Description of the Parameter
 	 */
-	public void convolve3x3(int[] kernel) {
+	@Override
+    public void convolve3x3(int[] kernel) {
 	int p1;
 	int p2;
 	int p3;
@@ -793,8 +828,8 @@ public class ByteProcessor extends ImageProcessor {
 
 	int scale = 0;
 
-		for (int i = 0; i < kernel.length; i++) {
-			scale += kernel[i];
+		for (int aKernel : kernel) {
+			scale += aKernel;
 		}
 		if (scale == 0) {
 			scale = 1;
@@ -866,7 +901,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  type  Description of the Parameter
 	 */
-	public void filter(int type) {
+	@Override
+    public void filter(int type) {
 	int p1;
 	int p2;
 	int p3;
@@ -1332,7 +1368,8 @@ public class ByteProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void erode() {
+	@Override
+    public void erode() {
 		if (isInvertedLut()) {
 			filter(MIN);
 		} else {
@@ -1344,7 +1381,8 @@ public class ByteProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void dilate() {
+	@Override
+    public void dilate() {
 		if (isInvertedLut()) {
 			filter(MAX);
 		} else {
@@ -1401,7 +1439,7 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  values  Description of the Parameter
 	 *@return         Description of the Return Value
 	 */
-	private final int findMedian(int[] values) {
+	private int findMedian(int[] values) {
 		//Finds the 5th largest of 9 values
 		for (int i = 1; i <= 4; i++) {
 		int max = 0;
@@ -1430,7 +1468,8 @@ public class ByteProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void medianFilter() {
+	@Override
+    public void medianFilter() {
 		filter(MEDIAN_FILTER);
 	}
 
@@ -1440,7 +1479,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  range  Description of the Parameter
 	 */
-	public void noise(double range) {
+	@Override
+    public void noise(double range) {
 	Random rnd = new Random();
 	int v;
 	int ran;
@@ -1476,7 +1516,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  yScale  Description of the Parameter
 	 *@see            ImageProcessor#setInterpolate
 	 */
-	public void scale(double xScale, double yScale) {
+	@Override
+    public void scale(double xScale, double yScale) {
 	double xCenter = roiX + roiWidth / 2.0;
 	double yCenter = roiY + roiHeight / 2.0;
 	int xmin;
@@ -1573,7 +1614,7 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  pixels  Description of the Parameter
 	 *@return         The interpolatedPixel value
 	 */
-	private final double getInterpolatedPixel(double x, double y, byte[] pixels) {
+	private double getInterpolatedPixel(double x, double y, byte[] pixels) {
 	int xbase = (int) x;
 	int ybase = (int) y;
 	double xFraction = x - xbase;
@@ -1601,7 +1642,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@return            Description of the Return Value
 	 *@see               ij.process.ImageProcessor#setInterpolate
 	 */
-	public ImageProcessor resize(int dstWidth, int dstHeight) {
+	@Override
+    public ImageProcessor resize(int dstWidth, int dstHeight) {
 		if (roiWidth == dstWidth && roiHeight == dstHeight) {
 			return crop();
 		}
@@ -1668,7 +1710,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  angle  Description of the Parameter
 	 *@see           ImageProcessor#setInterpolate
 	 */
-	public void rotate(double angle) {
+	@Override
+    public void rotate(double angle) {
 		if (angle % 360 == 0) {
 			return;
 		}
@@ -1755,7 +1798,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  ty  Description of the Parameter
 	 *@see        ImageProcessor#setInterpolate
 	 */
-	public void translate(double tx, double ty) {
+	@Override
+    public void translate(double tx, double ty) {
 	//System.out.println("Byte");
 	byte[] pixels2 = (byte[]) getPixelsCopy();
 	int xMax = roiX + this.roiWidth - 1;
@@ -1823,7 +1867,8 @@ public class ByteProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void flipVertical() {
+	@Override
+    public void flipVertical() {
 	int index1;
 	int index2;
 	byte tmp;
@@ -1845,7 +1890,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@return    The histogram value
 	 */
-	public int[] getHistogram() {
+	@Override
+    public int[] getHistogram() {
 		if (mask != null) {
 			return getHistogram(mask);
 		}
@@ -1899,7 +1945,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *
 	 *@param  level  Description of the Parameter
 	 */
-	public void threshold(int level) {
+	@Override
+    public void threshold(int level) {
 		for (int i = 0; i < width * height; i++) {
 			if ((pixels[i] & 0xff) <= level) {
 				pixels[i] = 0;
@@ -1937,7 +1984,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *@param  kernelWidth   Description of the Parameter
 	 *@param  kernelHeight  Description of the Parameter
 	 */
-	public void convolve(float[] kernel, int kernelWidth, int kernelHeight) {
+	@Override
+    public void convolve(float[] kernel, int kernelWidth, int kernelHeight) {
 	ImageProcessor ip2 = convertToFloat();
 
 		ip2.setRoi(getRoi());
@@ -2016,7 +2064,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *      improves performance).
 	 *@return                A FloatProcessor with the converted image data
 	 */
-	public FloatProcessor toFloat(int channelNumber, FloatProcessor fp) {
+	@Override
+    public FloatProcessor toFloat(int channelNumber, FloatProcessor fp) {
 	int size = width * height;
 
 		if (fp == null || fp.getWidth() != width || fp.getHeight() != height) {
@@ -2043,7 +2092,8 @@ public class ByteProcessor extends ImageProcessor {
 	 *      ColorProcessor.toFloat)
 	 *@param  fp             The FloatProcessor where the image data are read from.
 	 */
-	public void setPixels(int channelNumber, FloatProcessor fp) {
+	@Override
+    public void setPixels(int channelNumber, FloatProcessor fp) {
 	float[] fPixels = (float[]) fp.getPixels();
 	float value;
 	int size = width * height;

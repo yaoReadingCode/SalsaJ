@@ -4,8 +4,6 @@ import ij.gui.*;
 import ij.process.*;
 import ij.measure.Calibration;
 import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
 
 /**
  *  Implements the Image/Stacks/Make Montage command.
@@ -27,7 +25,8 @@ public class MontageMaker implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	ImagePlus imp = WindowManager.getCurrentImage();
 		if (imp == null || imp.getStackSize() == 1) {
 			//EU_HOU Bundle
@@ -239,12 +238,12 @@ public class MontageMaker implements PlugIn {
 	 *@param  height   Description of the Parameter
 	 */
 	void drawLabel(ImageProcessor montage, int slice, String label, int x, int y, int width, int height) {
-		if (label != null && !label.equals("") && montage.getStringWidth(label) >= width) {
+		if (label != null && !"".equals(label) && montage.getStringWidth(label) >= width) {
 			do {
 				label = label.substring(0, label.length() - 1);
 			} while (label.length() > 1 && montage.getStringWidth(label) >= width);
 		}
-		if (label == null || label.equals("")) {
+		if (label == null || "".equals(label)) {
 			label = "" + slice;
 		}
 	int swidth = montage.getStringWidth(label);

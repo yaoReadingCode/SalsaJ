@@ -39,7 +39,8 @@ public class Scaler implements PlugIn, TextListener, FocusListener {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		imp = IJ.getImage();
 	Roi roi = imp.getRoi();
 		if (roi != null && !roi.isArea()) {
@@ -223,7 +224,7 @@ public class Scaler implements PlugIn, TextListener, FocusListener {
 	String wstr = gd.getNextString();
 		newWidth = (int) Tools.parseDouble(wstr, 0);
 		newHeight = (int) Tools.parseDouble(gd.getNextString(), 0);
-		if (newHeight != 0 && (wstr.equals("-") || wstr.equals("0"))) {
+		if (newHeight != 0 && ("-".equals(wstr) || "0".equals(wstr))) {
 			newWidth = (int) (newHeight * (double) r.width / r.height);
 		}
 		if (newWidth == 0 || newHeight == 0) {
@@ -279,7 +280,8 @@ public class Scaler implements PlugIn, TextListener, FocusListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void textValueChanged(TextEvent e) {
+	@Override
+    public void textValueChanged(TextEvent e) {
 	Object source = e.getSource();
 	double newXScale = xscale;
 	double newYScale = yscale;
@@ -329,7 +331,8 @@ public class Scaler implements PlugIn, TextListener, FocusListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void focusGained(FocusEvent e) {
+	@Override
+    public void focusGained(FocusEvent e) {
 		fieldWithFocus = e.getSource();
 		if (fieldWithFocus == widthField) {
 			constainAspectRatio = true;
@@ -344,7 +347,8 @@ public class Scaler implements PlugIn, TextListener, FocusListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void focusLost(FocusEvent e) { }
+	@Override
+    public void focusLost(FocusEvent e) { }
 
 }
 

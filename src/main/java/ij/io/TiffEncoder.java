@@ -72,18 +72,22 @@ public class TiffEncoder {
 			default:
 				photoInterp = 0;
 		}
-		if (fi.unit!=null && fi.pixelWidth!=0 && fi.pixelHeight!=0)
-			nEntries += 3; // XResolution, YResolution and ResolutionUnit
-		if (fi.fileType==fi.GRAY32_FLOAT)
-			nEntries++; // SampleFormat tag
+		if (fi.unit!=null && fi.pixelWidth!=0 && fi.pixelHeight!=0) {
+            nEntries += 3; // XResolution, YResolution and ResolutionUnit
+        }
+		if (fi.fileType== FileInfo.GRAY32_FLOAT) {
+            nEntries++; // SampleFormat tag
+        }
 		makeDescriptionString();
-		if (description!=null)
-			nEntries++;  // ImageDescription tag
+		if (description!=null) {
+            nEntries++;  // ImageDescription tag
+        }
 		imageSize = fi.width*fi.height*bytesPerPixel;
 		stackSize = (long)imageSize*fi.nImages;
 		metaDataSize = getMetaDataSize();
-		if (metaDataSize>0)
-			nEntries += 2; // MetaData & MetaDataCounts
+		if (metaDataSize>0) {
+            nEntries += 2; // MetaData & MetaDataCounts
+        }
 		ifdSize = 2 + nEntries*12 + 4;
 		int descriptionSize = description!=null?description.length:0;
 		scaleSize = fi.unit!=null && fi.pixelWidth!=0 && fi.pixelHeight!=0?SCALE_DATA_SIZE:0;
@@ -98,28 +102,36 @@ public class TiffEncoder {
 	public void write(DataOutputStream out) throws IOException {
 		writeHeader(out);
 		long nextIFD = 0L;
-		if (fi.nImages>1)
-			nextIFD = imageOffset+stackSize;
-        if (nextIFD+fi.nImages*ifdSize>=0xffffffffL)
+		if (fi.nImages>1) {
+            nextIFD = imageOffset+stackSize;
+        }
+        if (nextIFD+fi.nImages*ifdSize>=0xffffffffL) {
             nextIFD = 0L;
+        }
 		writeIFD(out, (int)imageOffset, (int)nextIFD);
-		if (fi.fileType==FileInfo.RGB||fi.fileType==FileInfo.RGB48)
-			writeBitsPerPixel(out);
-		if (description!=null)
-			writeDescription(out);
-		if (scaleSize>0)
-			writeScale(out);
-		if (fi.fileType==FileInfo.COLOR8)
-			writeColorMap(out);
-		if (metaDataSize>0)
-			writeMetaData(out);
+		if (fi.fileType==FileInfo.RGB||fi.fileType==FileInfo.RGB48) {
+            writeBitsPerPixel(out);
+        }
+		if (description!=null) {
+            writeDescription(out);
+        }
+		if (scaleSize>0) {
+            writeScale(out);
+        }
+		if (fi.fileType==FileInfo.COLOR8) {
+            writeColorMap(out);
+        }
+		if (metaDataSize>0) {
+            writeMetaData(out);
+        }
 		new ImageWriter(fi).write(out);
         if (nextIFD>0L) {
             for (int i=2; i<=fi.nImages; i++) {
-                if (i==fi.nImages)
+                if (i==fi.nImages) {
                     nextIFD = 0;
-                else
+                } else {
                     nextIFD += ifdSize;
+                }
                 imageOffset += imageSize;
                 writeIFD(out, (int)imageOffset, (int)nextIFD);
             }
@@ -143,10 +155,13 @@ public class TiffEncoder {
 				if (fi.sliceLabels[i]!=null&&fi.sliceLabels[i].length()>0) {
 					nSliceLabels++;
 					size += fi.sliceLabels[i].length()*2;
-				} else
-					break;
+				} else {
+                    break;
+                }
 			}
-			if (nSliceLabels>0) nTypes++;
+			if (nSliceLabels>0) {
+                nTypes++;
+            }
 			metaDataEntries += nSliceLabels;
 		}
 		if (fi.metaDataTypes!=null && fi.metaData!=null && fi.metaData[0]!=null
@@ -155,13 +170,18 @@ public class TiffEncoder {
 			nTypes += extraMetaDataEntries;
 			metaDataEntries += extraMetaDataEntries;
 			for (int i=0; i<extraMetaDataEntries; i++) {
-                if (fi.metaData[i]!=null)
+                if (fi.metaData[i]!=null) {
                     size += fi.metaData[i].length;
+                }
             }
 		}
-		if (metaDataEntries>0) metaDataEntries++; // add entry for header
+		if (metaDataEntries>0) {
+            metaDataEntries++; // add entry for header
+        }
 		int hdrSize = 4 + nTypes*8;
-		if (size>0) size += hdrSize;
+		if (size>0) {
+            size += hdrSize;
+        }
 		return size;
 	}
 	
@@ -184,8 +204,9 @@ public class TiffEncoder {
 		out.writeShort(tag);
 		out.writeShort(fieldType);
 		out.writeInt(count);
-		if (count==1 && fieldType==TiffDecoder.SHORT)
-			value <<= 16; //left justify 16-bit values
+		if (count==1 && fieldType==TiffDecoder.SHORT) {
+            value <<= 16; //left justify 16-bit values
+        }
 		out.writeInt(value); // may be an offset
 	}
 	
@@ -199,8 +220,9 @@ public class TiffEncoder {
 		if (fi.fileType==FileInfo.RGB||fi.fileType==FileInfo.RGB48) {
 			writeEntry(out, TiffDecoder.BITS_PER_SAMPLE,  3, 3, tagDataOffset);
 			tagDataOffset += BPS_DATA_SIZE;
-		} else
-			writeEntry(out, TiffDecoder.BITS_PER_SAMPLE,  3, 1, bitsPerSample);
+		} else {
+            writeEntry(out, TiffDecoder.BITS_PER_SAMPLE,  3, 1, bitsPerSample);
+        }
 		writeEntry(out, TiffDecoder.PHOTO_INTERP,     3, 1, photoInterp);
 		if (description!=null) {
 			writeEntry(out, TiffDecoder.IMAGE_DESCRIPTION, 2, description.length, tagDataOffset);
@@ -215,13 +237,14 @@ public class TiffEncoder {
 			writeEntry(out, TiffDecoder.Y_RESOLUTION, 5, 1, tagDataOffset+8);
 			tagDataOffset += SCALE_DATA_SIZE;
 			int unit = 1;
-			if (fi.unit.equals("inch"))
-				unit = 2;
-			else if (fi.unit.equals("cm"))
-				unit = 3;
+			if ("inch".equals(fi.unit)) {
+                unit = 2;
+            } else if ("cm".equals(fi.unit)) {
+                unit = 3;
+            }
 			writeEntry(out, TiffDecoder.RESOLUTION_UNIT, 3, 1, unit);
 		}
-		if (fi.fileType==fi.GRAY32_FLOAT) {
+		if (fi.fileType== FileInfo.GRAY32_FLOAT) {
 			int format = TiffDecoder.FLOATING_POINT;
 			writeEntry(out, TiffDecoder.SAMPLE_FORMAT, 3, 1, format);
 		}
@@ -250,7 +273,9 @@ public class TiffEncoder {
 		double xscale = 1.0/fi.pixelWidth;
 		double yscale = 1.0/fi.pixelHeight;
 		double scale = 1000000.0;
-		if (xscale>1000.0) scale = 1000.0;
+		if (xscale>1000.0) {
+            scale = 1000.0;
+        }
 		out.writeInt((int)(xscale*scale));
 		out.writeInt((int)scale);
 		out.writeInt((int)(yscale*scale));
@@ -281,16 +306,23 @@ public class TiffEncoder {
 	
 		// write byte counts
 		int nTypes = 0;
-		if (fi.info!=null) nTypes++;
-		if (nSliceLabels>0) nTypes++;
+		if (fi.info!=null) {
+            nTypes++;
+        }
+		if (nSliceLabels>0) {
+            nTypes++;
+        }
 		nTypes += extraMetaDataEntries;
 		out.writeInt(4+nTypes*8); // header size	
-		if (fi.info!=null)
-			out.writeInt(fi.info.length()*2);
-		for (int i=0; i<nSliceLabels; i++)
-			out.writeInt(fi.sliceLabels[i].length()*2);
-		for (int i=0; i<extraMetaDataEntries; i++)
-			out.writeInt(fi.metaData[i].length);	
+		if (fi.info!=null) {
+            out.writeInt(fi.info.length()*2);
+        }
+		for (int i=0; i<nSliceLabels; i++) {
+            out.writeInt(fi.sliceLabels[i].length()*2);
+        }
+		for (int i=0; i<extraMetaDataEntries; i++) {
+            out.writeInt(fi.metaData[i].length);
+        }
 		
 		// write header
 		out.writeInt(0x494a494a); // magic number ("IJIJ")
@@ -308,12 +340,15 @@ public class TiffEncoder {
 		}
 		
 		// write data
-		if (fi.info!=null)
-			out.writeChars(fi.info);
-		for (int i=0; i<nSliceLabels; i++)
-			out.writeChars(fi.sliceLabels[i]);
-		for (int i=0; i<extraMetaDataEntries; i++)
-			out.write(fi.metaData[i]); 
+		if (fi.info!=null) {
+            out.writeChars(fi.info);
+        }
+		for (int i=0; i<nSliceLabels; i++) {
+            out.writeChars(fi.sliceLabels[i]);
+        }
+		for (int i=0; i<extraMetaDataEntries; i++) {
+            out.write(fi.metaData[i]);
+        }
 					
 	}
 
@@ -322,12 +357,14 @@ public class TiffEncoder {
 		decoding an IFD for each slice.*/
 	void makeDescriptionString() {
 		if (fi.description!=null) {
-			if (fi.description.charAt(fi.description.length()-1)!=(char)0)
-				fi.description += " ";
+			if (fi.description.charAt(fi.description.length()-1)!=(char)0) {
+                fi.description += " ";
+            }
 			description = fi.description.getBytes();
 			description[description.length-1] = (byte)0;
-		} else
-			description = null;
+		} else {
+            description = null;
+        }
 	}
 
 }

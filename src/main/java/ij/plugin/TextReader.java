@@ -1,6 +1,4 @@
 package ij.plugin;
-import java.awt.*;
-import java.awt.image.*;
 import java.io.*;
 import ij.*;
 import ij.io.*;
@@ -24,7 +22,8 @@ public class TextReader implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		if (showDialog()) {
 			//EU_HOU Bundle
 			IJ.showStatus("Opening: " + path);
@@ -90,7 +89,7 @@ public class TextReader implements PlugIn {
 			ip.resetMinAndMax();
 		} catch (IOException e) {
 		String msg = e.getMessage();
-			if (msg == null || msg.equals("")) {
+			if (msg == null || "".equals(msg)) {
 				msg = "" + e;
 			}
 			if (!hideErrorMessages) {

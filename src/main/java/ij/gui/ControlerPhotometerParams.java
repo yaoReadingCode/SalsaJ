@@ -10,17 +10,20 @@ public class ControlerPhotometerParams implements ActionListener {
     private ImagePlus imp;
     private OvalRoi in;
 
-    public ControlerPhotometerParams(){};
+    public ControlerPhotometerParams(){}
 
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         try{
 
-            if(e.getActionCommand().equals("bPlus"))
+            if("bPlus".equals(e.getActionCommand())) {
                 PhotometerParams.getInstance().setstatf(PhotometerParams.getInstance().getstatf()+1);
-            else if(e.getActionCommand().equals("bMoin"))
-                if(PhotometerParams.getInstance().getstatf()>1)
-                    PhotometerParams.getInstance().setstatf(PhotometerParams.getInstance().getstatf()-1);
+            } else if("bMoin".equals(e.getActionCommand())) {
+                if(PhotometerParams.getInstance().getstatf()>1) {
+                    PhotometerParams.getInstance().setstatf(PhotometerParams.getInstance().getstatf() - 1);
+                }
+            }
 
 
 
@@ -34,7 +37,7 @@ public class ControlerPhotometerParams implements ActionListener {
 
         }
         
-        catch(NumberFormatException a){}
+        catch(NumberFormatException ignored){}
     }
 
 }

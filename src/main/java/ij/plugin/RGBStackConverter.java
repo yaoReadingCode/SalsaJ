@@ -17,7 +17,8 @@ public class RGBStackConverter implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	ImagePlus imp = IJ.getImage();
 	CompositeImage cimg = imp instanceof CompositeImage ? (CompositeImage) imp : null;
 	int size = imp.getStackSize();

@@ -1,20 +1,17 @@
 //EU_HOU
 package ij.gui;
 import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
 import java.util.*;
 import ij.*;
 import ij.process.*;
 import ij.util.*;
-import ij.plugin.filter.Analyzer;
 import ij.macro.Interpreter;
 import ij.measure.Calibration;
 /*
     EU_HOU CHANGES
   */
 //import ij.plugin.RadioSpectrum_Reader;
-import ij.io.*;
+
 /*
     EU_HOU END
   */
@@ -360,7 +357,7 @@ public class Plot {
 		  */
 		this(title, xLabel, yLabel, xValues, yValues, xValues, yValues, DEFAULT_FLAGS, orig, reg);
 
-		this.horizontal = false;
+		horizontal = false;
 		/*
 		    EU_HOU END
 		  */
@@ -383,7 +380,7 @@ public class Plot {
 		  */
 		this(title, xLabel, yLabel, xValues, yValues, xValues, yValues, DEFAULT_FLAGS, null, null);
 
-		this.horizontal = false;
+		horizontal = false;
 
 		this.radio = RadioSpectra;
 		/*
@@ -419,7 +416,7 @@ public class Plot {
 	//EU_HOU
 	public Plot(String title, String xLabel, String yLabel, double[] xValues, double[] yValues, int flags) {
 		this(title, xLabel, yLabel, xValues != null ? Tools.toFloat(xValues) : null, yValues != null ? Tools.toFloat(yValues) : null, xValues != null ? Tools.toFloat(xValues) : null, yValues != null ? Tools.toFloat(yValues) : null, flags, null, null);
-		this.horizontal = false;
+		horizontal = false;
 	}
 
 
@@ -645,8 +642,8 @@ public class Plot {
 		    EU_HOU CHANGES
 		  */
 		labels.add(label);
-		xlabs.add(new Integer(xt));
-		ylabs.add(new Integer(yt));
+		xlabs.add(xt);
+		ylabs.add(yt);
 		/*
 		    EU_HOU END
 		  */
@@ -1073,7 +1070,7 @@ public class Plot {
 	 * @param  fm      Description of the Parameter
 	 */
 	void drawYLabel(String yLabel, int x, int y, int height, FontMetrics fm) {
-		if (yLabel.equals("")) {
+		if ("".equals(yLabel)) {
 			return;
 		}
 		int w = fm.stringWidth(yLabel) + 5;
@@ -1096,7 +1093,7 @@ public class Plot {
 	}
 
         void drawXLabel(String yLabel, int x, int y, int height, FontMetrics fm) {
-		if (yLabel.equals("")) {
+		if ("".equals(yLabel)) {
 			return;
 		}
 		int w = fm.stringWidth(yLabel) + 5;
@@ -1253,8 +1250,8 @@ public class Plot {
 			Enumeration e = labels.elements();
 			int i = 0;
 			while (e.hasMoreElements()) {
-				int xxx = ((Integer) xlabs.elementAt(i)).intValue();
-				int yyy = ((Integer) ylabs.elementAt(i++)).intValue();
+				int xxx = (Integer) xlabs.elementAt(i);
+				int yyy = (Integer) ylabs.elementAt(i++);
 				ip.drawString((String) e.nextElement(), xxx, yyy);
 			}
 			// EU_HOU

@@ -12,9 +12,13 @@ public class MessageDialog extends Dialog implements ActionListener, KeyListener
 	public MessageDialog(Frame parent, String title, String message) {
 		super(parent, title, true);
 		setLayout(new BorderLayout());
-		if (message==null) message = "";
+		if (message==null) {
+            message = "";
+        }
 		label = new MultiLineLabel(message);
-		if (!IJ.isLinux()) label.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		if (!IJ.isLinux()) {
+            label.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        }
 		Panel panel = new Panel();
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 15));
 		panel.add(label);
@@ -26,19 +30,22 @@ public class MessageDialog extends Dialog implements ActionListener, KeyListener
 		panel.setLayout(new FlowLayout());
 		panel.add(button);
 		add("South", panel);
-		if (ij.IJ.isMacintosh())
-			setResizable(false);
+		if (ij.IJ.isMacintosh()) {
+            setResizable(false);
+        }
 		pack();
 		GUI.center(this);
 		show();
 	}
 	
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 		setVisible(false);
 		dispose();
 	}
 	
-	public void keyPressed(KeyEvent e) { 
+	@Override
+    public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode(); 
 		IJ.setKeyDown(keyCode); 
 		if (keyCode==KeyEvent.VK_ENTER || keyCode==KeyEvent.VK_ESCAPE) {
@@ -47,11 +54,13 @@ public class MessageDialog extends Dialog implements ActionListener, KeyListener
 		}
 	} 
 	
-	public void keyReleased(KeyEvent e) {
+	@Override
+    public void keyReleased(KeyEvent e) {
 		int keyCode = e.getKeyCode(); 
 		IJ.setKeyUp(keyCode); 
 	}
 	
-	public void keyTyped(KeyEvent e) {}
+	@Override
+    public void keyTyped(KeyEvent e) {}
 
 }

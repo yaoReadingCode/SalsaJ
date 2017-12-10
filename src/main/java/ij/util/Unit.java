@@ -56,8 +56,8 @@ public class Unit {
     }
 
     public double conversion(double val, String unit1, String unit2) {
-        int u1 = units.get(unit1.substring(0, 1)).intValue();
-        int u2 = units.get(unit1.substring(0, 1)).intValue();
+        int u1 = units.get(unit1.substring(0, 1));
+        int u2 = units.get(unit1.substring(0, 1));
 
         return val * Math.pow(10, u1 - u2);
     }

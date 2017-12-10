@@ -16,20 +16,26 @@ public class PlugInFrame extends Frame implements PlugIn, WindowListener, FocusL
 		ImageJ ij = IJ.getInstance();
 		addWindowListener(this);
  		addFocusListener(this);
-		if (IJ.isLinux()) setBackground(ImageJ.backgroundColor);
+		if (IJ.isLinux()) {
+            setBackground(ImageJ.backgroundColor);
+        }
 		if (ij!=null) {
 			Image img = ij.getIconImage();
-			if (img!=null)
-				try {setIconImage(img);} catch (Exception e) {}
+			if (img!=null) {
+                try {setIconImage(img);} catch (Exception e) {}
+            }
 		}
 	}
 	
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	}
 	
+    @Override
     public void windowClosing(WindowEvent e) {
-    	if (e.getSource()==this)
-    		close();
+    	if (e.getSource()==this) {
+            close();
+        }
     }
     
     /** Closes this window. */
@@ -39,6 +45,7 @@ public class PlugInFrame extends Frame implements PlugIn, WindowListener, FocusL
 		WindowManager.removeWindow(this);
     }
 
+    @Override
     public void windowActivated(WindowEvent e) {
 		if (IJ.isMacintosh() && IJ.getInstance()!=null) {
 			IJ.wait(10); // may be needed for Java 1.4 on OS X
@@ -47,15 +54,22 @@ public class PlugInFrame extends Frame implements PlugIn, WindowListener, FocusL
 		WindowManager.setWindow(this);
 	}
 
-	public void focusGained(FocusEvent e) {
+	@Override
+    public void focusGained(FocusEvent e) {
 		//IJ.log("PlugInFrame: focusGained");
 		WindowManager.setWindow(this);
 	}
 
+    @Override
     public void windowOpened(WindowEvent e) {}
+    @Override
     public void windowClosed(WindowEvent e) {}
+    @Override
     public void windowIconified(WindowEvent e) {}
+    @Override
     public void windowDeiconified(WindowEvent e) {}
+    @Override
     public void windowDeactivated(WindowEvent e) {}
-	public void focusLost(FocusEvent e) {}
+	@Override
+    public void focusLost(FocusEvent e) {}
 }

@@ -24,7 +24,8 @@ public class StackEditor implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		imp = WindowManager.getCurrentImage();
 		if (imp == null) {
 			IJ.noImage();
@@ -34,17 +35,17 @@ public class StackEditor implements PlugIn {
 		width = imp.getWidth();
 		height = imp.getHeight();
 
-		if (arg.equals("tostack")) {
+		if ("tostack".equals(arg)) {
 			convertImagesToStack();
-		} else if (arg.equals("add")) {
+		} else if ("add".equals(arg)) {
 			addSlice();
-		} else if (arg.equals("delete")) {
+		} else if ("delete".equals(arg)) {
 			deleteSlice();
-		} else if (arg.equals("toimages")) {
+		} else if ("toimages".equals(arg)) {
 			convertStackToImages(imp);
-		} else if (arg.equals("stackto5d")) {
+		} else if ("stackto5d".equals(arg)) {
 			convertStackTo5D(imp);
-		} else if (arg.equals("5dtostack")) {
+		} else if ("5dtostack".equals(arg)) {
 			convert5DToStack(imp);
 		}
 	}
@@ -61,7 +62,7 @@ public class StackEditor implements PlugIn {
 	ImageStack stack = imp.getStack();
 		if (stack.getSize() == 1) {
 		String label = stack.getSliceLabel(1);
-			if (label != null && label.indexOf("\n") != -1) {
+			if (label != null && label.contains("\n")) {
 				stack.setSliceLabel(null, 1);
 			}
 			id = imp.getID();
@@ -118,12 +119,12 @@ public class StackEditor implements PlugIn {
 
 	int count = 0;
 	ImagePlus[] image = new ImagePlus[wList.length];
-		for (int i = 0; i < wList.length; i++) {
-		ImagePlus imp = WindowManager.getImage(wList[i]);
-			if (imp.getStackSize() == 1) {
-				image[count++] = imp;
-			}
-		}
+        for (int aWList : wList) {
+            ImagePlus imp = WindowManager.getImage(aWList);
+            if (imp.getStackSize() == 1) {
+                image[count++] = imp;
+            }
+        }
 		if (count < 2) {
 			//EU_HOU Bundle
 			IJ.error(IJ.getPluginBundle().getString("OneImgErr"));
@@ -228,7 +229,7 @@ public class StackEditor implements PlugIn {
 	CompositeImage cimg = imp instanceof CompositeImage ? (CompositeImage) imp : null;
 		for (int i = 1; i <= size; i++) {
 		String label = stack.getShortSliceLabel(i);
-		String title = label != null && !label.equals("") ? label : getTitle(imp, i);
+		String title = label != null && !"".equals(label) ? label : getTitle(imp, i);
 		ImageProcessor ip = stack.getProcessor(i);
 			if (cimg != null) {
 				ip.setMinAndMax(cimg.getMin(i), cimg.getMax(i));
@@ -353,9 +354,8 @@ public class StackEditor implements PlugIn {
 				//EU_HOU Bundle
 				IJ.error("channels*slices*frames!=stackSize");
 				goOn = false;
-				continue;
-			}
-		} while (goOn == false);
+            }
+		} while (!goOn);
 
 		nChannels = 1;
 		nSlices = 1;

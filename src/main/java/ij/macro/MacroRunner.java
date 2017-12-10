@@ -40,17 +40,19 @@ public class MacroRunner implements Runnable {
 	/** Create a new object that interprets a macro file using a separate thread. */
 	public MacroRunner(File file) {
 		int size = (int)file.length();
-		if (size<=0)
-			return;
+		if (size<=0) {
+            return;
+        }
 		try {
 			StringBuffer sb = new StringBuffer(5000);
 			BufferedReader r = new BufferedReader(new FileReader(file));
 			while (true) {
 				String s=r.readLine();
-				if (s==null)
-					break;
-				else
-					sb.append(s+"\n");
+				if (s==null) {
+                    break;
+                } else {
+                    sb.append(s+"\n");
+                }
 			}
 			r.close();
 			macro = new String(sb);
@@ -86,41 +88,48 @@ public class MacroRunner implements Runnable {
 		this.pgm = pgm;
 		this.address = address;
 		this.name = name;
-		if (pgm.queueCommands)
-			run();
-		else {
+		if (pgm.queueCommands) {
+            run();
+        } else {
 			thread = new Thread(this, name+"_Macro$");
 			thread.setPriority(Math.max(thread.getPriority()-2, Thread.MIN_PRIORITY));
 			thread.start();
 		}
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 		try {
 			Interpreter interp = new Interpreter();
 			interp.argument = argument;
-			if (pgm==null)
-				interp.run(macro);
-			else
-				interp.runMacro(pgm, address, name);
+			if (pgm==null) {
+                interp.run(macro);
+            } else {
+                interp.runMacro(pgm, address, name);
+            }
 		} catch(Throwable e) {
 			Interpreter.abort();
 			IJ.showStatus("");
 			IJ.showProgress(1.0);
 			ImagePlus imp = WindowManager.getCurrentImage();
-			if (imp!=null) imp.unlock();
+			if (imp!=null) {
+                imp.unlock();
+            }
 			String msg = e.getMessage();
-			if (e instanceof RuntimeException && msg!=null && e.getMessage().equals(Macro.MACRO_CANCELED))
-				return;
+			if (e instanceof RuntimeException && msg!=null && e.getMessage().equals(Macro.MACRO_CANCELED)) {
+                return;
+            }
 			CharArrayWriter caw = new CharArrayWriter();
 			PrintWriter pw = new PrintWriter(caw);
 			e.printStackTrace(pw);
 			String s = caw.toString();
-			if (IJ.isMacintosh())
-				s = Tools.fixNewLines(s);
+			if (IJ.isMacintosh()) {
+                s = Tools.fixNewLines(s);
+            }
 			//Don't show exceptions resulting from window being closed
-			if (!(s.indexOf("NullPointerException")>=0 && s.indexOf("ij.process")>=0))
-				new TextWindow("Exception", s, 350, 250);
+			if (!(s.contains("NullPointerException") && s.contains("ij.process"))) {
+                new TextWindow("Exception", s, 350, 250);
+            }
 		}
 	}
 

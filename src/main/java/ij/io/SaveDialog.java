@@ -2,7 +2,7 @@ package ij.io;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
-import javax.swing.filechooser.*;
+
 import ij.*;
 import ij.plugin.frame.Recorder;
 import ij.util.Java2;
@@ -23,16 +23,19 @@ public class SaveDialog {
 	public SaveDialog(String title, String defaultName, String extension) {
 		this.title = title;
 		ext = extension;
-		if (isMacro())
-			return;
+		if (isMacro()) {
+            return;
+        }
 		String defaultDir = OpenDialog.getDefaultDirectory();
 		defaultName = addExtension(defaultName, extension);
-		if (Prefs.useJFileChooser)
-			jSave(title, defaultDir, defaultName);
-		else
-			save(title, defaultDir, defaultName);
-		if (name!=null && dir!=null)
-			OpenDialog.setDefaultDirectory(dir);
+		if (Prefs.useJFileChooser) {
+            jSave(title, defaultDir, defaultName);
+        } else {
+            save(title, defaultDir, defaultName);
+        }
+		if (name!=null && dir!=null) {
+            OpenDialog.setDefaultDirectory(dir);
+        }
 		IJ.showStatus(title+": "+dir+name);
 	}
 	
@@ -41,13 +44,15 @@ public class SaveDialog {
 	public SaveDialog(String title, String defaultDir, String defaultName, String extension) {
 		this.title = title;
 		ext = extension;
-		if (isMacro())
-			return;
+		if (isMacro()) {
+            return;
+        }
 		defaultName = addExtension(defaultName, extension);
-		if (Prefs.useJFileChooser)
-			jSave(title, defaultDir, defaultName);
-		else
-			save(title, defaultDir, defaultName);
+		if (Prefs.useJFileChooser) {
+            jSave(title, defaultDir, defaultName);
+        } else {
+            save(title, defaultDir, defaultName);
+        }
 		IJ.showStatus(title+": "+dir+name);
 	}
 	
@@ -55,8 +60,9 @@ public class SaveDialog {
 		String macroOptions = Macro.getOptions();
 		if (macroOptions!=null) {
 			String path = Macro.getValue(macroOptions, title, null);
-			if (path==null)
-				path = Macro.getValue(macroOptions, "path", null);
+			if (path==null) {
+                path = Macro.getValue(macroOptions, "path", null);
+            }
 			//if (path==null && oneRunArg) {
 			//	path = macroOptions;
 			//}
@@ -79,12 +85,14 @@ public class SaveDialog {
 					if (Character.isDigit(name.charAt(i)))
 						{hasDigits=true; break;}
 				}
-				if (hasDigits)
-					name += extension;
-				else
-					name = name.substring(0, dotIndex) + extension;
-			} else
-				name += extension;
+				if (hasDigits) {
+                    name += extension;
+                } else {
+                    name = name.substring(0, dotIndex) + extension;
+                }
+			} else {
+                name += extension;
+            }
 		}
 		return name;
 	}
@@ -92,10 +100,11 @@ public class SaveDialog {
 	// Save using JFileChooser.
 	void jSave(String title, String defaultDir, String defaultName) {
 		Java2.setSystemLookAndFeel();
-		if (EventQueue.isDispatchThread())
-			jSaveDispatchThread(title, defaultDir, defaultName);
-		else
-			jSaveInvokeAndWait(title, defaultDir, defaultName);
+		if (EventQueue.isDispatchThread()) {
+            jSaveDispatchThread(title, defaultDir, defaultName);
+        } else {
+            jSaveInvokeAndWait(title, defaultDir, defaultName);
+        }
 	}
 
 	// Save using JFileChooser.
@@ -105,11 +114,13 @@ public class SaveDialog {
 		fc.setDialogTitle(title);
 		if (defaultDir!=null) {
 			File f = new File(defaultDir);
-			if (f!=null)
-				fc.setCurrentDirectory(f);
+			if (f!=null) {
+                fc.setCurrentDirectory(f);
+            }
 		}
-		if (defaultName!=null)
-			fc.setSelectedFile(new File(defaultName));
+		if (defaultName!=null) {
+            fc.setSelectedFile(new File(defaultName));
+        }
 		int returnVal = fc.showSaveDialog(IJ.getInstance());
 		if (returnVal!=JFileChooser.APPROVE_OPTION)
 			{Macro.abort(); return;}
@@ -119,11 +130,13 @@ public class SaveDialog {
 				"The file "+ f.getName() + " already exists. \nWould you like to replace it?",
 				"Replace?",
 				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if (ret!=JOptionPane.OK_OPTION) f = null;
+			if (ret!=JOptionPane.OK_OPTION) {
+                f = null;
+            }
 		}
-		if (f==null)
-			Macro.abort();
-		else {
+		if (f==null) {
+            Macro.abort();
+        } else {
 			dir = fc.getCurrentDirectory().getPath()+File.separator;
 			name = fc.getName(f);
 		}
@@ -134,16 +147,19 @@ public class SaveDialog {
 	void jSaveInvokeAndWait(final String title, final String defaultDir, final String defaultName) {
 		try {
 			EventQueue.invokeAndWait(new Runnable() {
+				@Override
 				public void run() {
 					JFileChooser fc = new JFileChooser();
 					fc.setDialogTitle(title);
 					if (defaultDir!=null) {
 						File f = new File(defaultDir);
-						if (f!=null)
-							fc.setCurrentDirectory(f);
+						if (f!=null) {
+                            fc.setCurrentDirectory(f);
+                        }
 					}
-					if (defaultName!=null)
-						fc.setSelectedFile(new File(defaultName));
+					if (defaultName!=null) {
+                        fc.setSelectedFile(new File(defaultName));
+                    }
 					int returnVal = fc.showSaveDialog(IJ.getInstance());
 					if (returnVal!=JFileChooser.APPROVE_OPTION)
 						{Macro.abort(); return;}
@@ -153,17 +169,19 @@ public class SaveDialog {
 							"The file "+ f.getName() + " already exists. \nWould you like to replace it?",
 							"Replace?",
 							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-						if (ret!=JOptionPane.OK_OPTION) f = null;
+						if (ret!=JOptionPane.OK_OPTION) {
+                            f = null;
+                        }
 					}
-					if (f==null)
-						Macro.abort();
-					else {
+					if (f==null) {
+                        Macro.abort();
+                    } else {
 						dir = fc.getCurrentDirectory().getPath()+File.separator;
 						name = fc.getName(f);
 					}
 				}
 			});
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 	}
 
 	// Save using FileDialog
@@ -171,18 +189,22 @@ public class SaveDialog {
 		ImageJ ij = IJ.getInstance();
 		Frame parent = ij!=null?ij:new Frame();
 		FileDialog fd = new FileDialog(parent, title, FileDialog.SAVE);
-		if (defaultName!=null)
-			fd.setFile(defaultName);			
-		if (defaultDir!=null)
-			fd.setDirectory(defaultDir);
+		if (defaultName!=null) {
+            fd.setFile(defaultName);
+        }
+		if (defaultDir!=null) {
+            fd.setDirectory(defaultDir);
+        }
 		fd.show();
 		name = fd.getFile();
 		dir = fd.getDirectory();
-		if (name==null)
-			Macro.abort();
+		if (name==null) {
+            Macro.abort();
+        }
 		fd.dispose();
-		if (ij==null)
-			parent.dispose();
+		if (ij==null) {
+            parent.dispose();
+        }
 	}
 	
 	/** Returns the selected directory. */

@@ -33,7 +33,8 @@ public class FolderOpener implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	//EU_HOU Bundle
 	OpenDialog od = new OpenDialog("Open Image Sequence...", arg);
 	String directory = od.getDirectory();
@@ -77,20 +78,20 @@ public class FolderOpener implements PlugIn {
 	boolean allSameCalibration = true;
 		IJ.resetEscape();
 		try {
-			for (int i = 0; i < list.length; i++) {
-				IJ.redirectErrorMessages();
-			ImagePlus imp = (new Opener()).openImage(directory, list[i]);
-				if (imp != null) {
-					width = imp.getWidth();
-					height = imp.getHeight();
-					bitDepth = imp.getBitDepth();
-					fi = imp.getOriginalFileInfo();
-					if (!showDialog(imp, list)) {
-						return;
-					}
-					break;
-				}
-			}
+            for (String aList1 : list) {
+                IJ.redirectErrorMessages();
+                ImagePlus imp = (new Opener()).openImage(directory, aList1);
+                if (imp != null) {
+                    width = imp.getWidth();
+                    height = imp.getHeight();
+                    bitDepth = imp.getBitDepth();
+                    fi = imp.getOriginalFileInfo();
+                    if (!showDialog(imp, list)) {
+                        return;
+                    }
+                    break;
+                }
+            }
 			if (width == 0) {
 				//EU_HOU Bundle
 				IJ.error("Import Sequence", "This folder does not appear to contain any TIFF,\n"
@@ -98,13 +99,13 @@ public class FolderOpener implements PlugIn {
 				return;
 			}
 
-			if (filter != null && (filter.equals("") || filter.equals("*"))) {
+			if (filter != null && ("".equals(filter) || "*".equals(filter))) {
 				filter = null;
 			}
 			if (filter != null) {
 			int filteredImages = 0;
 				for (int i = 0; i < list.length; i++) {
-					if (list[i].indexOf(filter) >= 0) {
+					if (list[i].contains(filter)) {
 						filteredImages++;
 					} else {
 						list[i] = null;
@@ -117,11 +118,11 @@ public class FolderOpener implements PlugIn {
 				}
 			String[] list2 = new String[filteredImages];
 			int j = 0;
-				for (int i = 0; i < list.length; i++) {
-					if (list[i] != null) {
-						list2[j++] = list[i];
-					}
-				}
+                for (String aList : list) {
+                    if (aList != null) {
+                        list2[j++] = aList;
+                    }
+                }
 				list = list2;
 			}
 			if (sortFileNames) {
@@ -348,7 +349,7 @@ public class FolderOpener implements PlugIn {
 	int count = 0;
 		for (int i = 0; i < rawlist.length; i++) {
 		String name = rawlist[i];
-			if (name.startsWith(".") || name.equals("Thumbs.db") || name.endsWith(".txt") || name.endsWith(".lut") || name.endsWith(".roi") || name.endsWith(".pty")) {
+			if (name.startsWith(".") || "Thumbs.db".equals(name) || name.endsWith(".txt") || name.endsWith(".lut") || name.endsWith(".roi") || name.endsWith(".pty")) {
 				rawlist[i] = null;
 			} else {
 				count++;
@@ -361,11 +362,11 @@ public class FolderOpener implements PlugIn {
 		if (count < rawlist.length) {
 			list = new String[count];
 		int index = 0;
-			for (int i = 0; i < rawlist.length; i++) {
-				if (rawlist[i] != null) {
-					list[index++] = rawlist[i];
-				}
-			}
+            for (String aRawlist : rawlist) {
+                if (aRawlist != null) {
+                    list[index++] = aRawlist;
+                }
+            }
 		}
 		return list;
 	}
@@ -381,12 +382,12 @@ public class FolderOpener implements PlugIn {
 	int listLength = list.length;
 	boolean allSameLength = true;
 	int len0 = list[0].length();
-		for (int i = 0; i < listLength; i++) {
-			if (list[i].length() != len0) {
-				allSameLength = false;
-				break;
-			}
-		}
+        for (String aList : list) {
+            if (aList.length() != len0) {
+                allSameLength = false;
+                break;
+            }
+        }
 		if (allSameLength) {
 			ij.util.StringSorter.sort(list);
 			return list;
@@ -460,7 +461,8 @@ class FolderOpenerDialog extends GenericDialog {
 	/**
 	 *  Description of the Method
 	 */
-	protected void setup() {
+	@Override
+    protected void setup() {
 		eightBits = ((Checkbox) checkbox.elementAt(0)).getState();
 		rgb = ((Checkbox) checkbox.elementAt(1)).getState();
 		setStackInfo();
@@ -472,7 +474,8 @@ class FolderOpenerDialog extends GenericDialog {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void itemStateChanged(ItemEvent e) {
+	@Override
+    public void itemStateChanged(ItemEvent e) {
 	Checkbox item = (Checkbox) e.getSource();
 	Checkbox grayscaleCB = (Checkbox) checkbox.elementAt(0);
 	Checkbox rgbCB = (Checkbox) checkbox.elementAt(1);
@@ -499,7 +502,8 @@ class FolderOpenerDialog extends GenericDialog {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void textValueChanged(TextEvent e) {
+	@Override
+    public void textValueChanged(TextEvent e) {
 		setStackInfo();
 	}
 
@@ -537,13 +541,13 @@ class FolderOpenerDialog extends GenericDialog {
 		}
 	TextField tf = (TextField) stringField.elementAt(0);
 	String filter = tf.getText();
-		if (!filter.equals("") && !filter.equals("*")) {
+		if (!"".equals(filter) && !"*".equals(filter)) {
 		int n2 = 0;
-			for (int i = 0; i < list.length; i++) {
-				if (list[i].indexOf(filter) >= 0) {
-					n2++;
-				}
-			}
+            for (String aList : list) {
+                if (aList.contains(filter)) {
+                    n2++;
+                }
+            }
 			if (n2 < n) {
 				n = n2;
 			}

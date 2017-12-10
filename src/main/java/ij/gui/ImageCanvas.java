@@ -2,10 +2,8 @@
 package ij.gui;
 
 import java.awt.*;
-import java.util.Properties;
 import java.awt.image.*;
-import ij.process.ImageProcessor;
-import ij.measure.*;
+
 import ij.plugin.frame.Recorder;
 import ij.plugin.frame.RoiManager;
 import ij.macro.*;
@@ -149,7 +147,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		imageWidth = width;
 		imageHeight = height;
 		srcRect = new Rectangle(0, 0, imageWidth, imageHeight);
-		setDrawingSize(imageWidth, (int) (imageHeight));
+		setDrawingSize(imageWidth, imageHeight);
 		magnification = 1.0;
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -188,7 +186,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		imageWidth = width;
 		imageHeight = height;
 		srcRect = new Rectangle(0, 0, imageWidth, imageHeight);
-		setDrawingSize(imageWidth, (int) imageHeight);
+		setDrawingSize(imageWidth, imageHeight);
 		magnification = 1.0;
 	}
 
@@ -262,7 +260,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		if ((cxloc != -1) && (cyloc != -1)) {
 			imp.killRoi();
 			imp.setRoi(r);
-			g.setColor(imp.getRoi().getColor());
+			g.setColor(Roi.getColor());
 			g.drawOval(screenX(cxloc) - rad, screenY(cyloc) - rad, dia, dia);
 		}
 	}
@@ -293,7 +291,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void update(Graphics g) {
+	@Override
+    public void update(Graphics g) {
 		paint(g);
 	}
 
@@ -303,7 +302,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void paint(Graphics g) {
+	@Override
+    public void paint(Graphics g) {
 		Roi roi = imp.getRoi();
 
 		if (roi != null) {
@@ -345,7 +345,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 			    EU_HOU CHANGES petite bille
 			  */
 			if ((cxloc != -1) && (cyloc != -1)) {
-				g.setColor(roi.getColor());
+				g.setColor(Roi.getColor());
 				g.drawOval(screenX(cxloc) - rad, screenY(cyloc) - rad, dia, dia);
 			}
 			/*
@@ -483,16 +483,16 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		if (roi.getType() == Roi.COMPOSITE) {
 			roi.setImage(imp);
 
-			Color c = roi.getColor();
+			Color c = Roi.getColor();
 
 			if (index == -1 && listColor != null) {
-				roi.setColor(listColor);
+				Roi.setColor(listColor);
 			}
 			else {
-				roi.setColor(showAllColor);
+				Roi.setColor(showAllColor);
 			}
 			roi.draw(g);
-			roi.setColor(c);
+			Roi.setColor(c);
 			if (index >= 0) {
 				drawRoiLabel(g, index, roi.getBounds());
 			}
@@ -703,7 +703,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@return    The preferredSize value
 	 */
-	public Dimension getPreferredSize() {
+	@Override
+    public Dimension getPreferredSize() {
 		return new Dimension(dstWidth, dstHeight);
 	}
 
@@ -780,10 +781,10 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 									setCursor(crosshairCursor);
 								}
 							}
-							else if (roi != null && roi.getState() != roi.CONSTRUCTING && roi.isHandle(sx, sy) >= 0) {
+							else if (roi != null && roi.getState() != Roi.CONSTRUCTING && roi.isHandle(sx, sy) >= 0) {
 								setCursor(handCursor);
 							}
-							else if (Prefs.usePointerCursor || (roi != null && roi.getState() != roi.CONSTRUCTING && roi.contains(ox, oy))) {
+							else if (Prefs.usePointerCursor || (roi != null && roi.getState() != Roi.CONSTRUCTING && roi.contains(ox, oy))) {
 								setCursor(defaultCursor);
 							}
 							else {
@@ -1032,14 +1033,13 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	public static double getLowerZoomLevel(double currentMag) {
 		double newMag = zoomLevels[0];
 
-		for (int i = 0; i < zoomLevels.length; i++) {
-			if (zoomLevels[i] < currentMag) {
-				newMag = zoomLevels[i];
-			}
-			else {
-				break;
-			}
-		}
+        for (double zoomLevel : zoomLevels) {
+            if (zoomLevel < currentMag) {
+                newMag = zoomLevel;
+            } else {
+                break;
+            }
+        }
 		return newMag;
 	}
 
@@ -1462,7 +1462,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mousePressed(MouseEvent e) {
+	@Override
+    public void mousePressed(MouseEvent e) {
 		if (ij == null) {
 			return;
 		}
@@ -1638,7 +1639,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		//if (roi != null && (roi.getType() == Roi.POLYGON || roi.getType() == Roi.POLYLINE)
 		//		 && roi.getState() == roi.CONSTRUCTING) {
 		if (roi != null && (roi.getType() == Roi.POLYGON || roi.getType() == Roi.POLYLINE || roi.getType() == Roi.ANGLE)
-				 && roi.getState() == roi.CONSTRUCTING) {
+				 && roi.getState() == Roi.CONSTRUCTING) {
 
 			roi.handleMouseUp(x, y);// simulate double-click to finalize
 			roi.handleMouseUp(x, y);// polygon or polyline selection
@@ -1661,7 +1662,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseExited(MouseEvent e) {
+	@Override
+    public void mouseExited(MouseEvent e) {
 		//autoScroll(e);
 		ImageWindow win = imp.getWindow();
 
@@ -1702,7 +1704,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseDragged(MouseEvent e) {
+	@Override
+    public void mouseDragged(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
 
@@ -1767,7 +1770,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 				return;
 			}
 			if ((type == Roi.POLYGON || type == Roi.POLYLINE || type == Roi.ANGLE)
-					 && roi.getState() == roi.CONSTRUCTING) {
+					 && roi.getState() == Roi.CONSTRUCTING) {
 				return;
 			}
 			int tool = Toolbar.getToolId();
@@ -1929,7 +1932,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 */
 	public void setShowCursorStatus(boolean status) {
 		showCursorStatus = status;
-		if (status == true) {
+		if (status) {
 			sx2 = sy2 = -1000;
 		}
 		else {
@@ -1944,7 +1947,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseReleased(MouseEvent e) {
+	@Override
+    public void mouseReleased(MouseEvent e) {
 		flags = e.getModifiers();
 		flags &= ~InputEvent.BUTTON1_MASK;// make sure button 1 bit is not set
 		flags &= ~InputEvent.BUTTON2_MASK;// make sure button 2 bit is not set
@@ -1959,8 +1963,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 			if ((r.width == 0 || r.height == 0)
 					 && !(type == Roi.POLYGON || type == Roi.POLYLINE || type == Roi.ANGLE || type == Roi.LINE)
 					 && !(roi instanceof TextRoi)
-					 && roi.getState() == roi.CONSTRUCTING
-					 && type != roi.POINT) {
+					 && roi.getState() == Roi.CONSTRUCTING
+					 && type != Roi.POINT) {
 
 				//if ((r.width == 0 || r.height == 0)
 				//		 && !(type == Roi.POLYGON || type == Roi.POLYLINE || type == Roi.LINE)
@@ -1979,7 +1983,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseMoved(MouseEvent e) {
+	@Override
+    public void mouseMoved(MouseEvent e) {
 		if (ij == null) {
 			return;
 		}
@@ -2007,7 +2012,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		Roi roi = imp.getRoi();
 
 		if (roi != null && (roi.getType() == Roi.POLYGON || roi.getType() == Roi.POLYLINE || roi.getType() == Roi.ANGLE)
-				 && roi.getState() == roi.CONSTRUCTING) {
+				 && roi.getState() == Roi.CONSTRUCTING) {
 
 			//if (roi != null && (roi.getType() == Roi.POLYGON || roi.getType() == Roi.POLYLINE)
 			//		 && roi.getState() == roi.CONSTRUCTING) {
@@ -2045,7 +2050,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseClicked(MouseEvent e) {
+	@Override
+    public void mouseClicked(MouseEvent e) {
 		if (ij == null) {
 			return;
 		}
@@ -2081,7 +2087,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseEntered(MouseEvent e) { }
+	@Override
+    public void mouseEntered(MouseEvent e) { }
 
 }
 

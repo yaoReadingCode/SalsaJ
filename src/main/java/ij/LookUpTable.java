@@ -10,7 +10,7 @@ import ij.process.*;
  *@author     Thomas
  *@created    19 novembre 2007
  */
-public class LookUpTable extends Object {
+public class LookUpTable {
 	private int width, height;
 	private byte[] pixels;
 	private int mapSize = 0;
@@ -29,8 +29,7 @@ public class LookUpTable extends Object {
 		try {
 			pg.grabPixels();
 			cm = pg.getColorModel();
-		} catch (InterruptedException e) {}
-		;
+		} catch (InterruptedException ignored) {}
 		getColors(cm);
 	}
 

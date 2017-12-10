@@ -3,12 +3,10 @@ package ij.gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.ImageObserver;
-import java.io.File;
+
 import ij.*;
 import ij.plugin.frame.Recorder;
 import ij.plugin.MacroInstaller;
-import ij.plugin.filter.PlugInFilter;
 import ij.process.Photometer;
 import java.util.*;
 import java.net.URL;
@@ -248,8 +246,7 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 							return;
 						default:
 							IJ.showStatus("");
-							return;
-		}
+        }
 	}
 
 
@@ -268,7 +265,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void paint(Graphics g) {
+	@Override
+    public void paint(Graphics g) {
 		drawButtons(g);
 	}
 
@@ -278,7 +276,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void update(Graphics g) {
+	@Override
+    public void update(Graphics g) {
 		for (int i = 0; i < NUM_TOOLS; i++) {
 			if (g.hitClip(i * SIZE, 0, SIZE, SIZE)) {
 				drawButton(g, i);
@@ -347,7 +346,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseReleased(MouseEvent e) {
+	@Override
+    public void mouseReleased(MouseEvent e) {
 		if (drag) {
 			return;
 		}
@@ -381,15 +381,15 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mousePressed(MouseEvent e) {
+	@Override
+    public void mousePressed(MouseEvent e) {
 		drag = false;
 
 	int x = e.getX();
 
 		x /= SIZE;
 		if (x > BRIGHTNESS_CONTRAST) {
-			return;
-		} else {
+        } else {
 			down[x] = !down[x];
 
 		Graphics g = getGraphics();
@@ -405,7 +405,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseExited(MouseEvent e) {
+	@Override
+    public void mouseExited(MouseEvent e) {
 		showMessage(NONE);
 	}
 
@@ -415,7 +416,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseClicked(MouseEvent e) { }
+	@Override
+    public void mouseClicked(MouseEvent e) { }
 
 
 	/**
@@ -423,7 +425,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseEntered(MouseEvent e) { }
+	@Override
+    public void mouseEntered(MouseEvent e) { }
 
 
 	/**
@@ -431,7 +434,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseDragged(MouseEvent e) {
+	@Override
+    public void mouseDragged(MouseEvent e) {
 		drag = true;
 
 	int x = e.getX();
@@ -454,7 +458,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseMoved(MouseEvent e) {
+	@Override
+    public void mouseMoved(MouseEvent e) {
 	int x = e.getX();
 
 		x /= SIZE;
@@ -468,7 +473,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@return    The size value
 	 */
-	public Dimension getSize() {
+	@Override
+    public Dimension getSize() {
 		return ps;
 	}
 
@@ -478,7 +484,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@return    The preferredSize value
 	 */
-	public Dimension getPreferredSize() {
+	@Override
+    public Dimension getPreferredSize() {
 		return ps;
 	}
 
@@ -488,7 +495,8 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *
 	 *@return    The minimumSize value
 	 */
-	public Dimension getMinimumSize() {
+	@Override
+    public Dimension getMinimumSize() {
 		return ps;
 	}
 
@@ -500,10 +508,11 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
             IJ.setTool(Toolbar.LINE);
             Enumeration en = WindowManager.getImageWindows().elements();
             photometer=Photometer.getInstance();
-            if(photometer==null)
-		photometer = new Photometer();
-            else
-		photometer.activate();
+            if(photometer==null) {
+                photometer = new Photometer();
+            } else {
+                photometer.activate();
+            }
 
             while (en.hasMoreElements()) {
 		ImageCanvas c = ((ImageWindow) en.nextElement()).getCanvas();
@@ -534,8 +543,9 @@ public class EuHouToolbar extends Canvas implements MouseListener, MouseMotionLi
 	 *  Description of the Method
 	 */
 	public static void clearPhotometer() {
-        if (Photometer.getInstance()!=null)
-		Photometer.clear();
+        if (Photometer.getInstance()!=null) {
+            Photometer.clear();
+        }
 	}
 
 }

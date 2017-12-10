@@ -7,7 +7,6 @@ package ij.plugin.filter;
 import ij.*;
 import ij.gui.*;
 import ij.process.*;
-import java.awt.*;
 
 /**
  *  This plugin implements the Image/Rotate command.
@@ -31,7 +30,8 @@ public class Translator implements PlugInFilter {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		IJ.register(Translator.class);
 		firstTime = true;
@@ -45,7 +45,8 @@ public class Translator implements PlugInFilter {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		if (canceled) {
 			return;
 		}

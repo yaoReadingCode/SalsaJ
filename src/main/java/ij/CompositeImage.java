@@ -1,9 +1,9 @@
 package ij;
 import ij.process.*;
-import ij.gui.*;
+
 import java.awt.*;
 import java.awt.image.*;
-import ij.plugin.*;
+
 import ij.plugin.frame.ContrastAdjuster;
 
 public class CompositeImage extends ImagePlus {
@@ -24,34 +24,41 @@ public class CompositeImage extends ImagePlus {
 		//count++; if (count==1) throw new IllegalArgumentException("");
 		ImageStack stack2;
 		boolean isRGB = imp.getBitDepth()==24;
-		if (isRGB)
-			stack2 = getRGBStack(imp);
-		else
-			stack2 = imp.getStack();
+		if (isRGB) {
+            stack2 = getRGBStack(imp);
+        } else {
+            stack2 = imp.getStack();
+        }
 		int stackSize = stack2.getSize();
-		if (channels<2 || (stackSize%channels)!=0)
-			throw new IllegalArgumentException("channels<2 or stacksize not multiple of channels");
+		if (channels<2 || (stackSize%channels)!=0) {
+            throw new IllegalArgumentException("channels<2 or stacksize not multiple of channels");
+        }
 		compositeImage = true;
 		setDimensions(channels, stackSize/channels, 1);
 		setup(channels, stack2);
 		setStack(imp.getTitle(), stack2);
 		setCalibration(imp.getCalibration());
 		Object info = imp.getProperty("Info");
-		if (info!=null)
-			setProperty("Info", imp.getProperty("Info"));
+		if (info!=null) {
+            setProperty("Info", imp.getProperty("Info"));
+        }
 	}
 
+	@Override
 	public Image getImage() {
-		if (img==null)
-			updateImage();
+		if (img==null) {
+            updateImage();
+        }
 		return img;
 	}
 	
+	@Override
 	public void updateChannelAndDraw() {
 		singleChannel = true;
 		updateAndDraw();
 	}
 	
+	@Override
 	public ImageProcessor getChannelProcessor() {
 		return cip[currentChannel];
 	}
@@ -65,6 +72,7 @@ public class CompositeImage extends ImagePlus {
 		}
 	}
 
+	@Override
 	public void updateImage() {
 		int imageSize = width*height;
 		int nChannels = getNChannels();
@@ -74,8 +82,9 @@ public class CompositeImage extends ImagePlus {
 		if (nChannels==1) {
 			pixels = null;
 			awtImagePixels = null;
-			if (ip!=null)
-				img = ip.createImage();
+			if (ip!=null) {
+                img = ip.createImage();
+            }
 			return;
 
 		}
@@ -89,7 +98,9 @@ public class CompositeImage extends ImagePlus {
 				slice = 1;
 			}
 		}
-		if (slice>nChannels) slice = nChannels;
+		if (slice>nChannels) {
+            slice = nChannels;
+        }
 
 		if (slice-1!=currentChannel) {
 			currentChannel = slice-1;
@@ -105,8 +116,9 @@ public class CompositeImage extends ImagePlus {
 		}
 		if (pixels==null || pixels.length!=nChannels || pixels[0].length!=imageSize) {
 			pixels = new int[nChannels][];
-			for (int i=0; i<nChannels; ++i)
-				pixels[i] = new int[imageSize];
+			for (int i=0; i<nChannels; ++i) {
+                pixels[i] = new int[imageSize];
+            }
 		}
 		
 		ImageProcessor ip = getProcessor();
@@ -114,12 +126,12 @@ public class CompositeImage extends ImagePlus {
 		if (singleChannel) {
 			PixelGrabber pg = new PixelGrabber(cip[currentChannel].createImage(), 0, 0, width, height, pixels[currentChannel], 0, width);
 			try { pg.grabPixels();}
-			catch (InterruptedException e){};
+			catch (InterruptedException ignored){}
 		} else {
 			for (int i=0; i<nChannels; ++i) {
 				PixelGrabber pg = new PixelGrabber(cip[i].createImage(), 0, 0, width, height, pixels[i], 0, width);
 				try { pg.grabPixels();}
-				catch (InterruptedException e){};
+				catch (InterruptedException ignored){}
 			}
 		}
 		if (singleChannel && nChannels<=3) {
@@ -150,9 +162,15 @@ public class CompositeImage extends ImagePlus {
 					redValue += (pixels[j][i]>>16)&0xff;
 					greenValue += (pixels[j][i]>>8)&0xff;
 					blueValue += (pixels[j][i])&0xff; 
-					if (redValue>255) redValue = 255;
-					if (greenValue>255) greenValue = 255;
-					if (blueValue>255) blueValue = 255;
+					if (redValue>255) {
+                        redValue = 255;
+                    }
+					if (greenValue>255) {
+                        greenValue = 255;
+                    }
+					if (blueValue>255) {
+                        blueValue = 255;
+                    }
 				}
 				awtImagePixels[i] = (redValue<<16) | (greenValue<<8) | (blueValue);
 			}
@@ -167,10 +185,12 @@ public class CompositeImage extends ImagePlus {
 		} else if (newPixels){
 			imageSource.newPixels(awtImagePixels, imageColorModel, 0, width);
 			newPixels = false;
-		} else
-			imageSource.newPixels();	
-		if (img == null && awtImage!=null)
-			img = awtImage;
+		} else {
+            imageSource.newPixels();
+        }
+		if (img == null && awtImage!=null) {
+            img = awtImage;
+        }
 		singleChannel = false;
 	}
 
@@ -211,31 +231,35 @@ public class CompositeImage extends ImagePlus {
 	
 	public Color getChannelColor() {
 		int index = getCurrentSlice()-1;
-		if (index<colors.length && colors[index]!=Color.white)
-			return colors[index];
-		else;
+		if (index<colors.length && colors[index]!=Color.white) {
+            return colors[index];
+        } else {
+        }
 			return Color.black;
 	}
 
 	public ImageProcessor getProcessor(int channel) {
-		if (cip==null || channel>cip.length)
-			return null;
-		else
-			return cip[channel-1];
+		if (cip==null || channel>cip.length) {
+            return null;
+        } else {
+            return cip[channel-1];
+        }
 	}
 
 	public double getMin(int channel) {
-		if (cip==null || channel>cip.length)
-			return 0.0;
-		else
-			return cip[channel-1].getMin();
+		if (cip==null || channel>cip.length) {
+            return 0.0;
+        } else {
+            return cip[channel-1].getMin();
+        }
 	}
 
 	public double getMax(int channel) {
-		if (cip==null || channel>cip.length)
-			return 0.0;
-		else
-			return cip[channel-1].getMax();
+		if (cip==null || channel>cip.length) {
+            return 0.0;
+        } else {
+            return cip[channel-1].getMax();
+        }
 	}
 
 }

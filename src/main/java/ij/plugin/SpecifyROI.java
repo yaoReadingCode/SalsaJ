@@ -1,11 +1,8 @@
 package ij.plugin;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.util.Tools;
 
 /**
  *      This plugin implements the Edit/Selection/Specify command.<p>
@@ -36,6 +33,7 @@ public class SpecifyROI implements PlugIn, DialogListener {
     Vector fields, checkboxes;
     int stackSize;
 
+    @Override
     public void run(String arg) {
         imp = IJ.getImage();
         stackSize = imp!=null?imp.getStackSize():0;
@@ -63,25 +61,28 @@ public class SpecifyROI implements PlugIn, DialogListener {
     void showDialog() {
     	Roi roi = imp.getRoi();
     	boolean rectOrOval = roi!=null && (roi.getType()==Roi.RECTANGLE||roi.getType()==Roi.OVAL);
-    	if (roi==null || !rectOrOval)
-    		drawRoi();
+    	if (roi==null || !rectOrOval) {
+            drawRoi();
+        }
         GenericDialog gd = new GenericDialog("Specify");
         gd.addNumericField("Width:", iWidth, 0);
         gd.addNumericField("Height:", iHeight, 0);
         gd.addNumericField("X Coordinate:", iXROI, 0);
         gd.addNumericField("Y Coordinate:", iYROI, 0);
-        if (stackSize>1)
-        	gd.addNumericField("Slice:", iSlice, 0);
+        if (stackSize>1) {
+            gd.addNumericField("Slice:", iSlice, 0);
+        }
         gd.addCheckbox("Oval", oval);
         gd.addCheckbox("Centered",centered);
         fields = gd.getNumericFields();
         gd.addDialogListener(this);
         gd.showDialog();
         if (gd.wasCanceled()) {
-        	 if (roi==null)
-        		imp.killRoi();
-        	 else if (!rectOrOval)
-        		imp.setRoi(roi);
+        	 if (roi==null) {
+                 imp.killRoi();
+             } else if (!rectOrOval) {
+                 imp.setRoi(roi);
+             }
         }
     }
     
@@ -93,26 +94,30 @@ public class SpecifyROI implements PlugIn, DialogListener {
             iX = iXROI;
             iY = iYROI;
         }
-        if (oval)
+        if (oval) {
             imp.setRoi(new OvalRoi(iX, iY, iWidth, iHeight,imp));
-        else
+        } else {
             imp.setRoi(iX, iY, iWidth, iHeight);
+        }
     }
     	
-	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
+	@Override
+    public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
 		iWidth = (int) gd.getNextNumber();
 		iHeight = (int) gd.getNextNumber();
 		iXROI = (int) gd.getNextNumber();	
 		iYROI = (int) gd.getNextNumber();
-		if (stackSize>1)	
-			iSlice = (int) gd.getNextNumber();  
+		if (stackSize>1) {
+            iSlice = (int) gd.getNextNumber();
+        }
 		oval = gd.getNextBoolean();
 		centered = gd.getNextBoolean();
-		if (gd.invalidNumber())
-			return false;
-		else {
-			if (stackSize>1 && iSlice>0 && iSlice<=stackSize)
-			    imp.setSlice(iSlice);
+		if (gd.invalidNumber()) {
+            return false;
+        } else {
+			if (stackSize>1 && iSlice>0 && iSlice<=stackSize) {
+                imp.setSlice(iSlice);
+            }
 			drawRoi();
         		return true;
 		}

@@ -13,8 +13,9 @@ public class FloatBlitter implements Blitter {
 	
 	static {
 		divideByZeroValue = (float)Prefs.getDouble(Prefs.DIV_BY_ZERO_VALUE, Float.POSITIVE_INFINITY);
-		if (divideByZeroValue==Float.MAX_VALUE)
-			divideByZeroValue = Float.POSITIVE_INFINITY;
+		if (divideByZeroValue==Float.MAX_VALUE) {
+            divideByZeroValue = Float.POSITIVE_INFINITY;
+        }
 	}
 	
 	/** Constructs a FloatBlitter from a FloatProcessor. */
@@ -25,25 +26,29 @@ public class FloatBlitter implements Blitter {
 		pixels = (float[])ip.getPixels();
 	}
 
-	public void setTransparentColor(Color c) {
+	@Override
+    public void setTransparentColor(Color c) {
 	}
 
 	/** Copies the float image in 'ip' to (x,y) using the specified mode. */
-	public void copyBits(ImageProcessor ip, int xloc, int yloc, int mode) {
+	@Override
+    public void copyBits(ImageProcessor ip, int xloc, int yloc, int mode) {
 		Rectangle r1, r2;
 		int srcIndex, dstIndex;
 		int xSrcBase, ySrcBase;
 		float[] srcPixels;
 		
-		if (!(ip instanceof FloatProcessor))
-			ip = ip.convertToFloat();
+		if (!(ip instanceof FloatProcessor)) {
+            ip = ip.convertToFloat();
+        }
 		int srcWidth = ip.getWidth();
 		int srcHeight = ip.getHeight();
 		r1 = new Rectangle(srcWidth, srcHeight);
 		r1.setLocation(xloc, yloc);
 		r2 = new Rectangle(width, height);
-		if (!r1.intersects(r2))
-			return;
+		if (!r1.intersects(r2)) {
+            return;
+        }
 		srcPixels = (float [])ip.getPixels();
 		r1 = r1.intersection(r2);
 		xSrcBase = (xloc<0)?-xloc:0;
@@ -55,12 +60,14 @@ public class FloatBlitter implements Blitter {
 			dstIndex = y * width + r1.x;
 			switch (mode) {
 				case COPY: case COPY_INVERTED:
-					for (int i=r1.width; --i>=0;)
-						pixels[dstIndex++] = srcPixels[srcIndex++];
+					for (int i=r1.width; --i>=0;) {
+                        pixels[dstIndex++] = srcPixels[srcIndex++];
+                    }
 					break;
 				case ADD:
-					for (int i=r1.width; --i>=0; srcIndex++, dstIndex++)
-						pixels[dstIndex] = srcPixels[srcIndex]+pixels[dstIndex];
+					for (int i=r1.width; --i>=0; srcIndex++, dstIndex++) {
+                        pixels[dstIndex] = srcPixels[srcIndex]+pixels[dstIndex];
+                    }
 					break;
 				case AVERAGE:
 					for (int i=r1.width; --i>=0;) {
@@ -75,20 +82,23 @@ public class FloatBlitter implements Blitter {
 					}
 					break;
 				case SUBTRACT:
-					for (int i=r1.width; --i>=0; srcIndex++, dstIndex++)
-						pixels[dstIndex] = pixels[dstIndex]-srcPixels[srcIndex];
+					for (int i=r1.width; --i>=0; srcIndex++, dstIndex++) {
+                        pixels[dstIndex] = pixels[dstIndex]-srcPixels[srcIndex];
+                    }
 					break;
 				case MULTIPLY:
-					for (int i=r1.width; --i>=0; srcIndex++, dstIndex++)
-						pixels[dstIndex] = srcPixels[srcIndex]*pixels[dstIndex];
+					for (int i=r1.width; --i>=0; srcIndex++, dstIndex++) {
+                        pixels[dstIndex] = srcPixels[srcIndex]*pixels[dstIndex];
+                    }
 					break;
 				case DIVIDE:
 					for (int i=r1.width; --i>=0; srcIndex++, dstIndex++) {
 							src = srcPixels[srcIndex];
-							if (useDBZValue && src==0.0)
-								pixels[dstIndex] = divideByZeroValue;
-							else
-								pixels[dstIndex] = pixels[dstIndex]/src;
+							if (useDBZValue && src==0.0) {
+                                pixels[dstIndex] = divideByZeroValue;
+                            } else {
+                                pixels[dstIndex] = pixels[dstIndex]/src;
+                            }
 						}
 					break;
 				case AND:
@@ -113,7 +123,9 @@ public class FloatBlitter implements Blitter {
 					for (int i=r1.width; --i>=0;) {
 						src = srcPixels[srcIndex++];
 						dst = pixels[dstIndex];
-						if (src<dst) dst = src;
+						if (src<dst) {
+                            dst = src;
+                        }
 						pixels[dstIndex++] = dst;
 					}
 					break;
@@ -121,13 +133,16 @@ public class FloatBlitter implements Blitter {
 					for (int i=r1.width; --i>=0;) {
 						src = srcPixels[srcIndex++];
 						dst = pixels[dstIndex];
-						if (src>dst) dst = src;
+						if (src>dst) {
+                            dst = src;
+                        }
 						pixels[dstIndex++] = dst;
 					}
 					break;
 			}
-			if (y%20==0)
-				ip.showProgress((double)(y-r1.y)/r1.height);
+			if (y%20==0) {
+                ip.showProgress((double)(y-r1.y)/r1.height);
+            }
 		}
 		ip.showProgress(1.0);
 	}

@@ -50,7 +50,7 @@ public class SpectrumOptical extends Spectrum {
         float tmp_freq, tmp_freq0;
         for (int i = 0; i < length; i++) {
             tmp_wave = (float) (fd.getCrval1() + fd.getCdelt1() * ((float) (i))) * 0.1f; // nanometers
-            tmp_freq = (float) ((3.0E8 / ((float) tmp_wave * 1.E-9))); // Hz
+            tmp_freq = (float) ((3.0E8 / (tmp_wave * 1.E-9))); // Hz
             //tmp_freq0 = (float) (3.e8 / 589.0e-9); // Hz; 589.6
             tmp_freq0 = (float) (3.e17 / (Wave_ref)); // Hz; 589.6
             switch (display) {
@@ -66,7 +66,7 @@ public class SpectrumOptical extends Spectrum {
                     XdataDisplay[i] = (float) ((tmp_freq) * 1e-12); // THz
                     break;
                 case Spectrum.DISPLAY_WAVELENGTH:
-                    XdataDisplay[i] = (float) (tmp_wave);
+                    XdataDisplay[i] = tmp_wave;
                     break;
                 default:
                     XdataDisplay[i] = (float) (i);

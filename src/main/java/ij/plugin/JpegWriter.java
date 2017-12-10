@@ -1,6 +1,5 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.io.FileSaver;
 import java.awt.image.*;
 import java.awt.*;
@@ -14,9 +13,12 @@ import javax.imageio.stream.*;
 public class JpegWriter implements PlugIn {
 	public static final int DEFAULT_QUALITY = 75;
 
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		ImagePlus imp = WindowManager.getCurrentImage();
-		if (imp==null) return;
+		if (imp==null) {
+            return;
+        }
 		imp.startTiming();
 		saveAsJpeg(imp,arg,FileSaver.getJpegQuality());
 		IJ.showTime(imp, imp.getStartTime(), "JpegWriter: ");
@@ -58,10 +60,11 @@ public class JpegWriter implements PlugIn {
 			ImageOutputStream ios = ImageIO.createImageOutputStream(f);
 			writer.setOutput(ios);
 			ImageWriteParam param = writer.getDefaultWriteParam();
-			param.setCompressionMode(param.MODE_EXPLICIT);
+			param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 			param.setCompressionQuality(quality/100f);
-			if (quality == 100)
-				param.setSourceSubsampling(1, 1, 0, 0);
+			if (quality == 100) {
+                param.setSourceSubsampling(1, 1, 0, 0);
+            }
 			IIOImage iioImage = new IIOImage(bi, null, null);
 			writer.write(null, iioImage, param);
 			ios.close();
@@ -69,7 +72,9 @@ public class JpegWriter implements PlugIn {
 			if (replacing) {
 				File f2 = new File(originalPath);
 				boolean ok = f2.delete();
-				if (ok) f.renameTo(f2);
+				if (ok) {
+                    f.renameTo(f2);
+                }
 			}
 		} catch (Exception e) {
 			error = ""+e;

@@ -90,8 +90,7 @@ public final class Util {
 	} else if (a > 1) { 
 	    a = 1;
 	}
-	double dist =  2*atan2(sqrt(a), sqrt(1-a));
-	return dist;
+        return 2*atan2(sqrt(a), sqrt(1-a));
     }
     
     /**

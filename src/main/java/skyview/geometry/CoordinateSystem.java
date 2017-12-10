@@ -62,7 +62,7 @@ public abstract class CoordinateSystem implements skyview.Component {
     public static CoordinateSystem factory(String name, String equinox) {
 	
 	name = name.toUpperCase();
-	if (name.equals("ICRS")) {
+	if ("ICRS".equals(name)) {
 	    return ICRS;
 	}
 	
@@ -81,7 +81,7 @@ public abstract class CoordinateSystem implements skyview.Component {
 	        if (equinox != null) {
 	            epoch = Double.parseDouble(equinox);
 		}
-	    } catch (Exception f) {}
+	    } catch (Exception ignored) {}
 	}
 	
 	switch (c) { 

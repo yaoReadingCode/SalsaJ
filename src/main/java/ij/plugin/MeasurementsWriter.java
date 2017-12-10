@@ -8,7 +8,8 @@ import java.io.*;
 /** Writes measurements to a tab-delimited text file. */
 public class MeasurementsWriter implements PlugIn {
 
-	public void run(String path) {
+	@Override
+    public void run(String path) {
 		save(path);
 	}
 	
@@ -16,17 +17,19 @@ public class MeasurementsWriter implements PlugIn {
 		if (IJ.isResultsWindow()) {
 			TextPanel tp = IJ.getTextPanel();
 			if (tp!=null) {
-				if (!tp.saveAs(path))
-					return false;
+                return tp.saveAs(path);
 			}
 		} else {
             ResultsTable rt = ResultsTable.getResultsTable();
-            if (rt==null || rt.getCounter()==0)
+            if (rt==null || rt.getCounter()==0) {
                 return false;
-            if (path.equals("")) {
+            }
+            if ("".equals(path)) {
                 SaveDialog sd = new SaveDialog("Save as Text", "Results", Prefs.get("options.ext", ".xls"));
                 String file = sd.getFileName();
-                if (file == null) return false;
+                if (file == null) {
+                    return false;
+                }
                 path = sd.getDirectory() + file;
             }
             PrintWriter pw = null;

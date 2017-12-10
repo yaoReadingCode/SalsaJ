@@ -2,14 +2,11 @@
 package ij.macro;
 import ij.*;
 import ij.process.*;
-import ij.gui.*;
-import ij.plugin.Macro_Runner;
 import ij.plugin.frame.Recorder;
 import ij.util.Tools;
-import java.awt.*;
+
 import java.util.*;
 import java.awt.event.KeyEvent;
-import java.io.PrintWriter;
 
 /**
  *  This is the recursive descent parser/interpreter for the ImageJ macro
@@ -360,7 +357,7 @@ public class Interpreter implements MacroConstants {
 							String s = getString();
 
 							inPrint = false;
-							if (s != null && !s.equals("NaN")) {
+							if (s != null && !"NaN".equals(s)) {
 								IJ.log(s);
 							}
 							return;
@@ -467,13 +464,17 @@ public class Interpreter implements MacroConstants {
 					if (v != null) {
 						int type = v.getType();
 
-						if (type == Variable.VALUE) {
-							value = v.getValue();
-						} else if (type == Variable.ARRAY) {
-							array = v.getArray();
-						} else {
-							str = v.getString();
-						}
+                        switch (type) {
+                            case Variable.VALUE:
+                                value = v.getValue();
+                                break;
+                            case Variable.ARRAY:
+                                array = v.getArray();
+                                break;
+                            default:
+                                str = v.getString();
+                                break;
+                        }
 					}
 					args[count] = new Variable(0, value, str, array);
 				} else if (next == WORD && nextPlus == '[') {
@@ -831,13 +832,18 @@ public class Interpreter implements MacroConstants {
 
 		getToken();
 		while (!finished && !done) {
-			if (token == ';') {
-				finished = true;
-			} else if (token == ELSE || token == PREDEFINED_FUNCTION) {
-				error("';' expected");
-			} else {
-				getToken();
-			}
+            switch (token) {
+                case ';':
+                    finished = true;
+                    break;
+                case ELSE:
+                case PREDEFINED_FUNCTION:
+                    error("';' expected");
+                    break;
+                default:
+                    getToken();
+                    break;
+            }
 		}
 	}
 
@@ -912,7 +918,7 @@ public class Interpreter implements MacroConstants {
 				int token2 = pgm.code[pc + 4];
 				String name = pgm.table[token2 >> TOK_SHIFT].str;
 
-				if (name.equals("getNumber") || name.equals("getCheckbox")) {
+				if ("getNumber".equals(name) || "getCheckbox".equals(name)) {
 					return STRING_FUNCTION;
 				}
 			}
@@ -1098,13 +1104,17 @@ public class Interpreter implements MacroConstants {
 			}
 			int type = v2.getType();
 
-			if (type == Variable.VALUE) {
-				v1.setValue(v2.getValue());
-			} else if (type == Variable.ARRAY) {
-				v1.setArray(v2.getArray());
-			} else {
-				v1.setString(v2.getString());
-			}
+            switch (type) {
+                case Variable.VALUE:
+                    v1.setValue(v2.getValue());
+                    break;
+                case Variable.ARRAY:
+                    v1.setArray(v2.getArray());
+                    break;
+                default:
+                    v1.setString(v2.getString());
+                    break;
+            }
 		}
 	}
 
@@ -1179,15 +1189,19 @@ public class Interpreter implements MacroConstants {
 			return;
 		}
 		getToken();
-		if (token == ARRAY_FUNCTION) {
-			v.setArray(func.getArrayFunction(pgm.table[tokenAddress].type));
-		} else if (token == WORD) {
-			Variable v2 = lookupVariable();
+        switch (token) {
+            case ARRAY_FUNCTION:
+                v.setArray(func.getArrayFunction(pgm.table[tokenAddress].type));
+                break;
+            case WORD:
+                Variable v2 = lookupVariable();
 
-			v.setArray(v2.getArray());
-		} else {
-			error("Array expected");
-		}
+                v.setArray(v2.getArray());
+                break;
+            default:
+                error("Array expected");
+                break;
+        }
 	}
 
 
@@ -1234,7 +1248,7 @@ public class Interpreter implements MacroConstants {
 
 		checkBoolean(value);
 		getRightParen();
-		return value == 0.0 ? false : true;
+		return !(value == 0.0);
 	}
 
 
@@ -1606,8 +1620,7 @@ public class Interpreter implements MacroConstants {
 				break;
 			}
 		}
-		;
-		return str;
+        return str;
 	}
 
 
@@ -1690,18 +1703,22 @@ public class Interpreter implements MacroConstants {
 		double value = getTerm();
 		int next;
 
-		while (true) {
-			next = nextNonEolToken();
-			if (next == '+') {
-				getToken();
-				value += getTerm();
-			} else if (next == '-') {
-				getToken();
-				value -= getTerm();
-			} else {
-				break;
-			}
-		}
+        label:
+        while (true) {
+            next = nextNonEolToken();
+            switch (next) {
+                case '+':
+                    getToken();
+                    value += getTerm();
+                    break;
+                case '-':
+                    getToken();
+                    value -= getTerm();
+                    break;
+                default:
+                    break label;
+            }
+        }
 		return value;
 	}
 
@@ -1815,20 +1832,24 @@ public class Interpreter implements MacroConstants {
 							}
 							int next = nextToken();
 
-							if (next == '[') {
-								v = getArrayElement(v);
-								value = v.getValue();
-								next = nextToken();
-							} else if (next == '.') {
-								value = getArrayLength(v);
-								next = nextToken();
-							} else {
-								if (prefixValue != 0 && !checkingType) {
-									v.setValue(v.getValue() + prefixValue);
-									prefixValue = 0;
-								}
-								value = v.getValue();
-							}
+                            switch (next) {
+                                case '[':
+                                    v = getArrayElement(v);
+                                    value = v.getValue();
+                                    next = nextToken();
+                                    break;
+                                case '.':
+                                    value = getArrayLength(v);
+                                    next = nextToken();
+                                    break;
+                                default:
+                                    if (prefixValue != 0 && !checkingType) {
+                                        v.setValue(v.getValue() + prefixValue);
+                                        prefixValue = 0;
+                                    }
+                                    value = v.getValue();
+                                    break;
+                            }
 							if (!(next == PLUS_PLUS || next == MINUS_MINUS)) {
 								break;
 							}
@@ -1902,7 +1923,7 @@ public class Interpreter implements MacroConstants {
 	final double getArrayLength(Variable v) {
 		getToken();// '.'
 		getToken();
-		if (!(token == WORD && tokenString.equals("length"))) {
+		if (!(token == WORD && "length".equals(tokenString))) {
 			error("'length' expected");
 		}
 		Variable[] array = v.getArray();
@@ -1922,35 +1943,38 @@ public class Interpreter implements MacroConstants {
 	final double getStringExpression() {
 		double value = getTerm();
 
-		while (true) {
-			getToken();
-			if (token == '+') {
-				getToken();
-				if (token == STRING_CONSTANT || token == STRING_FUNCTION) {
-					putTokenBack();
-					putTokenBack();
-					break;
-				}
-				if (token == WORD) {
-					Variable v = lookupVariable(tokenAddress);
+        label:
+        while (true) {
+            getToken();
+            switch (token) {
+                case '+':
+                    getToken();
+                    if (token == STRING_CONSTANT || token == STRING_FUNCTION) {
+                        putTokenBack();
+                        putTokenBack();
+                        break label;
+                    }
+                    if (token == WORD) {
+                        Variable v = lookupVariable(tokenAddress);
 
-					if (v != null && v.getString() != null) {
-						putTokenBack();
-						putTokenBack();
-						break;
-					}
-				}
-				putTokenBack();
-				value += getTerm();
-			} else if (token == '-') {
-				value -= getTerm();
-			} else {
-				putTokenBack();
-				break;
-			}
-		}
-		;
-		return value;
+                        if (v != null && v.getString() != null) {
+                            putTokenBack();
+                            putTokenBack();
+                            break label;
+                        }
+                    }
+                    putTokenBack();
+                    value += getTerm();
+                    break;
+                case '-':
+                    value -= getTerm();
+                    break;
+                default:
+                    putTokenBack();
+                    break label;
+            }
+        }
+        return value;
 	}
 
 
@@ -2134,31 +2158,35 @@ public class Interpreter implements MacroConstants {
 
 				int next = nextToken();
 
-				if (next == '[') {
-					int savePC = pc;
-					int index = getIndex();
-					Variable[] array = v.getArray();
+                switch (next) {
+                    case '[':
+                        int savePC = pc;
+                        int index = getIndex();
+                        Variable[] array = v.getArray();
 
-					if (array == null) {
-						error("Array expected");
-					}
-					if (index < 0 || index >= array.length) {
-						error("Index (" + index + ") out of 0-" + (array.length - 1) + " range");
-					}
-					str = array[index].getString();
-					if (str == null) {
-						pc = savePC - 1;
-						getToken();
-					}
-				} else if (next == '.') {
-					str = null;
-				} else {
-					if (v.getArray() != null) {
-						getToken();
-						error("'[' or '.' expected");
-					}
-					str = v.getString();
-				}
+                        if (array == null) {
+                            error("Array expected");
+                        }
+                        if (index < 0 || index >= array.length) {
+                            error("Index (" + index + ") out of 0-" + (array.length - 1) + " range");
+                        }
+                        str = array[index].getString();
+                        if (str == null) {
+                            pc = savePC - 1;
+                            getToken();
+                        }
+                        break;
+                    case '.':
+                        str = null;
+                        break;
+                    default:
+                        if (v.getArray() != null) {
+                            getToken();
+                            error("'[' or '.' expected");
+                        }
+                        str = v.getString();
+                        break;
+                }
 				break;
 			}
 		}
@@ -2316,7 +2344,7 @@ public class Interpreter implements MacroConstants {
 	 */
 	static void setBatchMode(boolean b) {
 		batchMode = b;
-		if (b == false) {
+		if (!b) {
 			imageTable = null;
 		}
 	}

@@ -13,11 +13,13 @@ import skyview.geometry.Transformer;
 public class StgProjecter extends Projecter {
     
     /** Get the name of the compontent */
-    public String getName() {
+    @Override
+	public String getName() {
 	return "StgProjecter";
     }
     /** Get a description of the component */
-    public String getDescription() {
+    @Override
+	public String getDescription() {
 	return "Project from antipodes to a tanget plane touching the sphere";
     }
 	       
@@ -25,7 +27,8 @@ public class StgProjecter extends Projecter {
      *  @param sphere a double[3] unit vector
      *  @param plane  a double[2] preallocated vector.
      */
-    public final void transform(double[] sphere, double[] plane) {
+    @Override
+	public final void transform(double[] sphere, double[] plane) {
 	
 	if (Double.isNaN(sphere[2]) || sphere[2] < 0) {
 	    plane[0] = Double.NaN;
@@ -38,40 +41,47 @@ public class StgProjecter extends Projecter {
     }
     
     /** Get the inverse transformation */
-    public Deprojecter inverse() {
+    @Override
+	public Deprojecter inverse() {
 	return new StgProjecter.TanDeprojecter();
     }
     
     /** Is this an inverse of some other transformation? */
-    public boolean isInverse(Transformer t) {
-	return t.getName().equals("StgDeprojecter");
+    @Override
+	public boolean isInverse(Transformer t) {
+	return "StgDeprojecter".equals(t.getName());
     }
     public class TanDeprojecter extends Deprojecter {
 	
 	/** Get the name of the component */
+	@Override
 	public String getName() {
 	    return "StgDeprojecter";
 	}
 	
 	/** Get a description of the component */
+	@Override
 	public String getDescription() {
 	    return "Transform from the stereoscopic tangent plane to the sphere";
 	}
 	
 	/** Get the inverse transformation */
+	@Override
 	public Projecter inverse() {
 	    return StgProjecter.this;
 	}
         /** Is this an inverse of some other transformation? */
-        public boolean isInverse(Transformer t) {
-	    return t.getName().equals("StgProjecter");
+        @Override
+		public boolean isInverse(Transformer t) {
+	    return "StgProjecter".equals(t.getName());
         }
     
         /** Deproject a point from the plane to the sphere.
          *  @param plane a double[2] vector in the tangent plane.
          *  @param sphere a preallocated double[3] vector.
          */
-        public final void  transform(double[] plane, double[] sphere) {
+        @Override
+		public final void  transform(double[] plane, double[] sphere) {
 	
 	    if (Double.isNaN(plane[0])) {
 	        sphere[0] = Double.NaN;

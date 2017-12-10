@@ -6,7 +6,6 @@ import java.awt.event.*;
 /*
  *  EU_HOU CHANGES
  */
-import java.util.ResourceBundle;
 //just for visibility of 'getString()'
 /*
  *  EU_HOU END
@@ -86,7 +85,8 @@ public class YesNoCancelDialog extends Dialog implements ActionListener, KeyList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == cancelB) {
 			cancelPressed = true;
 		} else if (e.getSource() == yesB) {
@@ -130,20 +130,29 @@ public class YesNoCancelDialog extends Dialog implements ActionListener, KeyList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void keyPressed(KeyEvent e) {
+	@Override
+    public void keyPressed(KeyEvent e) {
 	int keyCode = e.getKeyCode();
 
 		IJ.setKeyDown(keyCode);
-		if (keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_Y || keyCode == KeyEvent.VK_S) {
-			yesPressed = true;
-			closeDialog();
-		} else if (keyCode == KeyEvent.VK_N || keyCode == KeyEvent.VK_D) {
-			closeDialog();
-		} else if (keyCode == KeyEvent.VK_ESCAPE || keyCode == KeyEvent.VK_C) {
-			cancelPressed = true;
-			closeDialog();
-			IJ.resetEscape();
-		}
+        switch (keyCode) {
+            case KeyEvent.VK_ENTER:
+            case KeyEvent.VK_Y:
+            case KeyEvent.VK_S:
+                yesPressed = true;
+                closeDialog();
+                break;
+            case KeyEvent.VK_N:
+            case KeyEvent.VK_D:
+                closeDialog();
+                break;
+            case KeyEvent.VK_ESCAPE:
+            case KeyEvent.VK_C:
+                cancelPressed = true;
+                closeDialog();
+                IJ.resetEscape();
+                break;
+        }
 	}
 
 
@@ -152,7 +161,8 @@ public class YesNoCancelDialog extends Dialog implements ActionListener, KeyList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void keyReleased(KeyEvent e) {
+	@Override
+    public void keyReleased(KeyEvent e) {
 	int keyCode = e.getKeyCode();
 
 		IJ.setKeyUp(keyCode);
@@ -164,7 +174,8 @@ public class YesNoCancelDialog extends Dialog implements ActionListener, KeyList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void keyTyped(KeyEvent e) { }
+	@Override
+    public void keyTyped(KeyEvent e) { }
 
 
 	/**
@@ -172,7 +183,8 @@ public class YesNoCancelDialog extends Dialog implements ActionListener, KeyList
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void paint(Graphics g) {
+	@Override
+    public void paint(Graphics g) {
 		super.paint(g);
 		if (firstPaint) {
 			yesB.requestFocus();

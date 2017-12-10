@@ -39,20 +39,24 @@ public class Scaler extends Transformer implements skyview.Component {
     }
     
     /** What is the dimensionality of the output of a Scaler */
+    @Override
     protected int getOutputDimension() {
 	return 2;
     }
     /** What is the dimensionality of the input to a Scaler */
+    @Override
     protected int getInputDimension() {
 	return 2;
     }
     
     /** What is a name for this component? */
+    @Override
     public String getName() {
 	return "Scaler";
     }
     
     /** What is a descrition for this component? */
+    @Override
     public String getDescription() {
 	return "General Affine Transformation for 2-d points";
     }
@@ -61,6 +65,7 @@ public class Scaler extends Transformer implements skyview.Component {
      * @param x The input point (should be double[2])
      * @param y The output point (should be double[2])
      */
+    @Override
     public void transform (double[] x, double[] y) {
 	
 	// Use temporary to allow x and y to be the same.
@@ -76,6 +81,7 @@ public class Scaler extends Transformer implements skyview.Component {
      * @throws TransformationException if the forward transformation matrix is singular.
      */
     
+    @Override
     public Scaler inverse() throws TransformationException {
 	
 	// f(X) = X0 + M X
@@ -129,6 +135,7 @@ public class Scaler extends Transformer implements skyview.Component {
     }
     
     /** Is this an inverse of the current scaler? */
+    @Override
     public boolean isInverse(Transformer trans) {
 	if (! (trans instanceof Scaler) ) {
 	    return false;

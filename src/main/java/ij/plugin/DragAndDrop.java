@@ -5,6 +5,7 @@ import ij.io.*;
 import java.io.*;
 import java.awt.datatransfer.*;
 import java.awt.dnd.*;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -19,13 +20,15 @@ import java.util.ArrayList;
 public class DragAndDrop implements PlugIn, DropTargetListener, Runnable {
 	private Iterator iterator;
 	
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		ImageJ ij = IJ.getInstance();
 		ij.setDropTarget(null);
 		DropTarget dropTarget = new DropTarget(ij, this);
 	}  
 	    
-	public void drop(DropTargetDropEvent dtde)  {
+	@Override
+    public void drop(DropTargetDropEvent dtde)  {
 		dtde.acceptDrop(DnDConstants.ACTION_COPY);
 		try  {
 			Transferable t = dtde.getTransferable();
@@ -36,24 +39,28 @@ public class DragAndDrop implements PlugIn, DropTargetListener, Runnable {
 			} else {
 				// find a String path
 				DataFlavor[] flavors = t.getTransferDataFlavors();
-				for (int i=0; i<flavors.length; i++) {
-					if (!flavors[i].getRepresentationClass().equals(String.class)) continue;
-					Object ob = t.getTransferData(flavors[i]);
-					if (!(ob instanceof String)) continue;
-					String s = ob.toString().trim();
-					BufferedReader br = new BufferedReader(new StringReader(s));
-					String tmp;
-					ArrayList list = new ArrayList();
-					while (null != (tmp = br.readLine())) {
-						tmp = java.net.URLDecoder.decode(tmp, "UTF-8");
-						if (tmp.startsWith("file://")) {
-							tmp = tmp.substring(7);
-						}
-						list.add(new File(tmp));
-					}
-					this.iterator = list.iterator();
-					break;
-				}
+                for (DataFlavor flavor : flavors) {
+                    if (!flavor.getRepresentationClass().equals(String.class)) {
+                        continue;
+                    }
+                    Object ob = t.getTransferData(flavor);
+                    if (!(ob instanceof String)) {
+                        continue;
+                    }
+                    String s = ob.toString().trim();
+                    BufferedReader br = new BufferedReader(new StringReader(s));
+                    String tmp;
+                    ArrayList list = new ArrayList();
+                    while (null != (tmp = br.readLine())) {
+                        tmp = URLDecoder.decode(tmp, "UTF-8");
+                        if (tmp.startsWith("file://")) {
+                            tmp = tmp.substring(7);
+                        }
+                        list.add(new File(tmp));
+                    }
+                    this.iterator = list.iterator();
+                    break;
+                }
 			}
 			if (null != iterator) {
 				Thread thread = new Thread(this, "DrawAndDrop");
@@ -68,15 +75,20 @@ public class DragAndDrop implements PlugIn, DropTargetListener, Runnable {
 		dtde.dropComplete(true);
 	    } 
 
-	    public void dragEnter(DropTargetDragEvent dtde)  {
+	    @Override
+        public void dragEnter(DropTargetDragEvent dtde)  {
 			dtde.acceptDrag(DnDConstants.ACTION_COPY);
 	    }
 
-	    public void dragOver(DropTargetDragEvent e) {}
-	    public void dragExit(DropTargetEvent e) {}
-	    public void dropActionChanged(DropTargetDragEvent e) {}
+	    @Override
+        public void dragOver(DropTargetDragEvent e) {}
+	    @Override
+        public void dragExit(DropTargetEvent e) {}
+	    @Override
+        public void dropActionChanged(DropTargetDragEvent e) {}
 	    
-		public void run() {
+		@Override
+        public void run() {
 			Iterator iterator = this.iterator;
 			while(iterator.hasNext()) {
 				File file = (File)iterator.next();
@@ -87,7 +99,9 @@ public class DragAndDrop implements PlugIn, DropTargetListener, Runnable {
 		/** Open a file. If it's a directory, ask to open all images as a sequence in a stack or individually. */
 		private void openFile(File f) {
 			try {
-				if (null == f) return;
+				if (null == f) {
+                    return;
+                }
 				String tmp = f.getCanonicalPath();
 				if (f.exists()) {
 					if (f.isDirectory()) {
@@ -96,11 +110,12 @@ public class DragAndDrop implements PlugIn, DropTargetListener, Runnable {
 						if (yn.yesPressed()) {
 							IJ.run("Image Sequence...", "open=[" + tmp + "/]");
 						} else if (!yn.cancelPressed()) {
-							for (int k=0; k<names.length; k++) {
-								IJ.redirectErrorMessages();
-								if (!names[k].startsWith("."))
-									(new Opener()).open(tmp + "/" + names[k]);
-							}
+                            for (String name : names) {
+                                IJ.redirectErrorMessages();
+                                if (!name.startsWith(".")) {
+                                    (new Opener()).open(tmp + "/" + name);
+                                }
+                            }
 						}
 					} else {
 						(new Opener()).openAndAddToRecent(tmp);

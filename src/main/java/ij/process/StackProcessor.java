@@ -1,5 +1,4 @@
 package ij.process;
-import java.awt.*;
 import ij.*;
 import ij.process.*;
 import ij.macro.Interpreter;
@@ -25,8 +24,9 @@ public class StackProcessor {
     	this.stack = stack;
     	this.ip = ip;
     	nSlices = stack.getSize();
- 	    if (nSlices>1 && ip!=null)
- 	    	ip.setProgressBar(null);
+ 	    if (nSlices>1 && ip!=null) {
+            ip.setProgressBar(null);
+        }
    }
 	
 	static final int FLIPH=0, FLIPV=1, SCALE=2, INVERT=3, APPLY_TABLE=4, SCALE_WITH_FILL=5;
@@ -46,8 +46,9 @@ public class StackProcessor {
 	    for (int i=1; i<=nSlices; i++) {
     		showStatus(s,i,nSlices);
 	    	ip2.setPixels(stack.getPixels(i));
-	    	if (nSlices==1 && i==1 && command==SCALE)
-	    		ip2.snapshot();
+	    	if (nSlices==1 && i==1 && command==SCALE) {
+                ip2.snapshot();
+            }
 	    	switch (command) {
 	    		case FLIPH: ip2.flipHorizontal(); break;
 	    		case FLIPV: ip2.flipVertical(); break;
@@ -104,14 +105,16 @@ public class StackProcessor {
 	    		stack.deleteSlice(1);
 				//System.gc();
 				ip2 = ip.resize(newWidth, newHeight);
-				if (ip2!=null)
-					stack2.addSlice(label, ip2);
+				if (ip2!=null) {
+                    stack2.addSlice(label, ip2);
+                }
 				IJ.showProgress((double)i/nSlices);
 	    	}
 			IJ.showProgress(1.0);
 		} catch(OutOfMemoryError o) {
-			while(stack.getSize()>1)
-				stack.deleteLastSlice();
+			while(stack.getSize()>1) {
+                stack.deleteLastSlice();
+            }
 			IJ.outOfMemory("StackProcessor.resize");
 			IJ.showProgress(1.0);
 		}
@@ -144,17 +147,21 @@ public class StackProcessor {
     		String label = stack.getSliceLabel(1);
     		stack.deleteSlice(1);
 			//System.gc();
-			if (clockwise)
-				ip2 = ip.rotateRight();
-			else
-				ip2 = ip.rotateLeft();
-			if (ip2!=null)
-				stack2.addSlice(label, ip2);
-			if (!Interpreter.isBatchMode())
-				IJ.showProgress((double)i/nSlices);
+			if (clockwise) {
+                ip2 = ip.rotateRight();
+            } else {
+                ip2 = ip.rotateLeft();
+            }
+			if (ip2!=null) {
+                stack2.addSlice(label, ip2);
+            }
+			if (!Interpreter.isBatchMode()) {
+                IJ.showProgress((double)i/nSlices);
+            }
     	}
-		if (!Interpreter.isBatchMode())
-			IJ.showProgress(1.0);
+		if (!Interpreter.isBatchMode()) {
+            IJ.showProgress(1.0);
+        }
 		return stack2;
 	}
 	
@@ -176,14 +183,19 @@ public class StackProcessor {
 
  	private void copyBits(ImageProcessor srcIp, ImageStack srcStack, int xloc, int yloc, int mode) {
 	    int inc = nSlices/20;
-	    if (inc<1) inc = 1;
+	    if (inc<1) {
+            inc = 1;
+        }
 	    boolean stackSource = srcIp==null;
 	    for (int i=1; i<=nSlices; i++) {
-	    	if (stackSource)
-	    		srcIp = srcStack.getProcessor(i);
+	    	if (stackSource) {
+                srcIp = srcStack.getProcessor(i);
+            }
  	    	ImageProcessor dstIp = stack.getProcessor(i);
 	    	dstIp.copyBits(srcIp, xloc, yloc, mode);
-			if ((i%inc) == 0) IJ.showProgress((double)i/nSlices);
+			if ((i%inc) == 0) {
+                IJ.showProgress((double)i/nSlices);
+            }
 	    }
 		IJ.showProgress(1.0);
  	}

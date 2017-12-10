@@ -32,31 +32,39 @@ public class ShortStatistics extends ImageStatistics {
 		histMin = min;
 		histMax = max;
 		getStatistics(ip, hist, (int)min, (int)max, cTable);
-		if ((mOptions&MODE)!=0)
-			getMode();
-		if ((mOptions&ELLIPSE)!=0)
-			fitEllipse(ip);
-		else if ((mOptions&CENTROID)!=0)
-			getCentroid(ip, minThreshold, maxThreshold);
-		if ((mOptions&(CENTER_OF_MASS|SKEWNESS|KURTOSIS))!=0)
-			calculateMoments(ip, minThreshold, maxThreshold, cTable);
-		if ((mOptions&MIN_MAX)!=0 && cTable!=null)
-			getCalibratedMinAndMax(hist, (int)min, (int)max, cTable);
-		if ((mOptions&MEDIAN)!=0)
-			calculateMedian(hist, (int)histMin, cal);
-		if ((mOptions&AREA_FRACTION)!=0)
-			calculateAreaFraction(ip, hist);
+		if ((mOptions&MODE)!=0) {
+            getMode();
+        }
+		if ((mOptions&ELLIPSE)!=0) {
+            fitEllipse(ip);
+        } else if ((mOptions&CENTROID)!=0) {
+            getCentroid(ip, minThreshold, maxThreshold);
+        }
+		if ((mOptions&(CENTER_OF_MASS|SKEWNESS|KURTOSIS))!=0) {
+            calculateMoments(ip, minThreshold, maxThreshold, cTable);
+        }
+		if ((mOptions&MIN_MAX)!=0 && cTable!=null) {
+            getCalibratedMinAndMax(hist, (int)min, (int)max, cTable);
+        }
+		if ((mOptions&MEDIAN)!=0) {
+            calculateMedian(hist, (int)histMin, cal);
+        }
+		if ((mOptions&AREA_FRACTION)!=0) {
+            calculateAreaFraction(ip, hist);
+        }
 	}
 
 	void getRawMinAndMax(int[] hist, int minThreshold, int maxThreshold) {
 		int min = minThreshold;
-		while ((hist[min]==0) && (min<65535))
-			min++;
+		while ((hist[min]==0) && (min<65535)) {
+            min++;
+        }
 		this.min = min;
 			
 		int max = maxThreshold;
-		while ((hist[max]==0) && (max>0))
-			max--;
+		while ((hist[max]==0) && (max>0)) {
+            max--;
+        }
 		this.max = max;
 	}
 
@@ -72,8 +80,12 @@ public class ShortStatistics extends ImageStatistics {
 			histMin = min; 
 			histMax = max;
 		} else {
-			if (min<histMin) min = (int)histMin;
-			if (max>histMax) max = (int)histMax;
+			if (min<histMin) {
+                min = (int)histMin;
+            }
+			if (max>histMax) {
+                max = (int)histMax;
+            }
 		}
 		binSize = (histMax-histMin)/nBins;
 		double scale = 1.0/binSize;
@@ -93,16 +105,18 @@ public class ShortStatistics extends ImageStatistics {
 			sum += value*count;
 			sum2 += (value*value)*count;
 			index = (int)(scale*(i-hMin));
-			if (index>=nBins)
-				index = nBins-1;
+			if (index>=nBins) {
+                index = nBins-1;
+            }
 			histogram[index] += count;
 		}
 		area = pixelCount*pw*ph;
 		mean = sum/pixelCount;
 		umean = mean;
 		calculateStdDev(pixelCount, sum, sum2);
-        if (cTable!=null)
-        	dmode = cTable[(int)dmode];
+        if (cTable!=null) {
+            dmode = cTable[(int)dmode];
+        }
 	}
 	
 	void getMode() {
@@ -199,8 +213,12 @@ public class ShortStatistics extends ImageStatistics {
 		for (int i=minValue; i<=maxValue; i++) {
 			if (hist[i]>0) {
 				v = cTable[i];
-				if (v<min) min = v;
-				if (v>max) max = v;
+				if (v<min) {
+                    min = v;
+                }
+				if (v>max) {
+                    max = v;
+                }
 			}
 		}
 	}

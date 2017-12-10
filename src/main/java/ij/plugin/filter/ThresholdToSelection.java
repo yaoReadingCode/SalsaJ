@@ -11,8 +11,6 @@ import ij.gui.ShapeRoi;
 import ij.process.*;
 
 import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 
@@ -22,6 +20,7 @@ public class ThresholdToSelection implements PlugInFilter {
 	float min, max;
 	int w, h;
 
+	@Override
 	public void run(ImageProcessor ip) {
 		this.ip = ip;
 		min = (float)ip.getMinThreshold();
@@ -59,8 +58,9 @@ public class ThresholdToSelection implements PlugInFilter {
 
 		private void needs(int newCount, int offset) {
 			if (newCount > reserved || (offset > first)) {
-				if (newCount < reserved + GROW + 1)
-					newCount = reserved + GROW + 1;
+				if (newCount < reserved + GROW + 1) {
+                    newCount = reserved + GROW + 1;
+                }
 				int[] newX = new int[newCount];
 				int[] newY = new int[newCount];
 				System.arraycopy(x, 0, newX, offset, last);
@@ -127,9 +127,9 @@ public class ThresholdToSelection implements PlugInFilter {
 			int y1 = y[j] - y[j-1];
 			int x2 = x[first] - x[j];
 			int y2 = y[first] - y[j];
-			if (x1*y2==x2*y1)
-				last--;
-			else {
+			if (x1*y2==x2*y1) {
+                last--;
+            } else {
 				x[i] = x[j];
 				y[i] = y[j];
 			}
@@ -141,12 +141,16 @@ public class ThresholdToSelection implements PlugInFilter {
 			return new Polygon(xNew, yNew, count);
 		}
 
+		@Override
 		public String toString() {
 			String res = "(first:" + first + ",last:" + last +
 				",reserved:" + reserved + ":";
-			if (last > x.length) System.err.println("ERROR!");
-			for (int i = first; i < last && i < x.length; i++)
-				res += "(" + x[i] + "," + y[i] + ")";
+			if (last > x.length) {
+                System.err.println("ERROR!");
+            }
+			for (int i = first; i < last && i < x.length; i++) {
+                res += "(" + x[i] + "," + y[i] + ")";
+            }
 			return res + ")";
 		}
 	}
@@ -174,10 +178,7 @@ public class ThresholdToSelection implements PlugInFilter {
 		for (int y = 0; y <= h; y++) {
 			boolean[] b = prevRow; prevRow = thisRow; thisRow = b;
 			for (int x = 0; x <= w; x++) {
-				if (y < h && x < w)
-					thisRow[x + 1] = selected(x, y);
-				else
-					thisRow[x + 1] = false;
+				thisRow[x + 1] = y < h && x < w && selected(x, y);
 				if (thisRow[x + 1]) {
 					if (!prevRow[x + 1]) {
 						// upper edge:
@@ -207,21 +208,24 @@ public class ThresholdToSelection implements PlugInFilter {
 								outline[x] = outline[x + 1] = null;
 							} else {
 								outline[x].shift(outline[x + 1]);
-								for (int x1 = 0; x1 <= w; x1++)
+								for (int x1 = 0; x1 <= w; x1++) {
 									if (x1 != x + 1 && outline[x1] == outline[x + 1]) {
 										outline[x1] = outline[x];
 										outline[x] = outline[x + 1] = null;
 										break;
 									}
-								if (outline[x] != null)
+								}
+								if (outline[x] != null) {
 									throw new RuntimeException("assertion failed");
+								}
 							}
 						}
 					}
 					if (!thisRow[x]) {
 						// left edge
-						if (outline[x] == null)
+						if (outline[x] == null) {
 							throw new RuntimeException("assertion failed!");
+						}
 						outline[x].push(x, y + 1);
 					}
 				} else {
@@ -252,41 +256,49 @@ public class ThresholdToSelection implements PlugInFilter {
 							outline[x] = outline[x + 1] = null;
 						} else {
 							outline[x].push(outline[x + 1]);
-							for (int x1 = 0; x1 <= w; x1++)
+							for (int x1 = 0; x1 <= w; x1++) {
 								if (x1 != x + 1 && outline[x1] == outline[x + 1]) {
 									outline[x1] = outline[x];
 									outline[x] = outline[x + 1] = null;
 									break;
 								}
-							if (outline[x] != null)
+							}
+							if (outline[x] != null) {
 								throw new RuntimeException("assertion failed");
+							}
 						}
 					}
 					if (thisRow[x]) {
 						// right edge
-						if (outline[x] == null)
+						if (outline[x] == null) {
 							throw new RuntimeException("assertion failed");
+						}
 						outline[x].shift(x, y + 1);
 					}
 				}
 			}
-			if ((y&progressInc)==0) IJ.showProgress(y + 1, h + 1);
+			if ((y&progressInc)==0) {
+                IJ.showProgress(y + 1, h + 1);
+            }
 		}
 
 		//IJ.showStatus("Creating GeneralPath");
 		GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-		for (int i = 0; i < polygons.size(); i++)
-			path.append((Polygon)polygons.get(i), false);
+		for (Object polygon : polygons) {
+			path.append((Polygon) polygon, false);
+		}
 
 		ShapeRoi shape = new ShapeRoi(path);
 		Roi roi = shape!=null?shape.shapeToRoi():null; // try to convert to non-composite ROI
 		IJ.showProgress(1,1);
-		if (roi!=null)
-			return roi;
-		else
-			return shape;
+		if (roi!=null) {
+            return roi;
+        } else {
+            return shape;
+        }
 	}
 
+	@Override
 	public int setup(String arg, ImagePlus imp) {
 		image = imp;
 		return DOES_8G | DOES_16 | DOES_32 | NO_CHANGES;

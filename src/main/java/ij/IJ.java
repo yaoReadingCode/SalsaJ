@@ -16,8 +16,7 @@ import java.util.Locale;
 import java.awt.*;
 import java.applet.Applet;
 import java.io.*;
-import java.lang.reflect.*;
-/*
+        /*
  * EU_HOU CHANGES
  */
 import java.util.ResourceBundle;
@@ -114,7 +113,7 @@ public class IJ {
         isWin = osname.startsWith("Windows");
         isMac = !isWin && osname.startsWith("Mac");
         isLinux = osname.startsWith("Linux");
-        isVista = isWin && osname.indexOf("Vista") != -1;
+        isVista = isWin && osname.contains("Vista");
 
         String version = System.getProperty("java.version").substring(0, 3);
 
@@ -558,17 +557,17 @@ public class IJ {
             }
         }
 
-        if (command.equals("New...")) {
+        if ("New...".equals(command)) {
             command = "Image...";
-        } else if (command.equals("Threshold")) {
+        } else if ("Threshold".equals(command)) {
             command = "Make Binary";
-        } else if (command.equals("Display...")) {
+        } else if ("Display...".equals(command)) {
             command = "Appearance...";
-        } else if (command.equals("Start Animation")) {
+        } else if ("Start Animation".equals(command)) {
             command = "Start Animation [\\]";
-        } else if (command.equals("Convert Images to Stack")) {
+        } else if ("Convert Images to Stack".equals(command)) {
             command = "Images to Stack";
-        } else if (command.equals("Convert Stack to Images")) {
+        } else if ("Convert Stack to Images".equals(command)) {
             command = "Stack to Images";
         }
 
@@ -634,7 +633,7 @@ public class IJ {
         ImageCanvas ic = imp != null ? imp.getCanvas() : null;
 
         if (ic != null) {
-            ic.setShowCursorStatus(s.length() == 0 ? true : false);
+            ic.setShowCursorStatus(s.length() == 0);
         }
     }
 
@@ -711,7 +710,7 @@ public class IJ {
      */
     static void handleLogCommand(String s) {
         System.out.println("IJ.handleLogCommand 1, logPanel=" + logPanel);
-        if (s.equals("\\Closed")) {
+        if ("\\Closed".equals(s)) {
             System.out.println("IJ.handleLogCommand 2, logPanel=" + logPanel);
             logPanel = null;
         } else if (s.startsWith("\\Update:")) {
@@ -753,7 +752,7 @@ public class IJ {
             String s2 = s.substring(cindex + 1, s.length());
 
             logPanel.setLine(line, s2);
-        } else if (s.equals("\\Clear")) {
+        } else if ("\\Clear".equals(s)) {
             System.out.println("IJ.handleLogCommand 9, logPanel=" + logPanel);
             logPanel.clear();
         } else {
@@ -1014,7 +1013,7 @@ public class IJ {
     public static void wait(int msecs) {
         try {
             Thread.sleep(msecs);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
     }
 
@@ -1212,9 +1211,8 @@ public class IJ {
                     break;
             }
         }
-        String s = df.format(rounded);
         //if (s.length()>12) s = Float.toString((float)n); // use scientific notation
-        return s;
+        return df.format(rounded);
     }
 
     /**
@@ -1459,7 +1457,7 @@ public class IJ {
             String macroOptions = Macro.getOptions();
 
             if (macroOptions != null) {
-                if (macroOptions.indexOf("stack ") >= 0) {
+                if (macroOptions.contains("stack ")) {
                     return flags + PlugInFilter.DOES_STACKS;
                 } else {
                     return flags;
@@ -1605,11 +1603,11 @@ public class IJ {
 
         if (displayMode != null) {
             displayMode = displayMode.toLowerCase(Locale.US);
-            if (displayMode.indexOf("black") != -1) {
+            if (displayMode.contains("black")) {
                 mode = ImageProcessor.BLACK_AND_WHITE_LUT;
-            } else if (displayMode.indexOf("over") != -1) {
+            } else if (displayMode.contains("over")) {
                 mode = ImageProcessor.OVER_UNDER_LUT;
-            } else if (displayMode.indexOf("no") != -1) {
+            } else if (displayMode.contains("no")) {
                 mode = ImageProcessor.NO_LUT_UPDATE;
             }
         }
@@ -1673,7 +1671,7 @@ public class IJ {
             long start = System.currentTimeMillis();
             // timeout after 2 seconds unless current thread is event dispatch thread
             String thread = Thread.currentThread().getName();
-            int timeout = thread != null && thread.indexOf("EventQueue") != -1 ? 0 : 2000;
+            int timeout = thread != null && thread.contains("EventQueue") ? 0 : 2000;
 
             while (true) {
                 wait(10);
@@ -1948,26 +1946,26 @@ public class IJ {
      */
     public static String getDirectory(String title) {
         title = title.toLowerCase();
-        if (title.equals("plugins")) {
+        if ("plugins".equals(title)) {
             return Menus.getPlugInsPath();
-        } else if (title.equals("macros")) {
+        } else if ("macros".equals(title)) {
             return Menus.getMacrosPath();
-        } else if (title.equals("luts")) {
+        } else if ("luts".equals(title)) {
             return Prefs.getHomeDir() + File.separator + "luts" + File.separator;
-        } else if (title.equals("home")) {
+        } else if ("home".equals(title)) {
             return System.getProperty("user.home") + File.separator;
-        } else if (title.equals("startup") || title.equals("imagej")) {
+        } else if ("startup".equals(title) || "imagej".equals(title)) {
             return Prefs.getHomeDir() + File.separator;
-        } else if (title.equals("current")) {
+        } else if ("current".equals(title)) {
             return OpenDialog.getDefaultDirectory();
-        } else if (title.equals("temp")) {
+        } else if ("temp".equals(title)) {
             String dir = System.getProperty("java.io.tmpdir");
 
             if (dir != null && !dir.endsWith(File.separator)) {
                 dir += File.separator;
             }
             return dir;
-        } else if (title.equals("image")) {
+        } else if ("image".equals(title)) {
             ImagePlus imp = WindowManager.getCurrentImage();
             FileInfo fi = imp != null ? imp.getOriginalFileInfo() : null;
 
@@ -1976,7 +1974,7 @@ public class IJ {
             } else {
                 return null;
             }
-        } else if (title.equals("salsaj")) {
+        } else if ("salsaj".equals(title)) {
             return getIJDir();
         } else {
             DirectoryChooser dc = new DirectoryChooser(title);
@@ -2027,7 +2025,7 @@ public class IJ {
         Opener o = new Opener();
 
         macroRunning = true;
-        if (path == null || path.equals("")) {
+        if (path == null || "".equals(path)) {
             o.open();
         } else {
             o.open(path);
@@ -2041,7 +2039,7 @@ public class IJ {
      * there is an error, returns a message in the form "Error: message".
      */
     public static String openAsString(String path) {
-        if (path == null || path.equals("")) {
+        if (path == null || "".equals(path)) {
             OpenDialog od = new OpenDialog("Open Text File", "");
             String directory = od.getDirectory();
             String name = od.getFileName();
@@ -2063,7 +2061,7 @@ public class IJ {
                 if (s == null) {
                     break;
                 } else {
-                    sb.append(s + "\n");
+                    sb.append(s).append("\n");
                 }
             }
             r.close();
@@ -2093,7 +2091,7 @@ public class IJ {
             sb = new StringBuffer();
             String line;
             while ((line = br.readLine()) != null) {
-                sb.append(line + "\n");
+                sb.append(line).append("\n");
             }
             in.close();
         } catch (Exception e) {
@@ -2160,53 +2158,53 @@ public class IJ {
             path = null;
         }
         format = format.toLowerCase(Locale.US);
-        if (format.indexOf("tif") != -1) {
+        if (format.contains("tif")) {
             path = updateExtension(path, ".tif");
             format = "Tiff...";
-        } else if (format.indexOf("jpeg") != -1 || format.indexOf("jpg") != -1) {
+        } else if (format.contains("jpeg") || format.contains("jpg")) {
             path = updateExtension(path, ".jpg");
             format = "Jpeg...";
-        } else if (format.indexOf("gif") != -1) {
+        } else if (format.contains("gif")) {
             path = updateExtension(path, ".gif");
             format = "Gif...";
-        } else if (format.indexOf("text image") != -1) {
+        } else if (format.contains("text image")) {
             path = updateExtension(path, ".txt");
             format = "Text Image...";
-        } else if (format.indexOf("text") != -1 || format.indexOf("txt") != -1) {
+        } else if (format.contains("text") || format.contains("txt")) {
             if (path != null && !path.endsWith(".xls")) {
                 path = updateExtension(path, ".txt");
             }
             format = "Text...";
-        } else if (format.indexOf("zip") != -1) {
+        } else if (format.contains("zip")) {
             path = updateExtension(path, ".zip");
             format = "ZIP...";
-        } else if (format.indexOf("raw") != -1) {
+        } else if (format.contains("raw")) {
             path = updateExtension(path, ".raw");
             format = "Raw Data...";
-        } else if (format.indexOf("avi") != -1) {
+        } else if (format.contains("avi")) {
             path = updateExtension(path, ".avi");
             format = "AVI... ";
-        } else if (format.indexOf("bmp") != -1) {
+        } else if (format.contains("bmp")) {
             path = updateExtension(path, ".bmp");
             format = "BMP...";
-        } else if (format.indexOf("fits") != -1) {
+        } else if (format.contains("fits")) {
             path = updateExtension(path, ".fits");
             format = "FITS...";
-        } else if (format.indexOf("png") != -1) {
+        } else if (format.contains("png")) {
             path = updateExtension(path, ".png");
             format = "PNG...";
-        } else if (format.indexOf("pgm") != -1) {
+        } else if (format.contains("pgm")) {
             path = updateExtension(path, ".pgm");
             format = "PGM...";
-        } else if (format.indexOf("lut") != -1) {
+        } else if (format.contains("lut")) {
             path = updateExtension(path, ".lut");
             format = "LUT...";
-        } else if (format.indexOf("measurements") != -1) {
+        } else if (format.contains("measurements")) {
             format = "Measurements...";
-        } else if (format.indexOf("selection") != -1 || format.indexOf("roi") != -1) {
+        } else if (format.contains("selection") || format.contains("roi")) {
             path = updateExtension(path, ".roi");
             format = "Selection...";
-        } else if (format.indexOf("xy") != -1 || format.indexOf("coordinates") != -1) {
+        } else if (format.contains("xy") || format.contains("coordinates")) {
             path = updateExtension(path, ".txt");
             format = "XY Coordinates...";
         } else {
@@ -2261,13 +2259,13 @@ public class IJ {
 
         int bitDepth = 8;
 
-        if (type.indexOf("16") != -1) {
+        if (type.contains("16")) {
             bitDepth = 16;
         }
-        if (type.indexOf("24") != -1 || type.indexOf("rgb") != -1) {
+        if (type.contains("24") || type.contains("rgb")) {
             bitDepth = 24;
         }
-        if (type.indexOf("32") != -1) {
+        if (type.contains("32")) {
             bitDepth = 32;
         }
         int options = NewImage.FILL_WHITE;
@@ -2275,11 +2273,11 @@ public class IJ {
         if (bitDepth == 16 || bitDepth == 32) {
             options = NewImage.FILL_BLACK;
         }
-        if (type.indexOf("white") != -1) {
+        if (type.contains("white")) {
             options = NewImage.FILL_WHITE;
-        } else if (type.indexOf("black") != -1) {
+        } else if (type.contains("black")) {
             options = NewImage.FILL_BLACK;
-        } else if (type.indexOf("ramp") != -1) {
+        } else if (type.contains("ramp")) {
             options = NewImage.FILL_RAMP;
         }
         options += NewImage.CHECK_AVAILABLE_MEMORY;

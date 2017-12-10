@@ -20,7 +20,9 @@ public class MultiLineLabel extends Canvas {
         num_lines = t.countTokens();
         lines = new String[num_lines];
         line_widths = new int[num_lines];
-        for(int i = 0; i < num_lines; i++) lines[i] = t.nextToken();
+        for(int i = 0; i < num_lines; i++) {
+            lines[i] = t.nextToken();
+        }
     }
     
 
@@ -29,18 +31,23 @@ public class MultiLineLabel extends Canvas {
     protected void measure() {
         FontMetrics fm = this.getFontMetrics(this.getFont());
         // If we don't have font metrics yet, just return.
-        if (fm == null) return;
+        if (fm == null) {
+            return;
+        }
         
         line_height = fm.getHeight();
         line_ascent = fm.getAscent();
         max_width = 0;
         for(int i = 0; i < num_lines; i++) {
             line_widths[i] = fm.stringWidth(lines[i]);
-            if (line_widths[i] > max_width) max_width = line_widths[i];
+            if (line_widths[i] > max_width) {
+                max_width = line_widths[i];
+            }
         }
     }
     
 
+    @Override
     public void setFont(Font f) {
         super.setFont(f);
         measure();
@@ -53,7 +60,8 @@ public class MultiLineLabel extends Canvas {
 	// invoked our superclass's addNotify() method, we have font
 	// metrics and can successfully call measure() to figure out
 	// how big the label is.
-	public void addNotify() {
+	@Override
+    public void addNotify() {
 		super.addNotify();
 		measure();
 	}
@@ -61,6 +69,7 @@ public class MultiLineLabel extends Canvas {
 
     // Called by a layout manager when it wants to
     // know how big we'd like to be.  
+    @Override
     public Dimension getPreferredSize() {
         return new Dimension(max_width + 2*margin_width, 
                      num_lines * line_height + 2*margin_height);
@@ -69,15 +78,19 @@ public class MultiLineLabel extends Canvas {
 
     // Called when the layout manager wants to know
     // the bare minimum amount of space we need to get by.
+    @Override
     public Dimension getMinimumSize() {
         return new Dimension(max_width, num_lines * line_height);
     }
     
     // Draws the label
+    @Override
     public void paint(Graphics g) {
         int x, y;
         Dimension d = this.getSize();
-		if (!ij.IJ.isLinux()) setAntialiasedText(g);
+		if (!ij.IJ.isLinux()) {
+            setAntialiasedText(g);
+        }
         y = line_ascent + (d.height - num_lines * line_height)/2;
         for(int i = 0; i < num_lines; i++, y += line_height) {
             x = margin_width;

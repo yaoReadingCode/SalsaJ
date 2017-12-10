@@ -65,7 +65,7 @@ public class Photometer implements MouseListener, WindowListener {
                 for (int j = 1; j <= m; ++j) {
                     IPhot res = (IPhot) PS.results.get(String.valueOf(j));
                     if (res != null) {
-                        sb.append(j + "\t" + res.toString() + "\n");
+                        sb.append(j).append("\t").append(res.toString()).append("\n");
                     }
                 }
 
@@ -78,7 +78,7 @@ public class Photometer implements MouseListener, WindowListener {
             }
             res.append(new String(sb));
         }
-        this.activate();
+        activate();
     }
 
     /**
@@ -103,6 +103,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         if (instance != null) {
 
@@ -169,7 +170,7 @@ public class Photometer implements MouseListener, WindowListener {
                         for (int i = ii - rad; i <= ii + rad; ++i) {
                             for (int j = jj - rad; j <= jj + rad; ++j) {
                                 if (i >= 0 && i < imwidth && j >= 0 && j < imheight) {
-                                    pixL += (double) cal.getCValue(imp.getPixel(i, j)[0]);
+                                    pixL += cal.getCValue(imp.getPixel(i, j)[0]);
                                 } else {
                                     ++valnul;
                                 }
@@ -273,7 +274,7 @@ public class Photometer implements MouseListener, WindowListener {
                 for (int i = x - rad; i <= x + rad; ++i) {
                     for (int j = y - rad; j <= y + rad; ++j) {
                         if (i >= 0 && i < imwidth && j >= 0 && j < imheight) {
-                            cval += (Double) cal.getCValue(imp.getPixel(i, j)[0]);
+                            cval += cal.getCValue(imp.getPixel(i, j)[0]);
                         } else {
                             ++valnul;
                         }
@@ -482,7 +483,7 @@ public class Photometer implements MouseListener, WindowListener {
                     for (int i = ii - rad; i <= ii + rad; ++i) {
                         for (int j = jj - rad; j <= jj + rad; ++j) {
                             if (i >= 0 && i < imwidth && j >= 0 && j < imheight) {
-                                pixL += (double) cal.getCValue(imp.getPixel(i, j)[0]);
+                                pixL += cal.getCValue(imp.getPixel(i, j)[0]);
                             } else {
                                 ++valnul;
                             }
@@ -586,7 +587,7 @@ public class Photometer implements MouseListener, WindowListener {
             for (int i = x - rad; i <= x + rad; ++i) {
                 for (int j = y - rad; j <= y + rad; ++j) {
                     if (i >= 0 && i < imwidth && j >= 0 && j < imheight) {
-                        cval += (Double) cal.getCValue(imp.getPixel(i, j)[0]);
+                        cval += cal.getCValue(imp.getPixel(i, j)[0]);
                     } else {
                         ++valnul;
                     }
@@ -778,7 +779,7 @@ public class Photometer implements MouseListener, WindowListener {
 
 
             if (PS.s1.compareTo(PS.s2) != 0) {
-                res.append(new String(phindex + PS.s2));
+                res.append(phindex + PS.s2);
                 res.getTextPanel().resetSelection();
                 PS.results.put(String.valueOf(phindex), new IPhot(t, x, y, in, (int) istat.mean, (int) stat.mean, this));
                 PS.s1 = PS.s2;
@@ -786,8 +787,7 @@ public class Photometer implements MouseListener, WindowListener {
             }
 
         } catch (Exception exp) {
-            return;
-        }
+         }
     }
 
     public int[] getCoord() {
@@ -801,6 +801,7 @@ public class Photometer implements MouseListener, WindowListener {
         return this.imp;
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
 
         String t;
@@ -838,7 +839,7 @@ public class Photometer implements MouseListener, WindowListener {
 
 
             if (PS.s1.compareTo(PS.s2) != 0) {
-                res.append(new String(phindex + PS.s2));
+                res.append(phindex + PS.s2);
                 res.getTextPanel().resetSelection();
                 PS.results.put(String.valueOf(phindex), new IPhot(t, x, y, in, (int) istat.mean, (int) stat.mean, this));
                 PS.s1 = PS.s2;
@@ -846,7 +847,6 @@ public class Photometer implements MouseListener, WindowListener {
             }
 
         } catch (Exception exp) {
-            return;
         }
 
     }
@@ -873,6 +873,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
@@ -886,6 +887,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
@@ -894,6 +896,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
@@ -936,7 +939,7 @@ public class Photometer implements MouseListener, WindowListener {
                 WindowManager.activateWindow(img);
                 WindowManager.getCurrentWindow().getImagePlus().killRoi();
                 PS.results.remove(String.valueOf(index));
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }         
         }
     }
@@ -961,6 +964,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowActivated(WindowEvent e) {
     }
 
@@ -969,6 +973,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowClosing(WindowEvent e) {
     }
 
@@ -977,6 +982,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowClosed(WindowEvent e) {
     }
 
@@ -985,6 +991,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowDeactivated(WindowEvent e) {
     }
 
@@ -993,6 +1000,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowDeiconified(WindowEvent e) {
     }
 
@@ -1001,6 +1009,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowIconified(WindowEvent e) {
     }
 
@@ -1009,6 +1018,7 @@ public class Photometer implements MouseListener, WindowListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowOpened(WindowEvent e) {
     }
 

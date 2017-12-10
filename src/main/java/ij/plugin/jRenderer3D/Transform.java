@@ -7,13 +7,13 @@ class Transform {
 			
 	
 	Transform(int width, int height ) {
-		xs = (double)(width/2.  + 0.5);
-		ys = (double)(height/2. + 0.5);
+		xs = width/2.  + 0.5;
+		ys = height/2. + 0.5;
 		
 		initializeTransformation();
-	};
-	
-	protected void transform(SurfacePlotData plotItem) {
+	}
+
+    protected void transform(SurfacePlotData plotItem) {
 		y = plotItem.y;
 		x = plotItem.x;
 		z = plotItem.z;
@@ -47,10 +47,11 @@ class Transform {
 	}
 	
 	protected void setZOrientation(int zOrientation) {
-		if (zOrientation <= 0)
-			this.zOrientation = -1;
-		else
-			this.zOrientation = 1;
+		if (zOrientation <= 0) {
+            this.zOrientation = -1;
+        } else {
+            this.zOrientation = 1;
+        }
 		initializeTransformation();
 	}
 	
@@ -170,12 +171,12 @@ class Transform {
 		//System.out.println(angleX + " " + angleY + " " + angleZ);
 		
 		// calculate new cos and sins 
-		cosX = (double)Math.cos(angleX); 
-		sinX = (double)Math.sin(angleX);
-		cosY = (double)Math.cos(angleY); 
-		sinY = (double)Math.sin(angleY);
-		cosZ = (double)Math.cos(angleZ);
-		sinZ = (double)Math.sin(angleZ);
+		cosX = Math.cos(angleX);
+		sinX = Math.sin(angleX);
+		cosY = Math.cos(angleY);
+		sinY = Math.sin(angleY);
+		cosZ = Math.cos(angleZ);
+		sinZ = Math.sin(angleZ);
 		
 
 		double s = 1; //scale;
@@ -329,7 +330,7 @@ class Transform {
 //		Y = sz*Y + ys;
 //	}
 
-	private final void xyzPos() {
+	private void xyzPos() {
 		X = a00*x + a01*y + a02*z + a03;
 		Y = a10*x + a11*y + a12*z + a13;
 		Z = a20*x + a21*y + a22*z + a23;
@@ -340,14 +341,14 @@ class Transform {
 		Y = sz*Y + ys;
 	}
 	
-	private final void xyzPos_noShift() {
+	private void xyzPos_noShift() {
 		X = a00*x + a01*y + a02*z + a03;
 		Y = a10*x + a11*y + a12*z + a13;
 		Z = a20*x + a21*y + a22*z + a23;
 	}
 
 
-	private final void invxyzPos() {
+	private void invxyzPos() {
 		double sz = (maxDistance + perspective*Z)/(scale * maxDistance);
 		
 		X = (X - xs)*sz;
@@ -372,14 +373,17 @@ class Transform {
 			ii[i]=matge4(w,i);
 			matXr4(w,i,ii[i]);
 			for (j=0; j<n; j++) {
-				if (i==j) continue;
+				if (i==j) {
+                    continue;
+                }
 				f=-w[i][j]/w[i][i];
 				matAc4(w,j,j,f,i);
 				matAc4(z,j,j,f,i);
 			}
 		}
-		for (i=0; i<n; i++) 
-			matMc4(z,1.0f/w[i][i],i);
+		for (i=0; i<n; i++) {
+            matMc4(z,1.0f/w[i][i],i);
+        }
 		for (i=0; i<n; i++) {
 			j=n-i-1; 
 			matXc4(z,j,ii[j]);
@@ -396,7 +400,9 @@ class Transform {
 		for (int i=n; i<4; i++) {
 			h=p[i][n];
 			h=(h<0.0?-h:h);
-			if (h<g) continue;
+			if (h<g) {
+                continue;
+            }
 			g=h; m=i;
 		}
 		return m;
@@ -405,16 +411,19 @@ class Transform {
 	/* copy 4x4 matrix */
 	void matCopy4(double z[][], double x[][]) {
 		int i, j;
-		for (i=0; i<4; i++) 
-			for (j=0; j<4; j++) 
-				z[i][j]=x[i][j];
+		for (i=0; i<4; i++) {
+            for (j=0; j<4; j++) {
+                z[i][j] = x[i][j];
+            }
+        }
 	}
 	
 	/* 4x4 unit matrix */
 	void matUnit4(double z[][]) {
 		for (int i=0; i<4; i++) {
-			for (int j=0; j<4; j++) 
-				z[i][j]=0.0f;
+			for (int j=0; j<4; j++) {
+                z[i][j]=0.0f;
+            }
 			z[i][i]=1.0f;
 		}
 	}
@@ -422,8 +431,9 @@ class Transform {
 	/* exchange ith and jth columns of a 4x4 matrix */
 	void matXc4(double z[][], int i, int j) {
 		double t;
-		if (i==j) 
-			return;
+		if (i==j) {
+            return;
+        }
 		for (int k=0; k<4; k++) {
 			t=z[k][i]; 
 			z[k][i]=z[k][j]; 
@@ -433,8 +443,9 @@ class Transform {
 	/* exchange ith and jth rows of a 4x4 matrix */
 	void matXr4(double z[][], int i, int j) {
 		double t;
-		if (i==j) 
-			return;
+		if (i==j) {
+            return;
+        }
 		for (int k=0; k<4; k++) {
 			t=z[i][k]; 
 			z[i][k]=z[j][k]; 
@@ -445,22 +456,25 @@ class Transform {
 	/* extract nth column from 4x4 matrix */
 	void matXtc4(double p[], double z[][], int n) {
 		int i;
-		for (i=0; i<4; i++) 
-			p[i]=z[i][n];
+		for (i=0; i<4; i++) {
+            p[i]=z[i][n];
+        }
 	}
 	
 	/* augment column of a 4x4 matrix */
 	void matAc4(double z[][], int i, int j, double f, int k) {
 		int l;
-		for (l=0; l<4; l++) 
-			z[l][i] = z[l][j] + f*z[l][k];
+		for (l=0; l<4; l++) {
+            z[l][i] = z[l][j] + f*z[l][k];
+        }
 	}
 	
 	/* multiply ith column of 4x4 matrix by a factor */
 	void matMc4(double z[][], double f, int i) {
 		int j;
-		for (j=0; j<4; j++) 
-			z[j][i]*=f;
+		for (j=0; j<4; j++) {
+            z[j][i]*=f;
+        }
 	}
 	
 	/* product of two 4x4 matrices */
@@ -481,12 +495,14 @@ class Transform {
 //	}
 	void matProd(double z[][], double u[][], double v[][]) {
 		int i, j, k;
-		for (i=0; i<4; i++) 
-			for (j=0; j<4; j++) {
-				z[i][j]=0.0f;
-				for (k=0; k<4; k++) 
-					z[i][j]+=u[i][k]*v[k][j];
-			}
+		for (i=0; i<4; i++) {
+            for (j=0; j<4; j++) {
+                z[i][j]=0.0f;
+                for (k=0; k<4; k++) {
+                    z[i][j] += u[i][k] * v[k][j];
+                }
+            }
+        }
 	}
 	
 	final void xyzPos(int[] xyz) {

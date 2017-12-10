@@ -3,7 +3,6 @@ import ij.*;
 import ij.gui.*;
 import ij.process.*;
 import java.awt.*;
-import java.util.Properties;
 import java.util.*;
 import java.awt.print.*;
 
@@ -20,15 +19,17 @@ public class Printer implements PlugInFilter, Printable {
         /*EU_HOU CHANGES*/
         private static ResourceBundle menubun;
 
-	public int setup(String arg, ImagePlus imp) {
-		if (arg.equals("setup"))
+	@Override
+    public int setup(String arg, ImagePlus imp) {
+		if ("setup".equals(arg))
 			{pageSetup(); return DONE;}
 		this.imp = imp;
 		IJ.register(Printer.class);
 		return DOES_ALL+NO_CHANGES;
 	}
 
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		//pageSetup();
 		print(imp);
 	}
@@ -42,10 +43,13 @@ public class Printer implements PlugInFilter, Printable {
 		gd.addCheckbox(IJ.getBundle().getString("SelectionOnly"), printSelection);
 		gd.addCheckbox(IJ.getBundle().getString("Rotate90")+IJ.degreeSymbol, rotate);
 		gd.showDialog();
-		if (gd.wasCanceled())
-			return;
+		if (gd.wasCanceled()) {
+            return;
+        }
 		scaling = gd.getNextNumber();
-		if (scaling<5.0) scaling = 5;
+		if (scaling<5.0) {
+            scaling = 5;
+        }
 		drawBorder = gd.getNextBoolean();
 		center = gd.getNextBoolean();
 		label = gd.getNextBoolean();
@@ -66,19 +70,26 @@ public class Printer implements PlugInFilter, Printable {
 		}
 	}
 	
-	public int print(Graphics g, PageFormat pf, int pageIndex) {
-		if (pageIndex != 0) return NO_SUCH_PAGE;
+	@Override
+    public int print(Graphics g, PageFormat pf, int pageIndex) {
+		if (pageIndex != 0) {
+            return NO_SUCH_PAGE;
+        }
 		ImageProcessor ip = imp.getProcessor();
 		Roi roi = imp.getRoi();
-		if (printSelection && roi!=null && roi.isArea() )
-			ip = ip.crop();
-		if (rotate)
-			ip = ip.rotateLeft();
+		if (printSelection && roi!=null && roi.isArea() ) {
+            ip = ip.crop();
+        }
+		if (rotate) {
+            ip = ip.rotateLeft();
+        }
 		//new ImagePlus("ip", ip.duplicate()).show();
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		int margin = 0;
-		if (drawBorder) margin = 1;
+		if (drawBorder) {
+            margin = 1;
+        }
 		double scale = scaling/100.0;
 		int dstWidth = (int)(width*scale);
 		int dstHeight = (int)(height*scale);
@@ -107,8 +118,9 @@ public class Printer implements PlugInFilter, Printable {
 			dstX, dstY, dstX+dstWidth, dstY+dstHeight,
 			0, 0, width, height, 
 			null);
-		if (drawBorder)
-			g.drawRect(dstX-1, dstY-1, dstWidth+1, dstHeight+1);
+		if (drawBorder) {
+            g.drawRect(dstX-1, dstY-1, dstWidth+1, dstHeight+1);
+        }
 		if (label) {
 			g.setFont(new Font("SanSerif", Font.PLAIN, fontSize));
 			g.setColor(Color.black);

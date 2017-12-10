@@ -1,16 +1,10 @@
 package ij.plugin;
 import ij.*;
 import ij.io.*;
-import ij.gui.*;
 import ij.process.*;
 import ij.plugin.*;
 import java.io.*;
-import java.awt.*;
 import java.awt.image.*;
-import java.awt.Color;
-import java.awt.Point;
-import java.io.OutputStream;
-import java.io.IOException;
 
 
 /**
@@ -46,11 +40,14 @@ import java.io.IOException;
 public class GifWriter implements PlugIn {
 	static int transparentIndex = -1;
    
-	public void run(String path) {
+	@Override
+    public void run(String path) {
 		ImagePlus imp = IJ.getImage();
-		if (path.equals("")) {
+		if ("".equals(path)) {
 			SaveDialog sd = new SaveDialog("Save as Gif", imp.getTitle(), ".gif");
-			if (sd.getFileName()==null) return;
+			if (sd.getFileName()==null) {
+                return;
+            }
 			path = sd.getDirectory()+sd.getFileName();
 		}
 
@@ -59,9 +56,15 @@ public class GifWriter implements PlugIn {
 		int nSlices = stack.getSize();
 	    GifEncoder ge = new GifEncoder();
 		double fps = imp.getCalibration().fps;
-		if (fps==0.0) fps = Animator.getFrameRate();
-		if (fps<=0.2) fps = 0.2;
-		if (fps>60.0) fps = 60.0;
+		if (fps==0.0) {
+            fps = Animator.getFrameRate();
+        }
+		if (fps<=0.2) {
+            fps = 0.2;
+        }
+		if (fps>60.0) {
+            fps = 60.0;
+        }
 		ge.setDelay((int)((1.0/fps)*1000.0));
 		if (transparentIndex!=-1) {
 			ge.transparent = true;
@@ -90,7 +93,9 @@ public class GifWriter implements PlugIn {
 	
 	/** Sets the transparent index (0-255), or set to -1 to disable transparency. */
 	public static void setTransparentIndex(int index) {
-		if (index<-1 || index>255) index = -1;
+		if (index<-1 || index>255) {
+            index = -1;
+        }
 		transparentIndex = index;
 	}
 
@@ -145,7 +150,9 @@ class GifEncoder {
     * @return true if successful.
     */
    public boolean addFrame(ImagePlus image) {
-      if ((image == null) || !started) return false;
+      if ((image == null) || !started) {
+          return false;
+      }
       boolean ok = true;
       try {
          if (firstFrame) {
@@ -154,7 +161,9 @@ class GifEncoder {
                setSize(image.getWidth(), image.getHeight());
             }
             writeLSD();
-            if (repeat>=0) writeNetscapeExt();      // use NS app extension to indicate reps
+            if (repeat>=0) {
+                writeNetscapeExt();      // use NS app extension to indicate reps
+            }
             firstFrame = false;
          }
       	int bitDepth = image.getBitDepth();
@@ -226,14 +235,17 @@ void Process8bitCLT(ImagePlus image){
     * closed.
     */
    public boolean finish() {
-      if (!started) return false;
+      if (!started) {
+          return false;
+      }
       boolean ok = true;
       started = false;
       try {
          out.write(0x3b);  // gif trailer
          out.flush();
-         if (closeStream)
-            out.close();
+         if (closeStream) {
+             out.close();
+         }
       } catch (IOException e) { ok = false; }
 
       // reset for subsequent use
@@ -271,8 +283,9 @@ void Process8bitCLT(ImagePlus image){
     * @param code int disposal code.
     */
    public void setDispose(int code) {
-      if (code >= 0)
-         dispose = code;
+      if (code >= 0) {
+          dispose = code;
+      }
    }
 
 
@@ -301,7 +314,9 @@ void Process8bitCLT(ImagePlus image){
     * @return
     */
    public void setQuality(int quality) {
-      if (quality < 1) quality = 1;
+      if (quality < 1) {
+          quality = 1;
+      }
       sample = quality;
    }
    
@@ -315,8 +330,9 @@ void Process8bitCLT(ImagePlus image){
     * @return
     */
    public void setRepeat(int iter) {
-      if (iter >= 0)
-         repeat = iter;
+      if (iter >= 0) {
+          repeat = iter;
+      }
    }
 
 
@@ -329,11 +345,17 @@ void Process8bitCLT(ImagePlus image){
     * @param h int frame width.
     */
    public void setSize(int w, int h) {
-      if (started && !firstFrame) return;
+      if (started && !firstFrame) {
+          return;
+      }
       width = w;
       height = h;
-      if (width < 1) width = 320;
-      if (height < 1) height = 240;
+      if (width < 1) {
+          width = 320;
+      }
+      if (height < 1) {
+          height = 240;
+      }
       sizeSet = true;
    }
 
@@ -362,7 +384,9 @@ void Process8bitCLT(ImagePlus image){
     * @return false if initial write failed.
     */
    public boolean start(OutputStream os) {
-      if (os == null) return false;
+      if (os == null) {
+          return false;
+      }
       boolean ok = true;
       closeStream = false;
       out = os;
@@ -393,9 +417,14 @@ void Process8bitCLT(ImagePlus image){
 	
 **/
    public void OverRideQuality(int npixs){
-        if(npixs>100000) sample = 10;
-        else sample = npixs/10000;
-        if(sample < 1) sample = 1;
+        if(npixs>100000) {
+            sample = 10;
+        } else {
+            sample = npixs/10000;
+        }
+        if(sample < 1) {
+            sample = 1;
+        }
 
     }
     
@@ -414,8 +443,9 @@ void Process8bitCLT(ImagePlus image){
          transp = 1;
          disp = 2;             // force clear if using transparent color  
       }
-      if (dispose >= 0)
-         disp = dispose & 7;   // user override
+      if (dispose >= 0) {
+          disp = dispose & 7;   // user override
+      }
       disp <<= 2;
 
       // packed fields
@@ -441,10 +471,10 @@ void Process8bitCLT(ImagePlus image){
       writeShort(height);
       // packed fields
       out.write(0x80 |         // 1 local color table  1=yes
-        	0 |            // 2 interlace - 0=no
-            0 |            // 3 sorted - 0=no
-            0 |            // 4-5 reserved
-            lctSize);   // size of local color table
+              // 2 interlace - 0=no
+              0 |            // 3 sorted - 0=no
+              0 |            // 4-5 reserved
+              lctSize);   // size of local color table
    }
 
 
@@ -457,9 +487,9 @@ void Process8bitCLT(ImagePlus image){
       writeShort(height);
       // packed fields
       out.write((0x80 |       // 1   : global color table flag = 0 (nn
-               0x70 |         // 2-4 : color resolution = 7
-               0x00 |         // 5   : gct sort flag = 0
-               lctSize));        // 6-8 : gct size = 0
+              0x70 |         // 2-4 : color resolution = 7
+              // 5   : gct sort flag = 0
+              lctSize));        // 6-8 : gct size = 0
 
       out.write(0);           // background color index
       out.write(0);           // pixel aspect ratio - assume 1:1
@@ -505,8 +535,9 @@ void Process8bitCLT(ImagePlus image){
    protected void writePalette() throws IOException {
       out.write(colorTab, 0, colorTab.length);
       int n = (3 * 256) - colorTab.length;
-      for (int i = 0; i < n; i++)
-         out.write(0);
+      for (int i = 0; i < n; i++) {
+          out.write(0);
+      }
    }
 
 
@@ -532,8 +563,9 @@ void Process8bitCLT(ImagePlus image){
     * Writes string to output stream
     */
    protected void writeString(String s) throws IOException {
-      for (int i = 0; i < s.length(); i++)
-         out.write((byte) s.charAt(i));
+      for (int i = 0; i < s.length(); i++) {
+          out.write((byte) s.charAt(i));
+      }
    }
 }
 
@@ -653,8 +685,9 @@ class LZWEncoder {
   void char_out( byte c, OutputStream outs ) throws IOException
      {
      accum[a_count++] = c;
-     if ( a_count >= 254 )
-        flush_char( outs );
+     if ( a_count >= 254 ) {
+         flush_char( outs );
+     }
      }
 
 
@@ -674,8 +707,9 @@ class LZWEncoder {
   // reset code table
   void cl_hash( int hsize )
      {
-     for ( int i = 0; i < hsize; ++i )
-        htab[i] = -1;
+     for ( int i = 0; i < hsize; ++i ) {
+         htab[i] = -1;
+     }
      }
 
 
@@ -706,8 +740,9 @@ class LZWEncoder {
      ent = nextPixel();
 
      hshift = 0;
-     for ( fcode = hsize; fcode < 65536; fcode *= 2 )
-        ++hshift;
+     for ( fcode = hsize; fcode < 65536; fcode *= 2 ) {
+         ++hshift;
+     }
      hshift = 8 - hshift;         // set hash code range bound
 
      hsize_reg = hsize;
@@ -729,12 +764,14 @@ class LZWEncoder {
         else if ( htab[i] >= 0 )     // non-empty slot
            {
            disp = hsize_reg - i;  // secondary hash (after G. Knott)
-           if ( i == 0 )
-              disp = 1;
+           if ( i == 0 ) {
+               disp = 1;
+           }
            do
               {
-              if ( (i -= disp) < 0 )
-                 i += hsize_reg;
+              if ( (i -= disp) < 0 ) {
+                  i += hsize_reg;
+              }
 
               if ( htab[i] == fcode )
                  {
@@ -751,8 +788,9 @@ class LZWEncoder {
            codetab[i] = free_ent++;  // code -> hashtable
            htab[i] = fcode;
            }
-        else
-           cl_block( outs );
+        else {
+            cl_block( outs );
+        }
         }
      // Put out the final code.
      output( ent, outs );
@@ -797,8 +835,9 @@ class LZWEncoder {
   //----------------------------------------------------------------------------
   private int nextPixel()
   {
-   if (remaining == 0)
-     return EOF;
+   if (remaining == 0) {
+       return EOF;
+   }
 
    --remaining;
 
@@ -812,10 +851,11 @@ class LZWEncoder {
      {
      cur_accum &= masks[cur_bits];
 
-     if ( cur_bits > 0 )
-        cur_accum |= ( code << cur_bits );
-     else
-        cur_accum = code;
+     if ( cur_bits > 0 ) {
+         cur_accum |= ( code << cur_bits );
+     } else {
+         cur_accum = code;
+     }
 
      cur_bits += n_bits;
 
@@ -838,10 +878,11 @@ class LZWEncoder {
         else
            {
            ++n_bits;
-           if ( n_bits == maxbits )
-              maxcode = maxmaxcode;
-           else
-              maxcode = MAXCODE(n_bits);
+           if ( n_bits == maxbits ) {
+               maxcode = maxmaxcode;
+           } else {
+               maxcode = MAXCODE(n_bits);
+           }
            }
         }
 

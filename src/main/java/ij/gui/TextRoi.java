@@ -25,10 +25,12 @@ public class TextRoi extends Roi {
 		super(x, y, imp);
         ImageCanvas ic = imp.getCanvas();
         double mag = (ic!=null)?ic.getMagnification():1.0;
-        if (mag>1.0)
+        if (mag>1.0) {
             mag = 1.0;
-        if (size<(12/mag))
-        	size = (int)(12/mag);
+        }
+        if (size<(12/mag)) {
+            size = (int)(12/mag);
+        }
 		theText[0] = "Type, then";
 		theText[1] = "Ctl+D";
 		if (previousRoi!=null && (previousRoi instanceof TextRoi)) {
@@ -40,38 +42,45 @@ public class TextRoi extends Roi {
 
 	/** Adds the specified character to the end of the text string. */
 	public void addChar(char c) {
-		if (!(c>=' ' || c=='\b' || c=='\n')) return;
+		if (!(c>=' ' || c=='\b' || c=='\n')) {
+            return;
+        }
 		if (firstChar) {
 			cline = 0;
-			theText[cline] = new String("");
-			for (int i=1; i<MAX_LINES; i++)
-				theText[i] = null;
-		}
-		if ((int)c=='\b') {
-			// backspace
-			if (theText[cline].length()>0)
-				theText[cline] = theText[cline].substring(0, theText[cline].length()-1);
-			else if (cline>0) {
-				theText[cline] = null;
-				cline--;
-						}
-			imp.draw(clipX, clipY, clipWidth, clipHeight);
-			firstChar = false;
-			return;
-		} else if ((int)c=='\n') {
-			// newline
-			if (cline<(MAX_LINES-1)) cline++;
 			theText[cline] = "";
-			adjustSize();
-		} else {
-			char[] chr = {c};
-			theText[cline] += new String(chr);
-			adjustSize();
-			updateClipRect();
-			imp.draw(clipX, clipY, clipWidth, clipHeight);
-			firstChar = false;
-			return;
+			for (int i=1; i<MAX_LINES; i++) {
+                theText[i] = null;
+            }
 		}
+        switch ((int) c) {
+            case '\b':
+                // backspace
+                if (theText[cline].length() > 0) {
+                    theText[cline] = theText[cline].substring(0, theText[cline].length() - 1);
+                } else if (cline > 0) {
+                    theText[cline] = null;
+                    cline--;
+                }
+                imp.draw(clipX, clipY, clipWidth, clipHeight);
+                firstChar = false;
+                break;
+            case '\n':
+                // newline
+                if (cline < (MAX_LINES - 1)) {
+                    cline++;
+                }
+                theText[cline] = "";
+                adjustSize();
+                break;
+            default:
+                char[] chr = {c};
+                theText[cline] += new String(chr);
+                adjustSize();
+                updateClipRect();
+                imp.draw(clipX, clipY, clipWidth, clipHeight);
+                firstChar = false;
+                break;
+        }
 	}
 
 	Font getCurrentFont() {
@@ -84,7 +93,8 @@ public class TextRoi extends Roi {
 	}
 	
 	/** Renders the text on the image. */
-	public void drawPixels(ImageProcessor ip) {
+	@Override
+    public void drawPixels(ImageProcessor ip) {
 		Font font = new Font(name, style, size);
 		ip.setFont(font);
 		ip.setAntialiasedText(antialiasedText);
@@ -101,7 +111,8 @@ public class TextRoi extends Roi {
 	}
 
 	/** Draws the text on the screen, clipped to the ROI. */
-	public void draw(Graphics g) {
+	@Override
+    public void draw(Graphics g) {
 		super.draw(g); // draw the rectangle
 		g.setColor(instanceColor!=null?instanceColor:ROIColor);
 		double mag = ic.getMagnification();
@@ -110,8 +121,9 @@ public class TextRoi extends Roi {
 		int swidth = (int)(width*mag);
 		int sheight = (int)(height*mag);
 		Java2.setAntialiasedText(g, antialiasedText);
-		if (font==null)
-			adjustSize();
+		if (font==null) {
+            adjustSize();
+        }
 		Font font = getCurrentFont();
 		FontMetrics metrics = g.getFontMetrics(font);
 		int fontHeight = metrics.getHeight();
@@ -125,7 +137,9 @@ public class TextRoi extends Roi {
 			i++;
 			sy += fontHeight;
 		}
-		if (r!=null) g.setClip(r.x, r.y, r.width, r.height);
+		if (r!=null) {
+            g.setClip(r.x, r.y, r.width, r.height);
+        }
 	}
 
 	/*
@@ -170,28 +184,32 @@ public class TextRoi extends Roi {
 		ImagePlus imp = WindowManager.getCurrentImage();
 		if (imp!=null) {
 			Roi roi = imp.getRoi();
-			if (roi instanceof TextRoi)
-				imp.draw();
+			if (roi instanceof TextRoi) {
+                imp.draw();
+            }
 		}
 	}
 
 	//v1.24g
-	protected void handleMouseUp(int screenX, int screenY) {
+	@Override
+    protected void handleMouseUp(int screenX, int screenY) {
 		super.handleMouseUp(screenX, screenY);
 		if (firstMouseUp) {
 			adjustSize();
 			firstMouseUp = false;
 		} else {
-			if (width<5 || height<5)
-				imp.killRoi();
+			if (width<5 || height<5) {
+                imp.killRoi();
+            }
 		}
 	}
 	
 	/** Increases the size of the rectangle so it's large
 		enough to hold the text. */ //v1.24g
 	void adjustSize() {
-		if (ic==null)
-			return;
+		if (ic==null) {
+            return;
+        }
 		double mag = ic.getMagnification();
 		Font font = getCurrentFont();
 		Graphics g = ic.getGraphics();
@@ -208,19 +226,23 @@ public class TextRoi extends Roi {
 		while (i<MAX_LINES && theText[i]!=null) {
 			nLines++;
 			int w = (int)(stringWidth(theText[i],metrics,g)/mag);
-			if (w>width)
-				width = w;
+			if (w>width) {
+                width = w;
+            }
 			i++;
 		}
 		g.dispose();
 		width += 2;
-		if (x+width>xMax)
-			x = xMax-width;
+		if (x+width>xMax) {
+            x = xMax-width;
+        }
 		height = nLines*fontHeight+2;
-		if (height>yMax)
-			height = yMax;
-		if (y+height>yMax)
-			y = yMax-height;
+		if (height>yMax) {
+            height = yMax;
+        }
+		if (y+height>yMax) {
+            y = yMax-height;
+        }
 		updateClipRect();
 		imp.draw(clipX, clipY, clipWidth, clipHeight);
 	}

@@ -26,17 +26,19 @@ public class BitBuffer {
 	}
 
 	public int getBits(int bitsToRead) {
-		if (bitsToRead == 0)
-			return 0;
-		if (eofFlag)
-			return -1; // Already at end of file
+		if (bitsToRead == 0) {
+            return 0;
+        }
+		if (eofFlag) {
+            return -1; // Already at end of file
+        }
 		int toStore = 0;
 		while(bitsToRead != 0  && !eofFlag) {
 			if (bitsToRead >= 8 - currentBit) {
 				if (currentBit == 0) { // special
 					toStore = toStore << 8;
 					int cb = ((int) byteBuffer[currentByte]);
-					toStore += (cb<0 ? (int) 256 + cb : (int) cb);
+					toStore += (cb<0 ? 256 + cb : cb);
 					bitsToRead -= 8;
 					currentByte++;
 				} else {
@@ -49,7 +51,7 @@ public class BitBuffer {
 			} else {
 				toStore = toStore << bitsToRead;
 				int cb = ((int) byteBuffer[currentByte]);
-				cb = (cb<0 ? (int) 256 + cb : (int) cb);
+				cb = (cb<0 ? 256 + cb : cb);
 				toStore += ((cb) & (0x00FF - frontMask[currentBit])) >> (8 - (currentBit + bitsToRead));
 				currentBit += bitsToRead;
 				bitsToRead = 0;

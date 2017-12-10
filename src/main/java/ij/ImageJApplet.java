@@ -23,21 +23,30 @@ import java.applet.Applet;
 public class ImageJApplet extends Applet {
 
 	/** Starts ImageJ if it's not already running. */
+    @Override
     public void init() {
     	ImageJ ij = IJ.getInstance();
-     	if (ij==null || (ij!=null && !ij.isShowing()))
-			new ImageJ(this);
+     	if (ij==null || (ij!=null && !ij.isShowing())) {
+            new ImageJ(this);
+        }
 		for (int i=1; i<=9; i++) {
 			String url = getParameter("url"+i);
-			if (url==null) break;
+			if (url==null) {
+                break;
+            }
 			ImagePlus imp = new ImagePlus(url);
-			if (imp!=null) imp.show();
+			if (imp!=null) {
+                imp.show();
+            }
 		}
     }
     
+    @Override
     public void destroy() {
     	ImageJ ij = IJ.getInstance();
-    	if (ij!=null) ij.quit();
+    	if (ij!=null) {
+            ij.quit();
+        }
     }
 
 }

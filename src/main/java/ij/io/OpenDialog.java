@@ -1,12 +1,10 @@
 package ij.io;
 import ij.*;
-import ij.gui.*;
 import ij.plugin.frame.Recorder;
 import ij.util.Java2;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
-import javax.swing.filechooser.*;
 
 /** This class displays a dialog window from 
 	which the user can select an input file. */ 
@@ -27,17 +25,21 @@ import javax.swing.filechooser.*;
 		and updates the ImageJ default directory. */
 	public OpenDialog(String title, String path) {
 		String macroOptions = Macro.getOptions();
-		if (macroOptions!=null && (path==null||path.equals(""))) {
+		if (macroOptions!=null && (path==null|| "".equals(path))) {
 			path = Macro.getValue(macroOptions, title, path);
-			if (path==null || path.equals(""))
-				path = Macro.getValue(macroOptions, "path", path);		
+			if (path==null || "".equals(path)) {
+                path = Macro.getValue(macroOptions, "path", path);
+            }
 		}
-		if (path==null || path.equals("")) {
-			if (Prefs.useJFileChooser)
-				jOpen(title, getDefaultDirectory(), null);
-			else
-				open(title, getDefaultDirectory(), null);
-			if (name!=null) defaultDirectory = dir;
+		if (path==null || "".equals(path)) {
+			if (Prefs.useJFileChooser) {
+                jOpen(title, getDefaultDirectory(), null);
+            } else {
+                open(title, getDefaultDirectory(), null);
+            }
+			if (name!=null) {
+                defaultDirectory = dir;
+            }
 			this.title = title;
 			recordPath = true;
 		} else {
@@ -52,15 +54,17 @@ import javax.swing.filechooser.*;
 	public OpenDialog(String title, String defaultDir, String defaultName) {
 		String path = null;
 		String macroOptions = Macro.getOptions();
-		if (macroOptions!=null)
-			path = Macro.getValue(macroOptions, title, path);
-		if (path!=null)
-			decodePath(path);
-		else {
-			if (Prefs.useJFileChooser)
-				jOpen(title, defaultDir, defaultName);
-			else
-				open(title, defaultDir, defaultName);
+		if (macroOptions!=null) {
+            path = Macro.getValue(macroOptions, title, path);
+        }
+		if (path!=null) {
+            decodePath(path);
+        } else {
+			if (Prefs.useJFileChooser) {
+                jOpen(title, defaultDir, defaultName);
+            } else {
+                open(title, defaultDir, defaultName);
+            }
 			this.title = title;
 			recordPath = true;
 		}
@@ -69,10 +73,11 @@ import javax.swing.filechooser.*;
 	// Uses JFileChooser to display file open dialog box.
 	void jOpen(String title, String path, String fileName) {
 		Java2.setSystemLookAndFeel();
-		if (EventQueue.isDispatchThread())
-			jOpenDispatchThread(title, path, fileName);
-		else
-			jOpenInvokeAndWait(title, path, fileName);
+		if (EventQueue.isDispatchThread()) {
+            jOpenDispatchThread(title, path, fileName);
+        } else {
+            jOpenInvokeAndWait(title, path, fileName);
+        }
 	}
 		
 	// Uses the JFileChooser class to display the dialog box.
@@ -81,12 +86,15 @@ import javax.swing.filechooser.*;
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle(title);
 		File fdir = null;
-		if (path!=null)
-			fdir = new File(path);
-		if (fdir!=null)
-			fc.setCurrentDirectory(fdir);
-		if (fileName!=null)
-			fc.setSelectedFile(new File(fileName));
+		if (path!=null) {
+            fdir = new File(path);
+        }
+		if (fdir!=null) {
+            fc.setCurrentDirectory(fdir);
+        }
+		if (fileName!=null) {
+            fc.setSelectedFile(new File(fileName));
+        }
 		int returnVal = fc.showOpenDialog(IJ.getInstance());
 		if (returnVal!=JFileChooser.APPROVE_OPTION)
 			{Macro.abort(); return;}
@@ -101,16 +109,20 @@ import javax.swing.filechooser.*;
 	void jOpenInvokeAndWait(final String title, final String path, final String fileName) {
 		try {
 			EventQueue.invokeAndWait(new Runnable() {
-				public void run() {
+				@Override
+                public void run() {
 				JFileChooser fc = new JFileChooser();
 				fc.setDialogTitle(title);
 				File fdir = null;
-				if (path!=null)
-					fdir = new File(path);
-				if (fdir!=null)
-					fc.setCurrentDirectory(fdir);
-				if (fileName!=null)
-					fc.setSelectedFile(new File(fileName));
+				if (path!=null) {
+                    fdir = new File(path);
+                }
+				if (fdir!=null) {
+                    fc.setCurrentDirectory(fdir);
+                }
+				if (fileName!=null) {
+                    fc.setSelectedFile(new File(fileName));
+                }
 				int returnVal = fc.showOpenDialog(IJ.getInstance());
 				if (returnVal!=JFileChooser.APPROVE_OPTION)
 					{Macro.abort(); return;}
@@ -121,36 +133,43 @@ import javax.swing.filechooser.*;
 				dir = fc.getCurrentDirectory().getPath()+File.separator;
 				}
 			});
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 	}
 	
 	// Uses the AWT FileDialog class to display the dialog box
 	void open(String title, String path, String fileName) {
 		Frame parent = IJ.getInstance();
 		if (parent==null) {
-			if (sharedFrame==null) sharedFrame = new Frame();
+			if (sharedFrame==null) {
+                sharedFrame = new Frame();
+            }
 			parent = sharedFrame;
 		}
 		FileDialog fd = new FileDialog(parent, title);
-		if (path!=null)
-			fd.setDirectory(path);
-		if (fileName!=null)
-			fd.setFile(fileName);
+		if (path!=null) {
+            fd.setDirectory(path);
+        }
+		if (fileName!=null) {
+            fd.setFile(fileName);
+        }
 		//GUI.center(fd);
 		fd.show();
 		name = fd.getFile();
 		if (name==null) {
-			if (IJ.isMacOSX())
-				System.setProperty("apple.awt.fileDialogForDirectories", "false");
+			if (IJ.isMacOSX()) {
+                System.setProperty("apple.awt.fileDialogForDirectories", "false");
+            }
 			Macro.abort();
-		} else
-			dir = fd.getDirectory();
+		} else {
+            dir = fd.getDirectory();
+        }
 	}
 
 	void decodePath(String path) {
 		int i = path.lastIndexOf('/');
-		if (i==-1)
-			i = path.lastIndexOf('\\');
+		if (i==-1) {
+            i = path.lastIndexOf('\\');
+        }
 		if (i>0) {
 			dir = path.substring(0, i+1);
 			name = path.substring(i+1);
@@ -168,8 +187,9 @@ import javax.swing.filechooser.*;
 	
 	/** Returns the selected file name. */
 	public String getFileName() {
-		if (Recorder.record && recordPath)
-			Recorder.recordPath(title, dir+name);
+		if (Recorder.record && recordPath) {
+            Recorder.recordPath(title, dir+name);
+        }
 		lastName = name;
 		return name;
 	}
@@ -177,16 +197,18 @@ import javax.swing.filechooser.*;
 	/** Returns the current working directory, which may be null. The
 		returned string always ends with the separator character ("/" or "\").*/
 	public static String getDefaultDirectory() {
-		if (defaultDirectory==null)
-			defaultDirectory = Prefs.getString(Prefs.DIR_IMAGE);
+		if (defaultDirectory==null) {
+            defaultDirectory = Prefs.getString(Prefs.DIR_IMAGE);
+        }
 		return defaultDirectory;
 	}
 
 	/** Sets the current working directory. */
 	public static void setDefaultDirectory(String defaultDir) {
 		defaultDirectory = defaultDir;
-		if (!defaultDirectory.endsWith(File.separator))
-			defaultDirectory = defaultDirectory + File.separator;
+		if (!defaultDirectory.endsWith(File.separator)) {
+            defaultDirectory = defaultDirectory + File.separator;
+        }
 	}
 	
 	/** Returns the path to the last directory opened by the user

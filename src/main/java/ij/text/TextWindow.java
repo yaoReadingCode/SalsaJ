@@ -7,12 +7,10 @@ import ij.*;
 import ij.io.*;
 import ij.gui.*;
 import ij.plugin.filter.Analyzer;
-import ij.measure.ResultsTable;
 import ij.macro.Interpreter;
 /*
  *  EU_HOU CHANGES
  */
-import java.util.ResourceBundle;
 import ij.process.Photometer;
 /*
  *  EU_HOU END
@@ -86,7 +84,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
         textPanel.setTitle(title);
         add("Center", textPanel);
         textPanel.setColumnHeadings(headings);
-        if (data != null && !data.equals("")) {
+        if (data != null && !"".equals(data)) {
             textPanel.append(data);
         }
         addKeyListener(textPanel);
@@ -96,7 +94,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
             if (img != null) {
                 try {
                     setIconImage(img);
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -107,7 +105,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
         Point loc = null;
         int w = 0;
         int h = 0;
-        if (title.equals("Results")) {
+        if ("Results".equals(title)) {
             loc = Prefs.getLocation(LOC_KEY);
             w = (int) Prefs.get(WIDTH_KEY, 0.0);
             h = (int) Prefs.get(HEIGHT_KEY, 0.0);
@@ -142,7 +140,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
             if (img != null) {
                 try {
                     setIconImage(img);
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -192,7 +190,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
         Menu m = new Menu(IJ.getBundle().getString("File"));
 //EU_HOU Bundle
         m.add(new MenuItem(IJ.getBundle().getString("SaveAs"), new MenuShortcut(KeyEvent.VK_S)));
-        if (getTitle().equals("Results")) {
+        if ("Results".equals(getTitle())) {
             m.addSeparator();
             m.add(new MenuItem("Set File Extension..."));
         }
@@ -221,7 +219,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
         m.add(new MenuItem("Make Text Larger"));
         m.addSeparator();
         //EU_HOU Bundle
-        antialiased = new CheckboxMenuItem("Antialiased", Prefs.get(FONT_ANTI, IJ.isMacOSX() ? true : false));
+        antialiased = new CheckboxMenuItem("Antialiased", Prefs.get(FONT_ANTI, IJ.isMacOSX()));
         antialiased.addItemListener(this);
         m.add(antialiased);
         //EU_HOU Bundle
@@ -318,11 +316,11 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
     public void actionPerformed(ActionEvent evt) {
         String cmd = evt.getActionCommand();
 //EU_HOU Bundle FIXME
-        if (cmd.equals("Make Text Larger")) {
+        if ("Make Text Larger".equals(cmd)) {
             changeFontSize(true);
-        } else if (cmd.equals("Make Text Smaller")) {
+        } else if ("Make Text Smaller".equals(cmd)) {
             changeFontSize(false);
-        } else if (cmd.equals("Save Settings")) {
+        } else if ("Save Settings".equals(cmd)) {
             saveSettings();
         } else {
             textPanel.doCommand(cmd);
@@ -334,6 +332,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void processWindowEvent(WindowEvent e) {
         super.processWindowEvent(e);
 
@@ -365,6 +364,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void itemStateChanged(ItemEvent e) {
         setFont();
     }
@@ -374,7 +374,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
      */
     public void close() {
         if (Photometer.getInstance() != null) {
-            Photometer.getInstance().resetPh();
+            Photometer.resetPh();
         }
         //EU_HOU Bundle
         if (getTitle().equals(IJ.getBundle().getString("Results"))) {
@@ -388,7 +388,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
 
             Prefs.set(WIDTH_KEY, d.width);
             Prefs.set(HEIGHT_KEY, d.height);
-        } else if (getTitle().equals("Log")) {
+        } else if ("Log".equals(getTitle())) {
             System.out.println("TextWindow.close");
             IJ.debugMode = false;
             IJ.log("\\Closed");
@@ -480,6 +480,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void focusGained(FocusEvent e) {
         WindowManager.setWindow(this);
     }
@@ -489,6 +490,7 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void focusLost(FocusEvent e) {
     }
 }

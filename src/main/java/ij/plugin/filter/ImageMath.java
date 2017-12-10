@@ -3,7 +3,6 @@ package ij.plugin.filter;
 import ij.*;
 import ij.gui.*;
 import ij.process.*;
-import java.awt.*;
 
 /**
  *  This plugin implements ImageJ's Process/Math submenu.
@@ -35,6 +34,7 @@ public class ImageMath implements PlugInFilter {
      *@param  imp  Description of the Parameter
      *@return      Description of the Return Value
      */
+    @Override
     public int setup(String arg, ImagePlus imp) {
         this.arg = arg;
         this.imp = imp;
@@ -48,6 +48,7 @@ public class ImageMath implements PlugInFilter {
      *
      *@param  ip  Description of the Parameter
      */
+    @Override
     public void run(ImageProcessor ip) {
 
         double value;
@@ -56,7 +57,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("add")) {
+        if ("add".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 addValue = getValue(IJ.getPluginBundle().getString("Add"), IJ.getPluginBundle().getString("Value"), addValue, 0);
@@ -68,7 +69,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("sub")) {
+        if ("sub".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 addValue = getValue(IJ.getPluginBundle().getString("Subtract"), IJ.getPluginBundle().getString("Value"), addValue, 0);
@@ -80,7 +81,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("mul")) {
+        if ("mul".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 mulValue = getValue(IJ.getPluginBundle().getString("Multiply"), IJ.getPluginBundle().getString("Value"), mulValue, 2);
@@ -92,7 +93,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("div")) {
+        if ("div".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 mulValue = getValue(IJ.getPluginBundle().getString("Divide"), IJ.getPluginBundle().getString("Value"), mulValue, 2);
@@ -106,7 +107,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("and")) {
+        if ("and".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 andValue = getBinaryValue(IJ.getPluginBundle().getString("AND"), IJ.getPluginBundle().getString("BinValue"), andValue);
@@ -124,7 +125,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("or")) {
+        if ("or".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 andValue = getBinaryValue(IJ.getPluginBundle().getString("OR"), IJ.getPluginBundle().getString("BinValue"), andValue);
@@ -142,7 +143,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("xor")) {
+        if ("xor".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 andValue = getBinaryValue(IJ.getPluginBundle().getString("XOR"), IJ.getPluginBundle().getString("BinValue"), andValue);
@@ -160,7 +161,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("min")) {
+        if ("min".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 minValue = getValue(IJ.getPluginBundle().getString("Min"), IJ.getPluginBundle().getString("Value"), minValue, 0);
@@ -175,7 +176,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("max")) {
+        if ("max".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 maxValue = getValue(IJ.getPluginBundle().getString("Max"), IJ.getPluginBundle().getString("Value"), maxValue, 0);
@@ -190,7 +191,7 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("gamma")) {
+        if ("gamma".equals(arg)) {
             if (first) {
                 //EU_HOU Bundle
                 gammaValue = getValue(IJ.getPluginBundle().getString("Gamma"), IJ.getPluginBundle().getString("Value01"), gammaValue, 2);
@@ -208,27 +209,27 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("log")) {
+        if ("log".equals(arg)) {
             ip.log();
             return;
         }
 
-        if (arg.equals("exp")) {
+        if ("exp".equals(arg)) {
             ip.exp();
             return;
         }
 
-        if (arg.equals("sqr")) {
+        if ("sqr".equals(arg)) {
             ip.sqr();
             return;
         }
 
-        if (arg.equals("sqrt")) {
+        if ("sqrt".equals(arg)) {
             ip.sqrt();
             return;
         }
 
-        if (arg.equals("reciprocal")) {
+        if ("reciprocal".equals(arg)) {
             if (!isFloat(ip)) {
                 return;
             }
@@ -244,12 +245,12 @@ public class ImageMath implements PlugInFilter {
             return;
         }
 
-        if (arg.equals("nan")) {
+        if ("nan".equals(arg)) {
             setBackgroundToNaN(ip);
             return;
         }
 
-        if (arg.equals("abs")) {
+        if ("abs".equals(arg)) {
             if (!((ip instanceof FloatProcessor) || imp.getCalibration().isSigned16Bit())) {
                 //EU_HOU Bundle
                 IJ.error(IJ.getPluginBundle().getString("32BitSigned16BitImgReqErr"));
@@ -258,7 +259,6 @@ public class ImageMath implements PlugInFilter {
                 ip.abs();
                 ip.resetMinAndMax();
             }
-            return;
         }
     }
 
@@ -360,6 +360,5 @@ public class ImageMath implements PlugInFilter {
             }
         }
         ip.resetMinAndMax();
-        return;
     }
 }

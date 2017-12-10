@@ -1,10 +1,8 @@
 //EU_HOU
 package ij.process;
 
-import java.util.*;
 import java.awt.*;
 import java.awt.image.*;
-import ij.gui.*;
 
 /**
  * This is an 32-bit RGB image and methods that operate on that image.. Based on
@@ -48,9 +46,8 @@ public class ColorProcessor extends ImageProcessor {
 
         try {
             pg.grabPixels();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
-        ;
         createColorModel();
         fgColor = 0xff000000;//black
         resetRoi();
@@ -97,6 +94,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return Description of the Return Value
      */
+    @Override
     public Image createImage() {
         if (ij.IJ.isJava16()) {
             return createBufferedImage();
@@ -155,6 +153,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param height Description of the Parameter
      * @return Description of the Return Value
      */
+    @Override
     public ImageProcessor createProcessor(int width, int height) {
         int[] pixels = new int[width * height];
 
@@ -185,6 +184,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param color The new color value
      */
+    @Override
     public void setColor(Color color) {
         fgColor = color.getRGB();
         drawingColor = color;
@@ -196,6 +196,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param value The new value value
      */
+    @Override
     public void setValue(double value) {
         fgColor = (int) value;
     }
@@ -206,6 +207,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param value The new backgroundValue value
      */
+    @Override
     public void setBackgroundValue(double value) {
         bgColor = (int) value;
     }
@@ -215,6 +217,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return The min value
      */
+    @Override
     public double getMin() {
         return min;
     }
@@ -224,6 +227,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return The max value
      */
+    @Override
     public double getMax() {
         return max;
     }
@@ -235,6 +239,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param min The new minAndMax value
      * @param max The new minAndMax value
      */
+    @Override
     public void setMinAndMax(double min, double max) {
         setMinAndMax(min, max, 7);
     }
@@ -278,6 +283,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Description of the Method
      */
+    @Override
     public void snapshot() {
         snapshotWidth = width;
         snapshotHeight = height;
@@ -290,6 +296,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Description of the Method
      */
+    @Override
     public void reset() {
         if (snapshotPixels == null) {
             return;
@@ -302,6 +309,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param mask Description of the Parameter
      */
+    @Override
     public void reset(ImageProcessor mask) {
         if (mask == null || snapshotPixels == null) {
             return;
@@ -329,6 +337,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param pixels The new snapshotPixels value
      */
+    @Override
     public void setSnapshotPixels(Object pixels) {
         snapshotPixels = (int[]) pixels;
         snapshotWidth = width;
@@ -341,6 +350,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return The snapshotPixels value
      */
+    @Override
     public Object getSnapshotPixels() {
         return snapshotPixels;
     }
@@ -351,6 +361,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param mask Description of the Parameter
      */
+    @Override
     public void fill(ImageProcessor mask) {
         if (mask == null) {
             fill();
@@ -387,6 +398,7 @@ public class ColorProcessor extends ImageProcessor {
      * @see ImageProcessor#snapshot
      * @see ImageProcessor#setSnapshotCopyMode
      */
+    @Override
     public Object getPixelsCopy() {
         if (snapshotPixels != null && snapshotCopyMode) {
             snapshotCopyMode = false;
@@ -406,6 +418,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @return The pixel value
      */
+    @Override
     public int getPixel(int x, int y) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             return pixels[y * width + x];
@@ -421,6 +434,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @return Description of the Return Value
      */
+    @Override
     public final int get(int x, int y) {
         return pixels[y * width + x];
     }
@@ -432,6 +446,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @param value Description of the Parameter
      */
+    @Override
     public final void set(int x, int y, int value) {
         pixels[y * width + x] = value;
     }
@@ -442,6 +457,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param index Description of the Parameter
      * @return Description of the Return Value
      */
+    @Override
     public final int get(int index) {
         return pixels[index];
     }
@@ -452,6 +468,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param index Description of the Parameter
      * @param value Description of the Parameter
      */
+    @Override
     public final void set(int index, int value) {
         pixels[index] = value;
     }
@@ -463,6 +480,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @return Description of the Return Value
      */
+    @Override
     public final float getf(int x, int y) {
         return pixels[y * width + x];
     }
@@ -474,6 +492,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @param value Description of the Parameter
      */
+    @Override
     public final void setf(int x, int y, float value) {
         pixels[y * width + x] = (int) value;
     }
@@ -484,6 +503,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param index Description of the Parameter
      * @return Description of the Return Value
      */
+    @Override
     public final float getf(int index) {
         return pixels[index];
     }
@@ -494,6 +514,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param index Description of the Parameter
      * @param value Description of the Parameter
      */
+    @Override
     public final void setf(int index, float value) {
         pixels[index] = (int) value;
     }
@@ -508,6 +529,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param iArray Description of the Parameter
      * @return The pixel value
      */
+    @Override
     public int[] getPixel(int x, int y, int[] iArray) {
         if (iArray == null) {
             iArray = new int[3];
@@ -528,6 +550,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @param iArray Description of the Parameter
      */
+    @Override
     public void putPixel(int x, int y, int[] iArray) {
         int r = iArray[0];
         int g = iArray[1];
@@ -543,6 +566,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @return The interpolatedPixel value
      */
+    @Override
     public double getInterpolatedPixel(double x, double y) {
         int ix = (int) (x + 0.5);
         int iy = (int) (y + 0.5);
@@ -569,6 +593,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @param value Description of the Parameter
      */
+    @Override
     public void putPixel(int x, int y, int value) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             pixels[y * width + x] = value;
@@ -584,6 +609,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @param value Description of the Parameter
      */
+    @Override
     public void putPixelValue(int x, int y, double value) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             if (value > 255.0) {
@@ -607,6 +633,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param y Description of the Parameter
      * @return The pixelValue value
      */
+    @Override
     public float getPixelValue(int x, int y) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             int c = pixels[y * width + x];
@@ -626,6 +653,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param x Description of the Parameter
      * @param y Description of the Parameter
      */
+    @Override
     public void drawPixel(int x, int y) {
         if (x >= clipXMin && x <= clipXMax && y >= clipYMin && y <= clipYMax) {
             pixels[y * width + x] = fgColor;
@@ -637,8 +665,9 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return The pixels value
      */
+    @Override
     public Object getPixels() {
-        return (Object) pixels;
+        return pixels;
     }
 
     /**
@@ -646,6 +675,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param pixels The new pixels value
      */
+    @Override
     public void setPixels(Object pixels) {
         this.pixels = (int[]) pixels;
         resetPixels(pixels);
@@ -832,6 +862,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param yloc Description of the Parameter
      * @param mode Description of the Parameter
      */
+    @Override
     public void copyBits(ImageProcessor ip, int xloc, int yloc, int mode) {
         if (!((ip instanceof ColorProcessor) | (ip instanceof ByteProcessor))) {
             throw new IllegalArgumentException("8-bit or RGB image required");
@@ -848,6 +879,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param lut Description of the Parameter
      */
+    @Override
     public void applyTable(int[] lut) {
         int c;
         int r;
@@ -921,6 +953,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Fills the current rectangular ROI.
      */
+    @Override
     public void fill() {
         for (int y = roiY; y < (roiY + roiHeight); y++) {
             int i = y * width + roiX;
@@ -1035,6 +1068,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param range Description of the Parameter
      */
+    @Override
     public void noise(double range) {
         filterRGB(RGB_NOISE, range);
     }
@@ -1042,6 +1076,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Description of the Method
      */
+    @Override
     public void medianFilter() {
         filterRGB(RGB_MEDIAN, 0.0);
     }
@@ -1049,6 +1084,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Description of the Method
      */
+    @Override
     public void findEdges() {
         filterRGB(RGB_FIND_EDGES, 0.0);
     }
@@ -1056,6 +1092,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Description of the Method
      */
+    @Override
     public void erode() {
         filterRGB(RGB_ERODE, 0.0);
     }
@@ -1063,6 +1100,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Description of the Method
      */
+    @Override
     public void dilate() {
         filterRGB(RGB_DILATE, 0.0);
 
@@ -1071,6 +1109,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Description of the Method
      */
+    @Override
     public void autoThreshold() {
         filterRGB(RGB_THRESHOLD, 0.0);
     }
@@ -1082,6 +1121,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param yScale Description of the Parameter
      * @see ImageProcessor#setInterpolate
      */
+    @Override
     public void scale(double xScale, double yScale) {
         double xCenter = roiX + roiWidth / 2.0;
         double yCenter = roiY + roiHeight / 2.0;
@@ -1170,6 +1210,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return Description of the Return Value
      */
+    @Override
     public ImageProcessor crop() {
         int[] pixels2 = new int[roiWidth * roiHeight];
 
@@ -1189,6 +1230,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return Description of the Return Value
      */
+    @Override
     public synchronized ImageProcessor duplicate() {
         int[] pixels2 = new int[width * height];
 
@@ -1232,7 +1274,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param pixels Description of the Parameter
      * @return The interpolatedPixel value
      */
-    private final int getInterpolatedPixel(double x, double y, int[] pixels) {
+    private int getInterpolatedPixel(double x, double y, int[] pixels) {
         int xbase = (int) x;
         int ybase = (int) y;
         double xFraction = x - xbase;
@@ -1289,6 +1331,7 @@ public class ColorProcessor extends ImageProcessor {
      * @return Description of the Return Value
      * @see ImageProcessor#setInterpolate
      */
+    @Override
     public ImageProcessor resize(int dstWidth, int dstHeight) {
         double srcCenterX = roiX + roiWidth / 2.0;
         double srcCenterY = roiY + roiHeight / 2.0;
@@ -1416,6 +1459,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param angle Description of the Parameter
      * @see ImageProcessor#setInterpolate
      */
+    @Override
     public void rotate(double angle) {
         if (angle % 360 == 0) {
             return;
@@ -1498,6 +1542,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param ty Description of the Parameter
      * @see ImageProcessor#setInterpolate
      */
+    @Override
     public void translate(double tx, double ty) {
         //System.out.println("Color");
         int[] pixels2 = (int[]) getPixelsCopy();
@@ -1566,6 +1611,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Description of the Method
      */
+    @Override
     public void flipVertical() {
         int index1;
         int index2;
@@ -1587,6 +1633,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param kernel Description of the Parameter
      */
+    @Override
     public void convolve3x3(int[] kernel) {
         int p1;
         int p2;
@@ -1609,8 +1656,8 @@ public class ColorProcessor extends ImageProcessor {
 
         int scale = 0;
 
-        for (int i = 0; i < kernel.length; i++) {
-            scale += kernel[i];
+        for (int aKernel : kernel) {
+            scale += aKernel;
         }
         if (scale == 0) {
             scale = 1;
@@ -1718,6 +1765,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param type Description of the Parameter
      */
+    @Override
     public void filter(int type) {
         int p1;
         int p2;
@@ -1783,6 +1831,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return The histogram value
      */
+    @Override
     public int[] getHistogram() {
         if (mask != null) {
             return getHistogram(mask);
@@ -1861,6 +1910,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param kernelWidth Description of the Parameter
      * @param kernelHeight Description of the Parameter
      */
+    @Override
     public void convolve(float[] kernel, int kernelWidth, int kernelHeight) {
         int size = width * height;
         byte[] r = new byte[size];
@@ -1931,6 +1981,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return The invertedLut value
      */
+    @Override
     public boolean isInvertedLut() {
         return false;
     }
@@ -1941,6 +1992,7 @@ public class ColorProcessor extends ImageProcessor {
      * @param c Description of the Parameter
      * @return The bestIndex value
      */
+    @Override
     public int getBestIndex(Color c) {
         return 0;
     }
@@ -1948,6 +2000,7 @@ public class ColorProcessor extends ImageProcessor {
     /**
      * Does nothing since RGB images do not use LUTs.
      */
+    @Override
     public void invertLut() {
     }
 
@@ -1956,6 +2009,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @param level Description of the Parameter
      */
+    @Override
     public void threshold(int level) {
     }
 
@@ -1964,6 +2018,7 @@ public class ColorProcessor extends ImageProcessor {
      *
      * @return The nChannels value
      */
+    @Override
     public int getNChannels() {
         return 3;
     }
@@ -1979,6 +2034,7 @@ public class ColorProcessor extends ImageProcessor {
      * @return A FloatProcessor with the converted image data of the color
      * channel selected
      */
+    @Override
     public FloatProcessor toFloat(int channelNumber, FloatProcessor fp) {
         int size = width * height;
 
@@ -2004,12 +2060,13 @@ public class ColorProcessor extends ImageProcessor {
      * @param channelNumber Determines the color channel, 0=red, 1=green, 2=blue
      * @param fp The FloatProcessor where the image data are read from.
      */
+    @Override
     public void setPixels(int channelNumber, FloatProcessor fp) {
         float[] fPixels = (float[]) fp.getPixels();
         float value;
         int size = width * height;
         int shift = 16 - 8 * channelNumber;
-        int resetMask = 0xffffffff ^ (255 << shift);
+        int resetMask = ~(255 << shift);
 
         for (int i = 0; i < size; i++) {
             value = fPixels[i] + 0.49999995f;

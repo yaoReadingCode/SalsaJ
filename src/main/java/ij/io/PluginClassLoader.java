@@ -45,35 +45,45 @@ public class PluginClassLoader extends ClassLoader {
 		//find all JAR files on the path and subdirectories
 		File f = new File(path);
 		String[] list = f.list();
-		if (list==null)
-			return;
-		for (int i=0; i<list.length; i++) {
-			f=new File(path, list[i]);
-			if (f.isDirectory()) {
-				String[] innerlist = f.list();
-				if (innerlist==null) continue;
-				for (int j=0; j<innerlist.length; j++) {
-					File g = new File(f,innerlist[j]);
-					if (g.isFile()) addJAR(g);
-				}
-			} else 
-				addJAR(f);
-		}
+		if (list==null) {
+            return;
+        }
+        for (String aList : list) {
+            f = new File(path, aList);
+            if (f.isDirectory()) {
+                String[] innerlist = f.list();
+                if (innerlist == null) {
+                    continue;
+                }
+                for (String anInnerlist : innerlist) {
+                    File g = new File(f, anInnerlist);
+                    if (g.isFile()) {
+                        addJAR(g);
+                    }
+                }
+            } else {
+                addJAR(f);
+            }
+        }
 	}
 
     private void addJAR(File f) {
-        if (f.getName().endsWith(".jar") || f.getName().endsWith(".zip"))
+        if (f.getName().endsWith(".jar") || f.getName().endsWith(".zip")) {
             jarFiles.addElement(f);
+        }
     }
 
     /**
      * Returns a resource from the path or JAR files as a URL
      * @param name a resource name.
      */
+    @Override
     public URL getResource(String name) {
         // try system loader first
-        URL res = super.getSystemResource(name);
-        if (res != null) return res;
+        URL res = getSystemResource(name);
+        if (res != null) {
+            return res;
+        }
 
         File resFile;
 
@@ -85,23 +95,23 @@ public class PluginClassLoader extends ClassLoader {
               return res; 
             }
         }
-        catch (Exception e) {}
+        catch (Exception ignored) {}
 
         //try subfolders
         resFile = new File(path);
         String[] list = resFile.list();
         if (list!=null) {
-            for (int i=0; i<list.length; i++) {
-                resFile = new File(path, list[i]);
+            for (String aList : list) {
+                resFile = new File(path, aList);
                 if (resFile.isDirectory()) {
                     try {
-                        File f = new File(path+list[i], name);
+                        File f = new File(path + aList, name);
                         if (f.exists()) {
                             res = makeURL(f);
                             return res;
-                        }                        
+                        }
+                    } catch (Exception ignored) {
                     }
-                    catch (Exception e) {}
 
                 }
             }
@@ -130,31 +140,30 @@ public class PluginClassLoader extends ClassLoader {
     
     // make a URL from a file
     private URL makeURL (File fil) throws MalformedURLException {
-        URL url = new URL("file","",fil.toString());
-        return url;
+        return new URL("file","",fil.toString());
     }
     
     // make a URL from a file within a JAR
     private URL makeURL (String name, File jar) throws MalformedURLException {
-        StringBuffer filename = new StringBuffer("file:///");
-        filename.append(jar.toString());
-        filename.append("!/");
-        filename.append(name);
         //filename.insert(0,'/');
-        String sf = filename.toString();
+        String sf = "file:///" + jar.toString() +
+                "!/" +
+                name;
         String sfu = sf.replace('\\','/');
-        URL url = new URL("jar","",sfu);
-        return url;
+        return new URL("jar","",sfu);
     }
 
     /**
      * Returns a resource from the path or JAR files as an InputStream
      * @param name a resource name.
      */
+    @Override
     public InputStream getResourceAsStream(String name) {
         //try the system loader first
-        InputStream is = super.getSystemResourceAsStream(name);
-        if (is != null) return is;
+        InputStream is = getSystemResourceAsStream(name);
+        if (is != null) {
+            return is;
+        }
 
         File resFile;
 
@@ -163,22 +172,26 @@ public class PluginClassLoader extends ClassLoader {
         try { // read the byte codes
             is = new FileInputStream(resFile);
         }
-        catch (Exception e) {}
-        if (is != null) return is;
+        catch (Exception ignored) {}
+        if (is != null) {
+            return is;
+        }
 
         //try subdirectories
         resFile = new File(path);
         String[] list = resFile.list();
         if (list!=null) {
-            for (int i=0; i<list.length; i++) {
-                resFile = new File(path, list[i]);
+            for (String aList : list) {
+                resFile = new File(path, aList);
                 if (resFile.isDirectory()) {
                     try {
-                        File f = new File(path+list[i], name);
+                        File f = new File(path + aList, name);
                         is = new FileInputStream(f);
+                    } catch (Exception ignored) {
                     }
-                    catch (Exception e) {}
-                    if (is != null) return is;
+                    if (is != null) {
+                        return is;
+                    }
                 }
             }
         }
@@ -205,6 +218,7 @@ public class PluginClassLoader extends ClassLoader {
      * Returns a Class from the path or JAR files. Classes are automatically resolved.
      * @param className a class name without the .class extension.
      */
+    @Override
     public Class loadClass(String className) throws ClassNotFoundException {
         return (loadClass(className, true));
     }
@@ -214,6 +228,7 @@ public class PluginClassLoader extends ClassLoader {
      * @param className a String class name without the .class extension.
      *        resolveIt a boolean (should almost always be true)
      */
+    @Override
     public synchronized Class loadClass(String className, boolean resolveIt) throws ClassNotFoundException {
 
         Class   result;
@@ -230,17 +245,20 @@ public class PluginClassLoader extends ClassLoader {
             result = super.findSystemClass(className);
             return result;
         }
-        catch (Exception e) {}
+        catch (Exception ignored) {}
 
         // Try to load it from plugins directory
         classBytes = loadClassBytes(className);
 		//IJ.log("loadClass: "+ className + "  "+ (classBytes!=null?""+classBytes.length:"null"));
 		if (classBytes==null) {
 			result = getParent().loadClass(className);
-			if (result != null) return result;
+			if (result != null) {
+                return result;
+            }
 		}
-		if (classBytes==null)
-			throw new ClassNotFoundException(className);
+		if (classBytes==null) {
+            throw new ClassNotFoundException(className);
+        }
 
         // Define it (parse the class file)
         result = defineClass(className, classBytes, 0, classBytes.length);
@@ -249,7 +267,9 @@ public class PluginClassLoader extends ClassLoader {
         }
 
         //Resolve if necessary
-        if (resolveIt) resolveClass(result);
+        if (resolveIt) {
+            resolveClass(result);
+        }
 
         cache.put(className, result);
         return result;
@@ -273,8 +293,9 @@ public class PluginClassLoader extends ClassLoader {
                     try {
                         File jf = (File)jarFiles.elementAt(i);
                         classBytes = loadClassFromJar(jf.getPath(), name);
-                        if (classBytes != null)
+                        if (classBytes != null) {
                             return classBytes;
+                        }
                     }
                     catch (Exception e) {
                         //no problem, try the next one
@@ -307,13 +328,14 @@ public class PluginClassLoader extends ClassLoader {
         File f = new File(path);
         String[] list = f.list();
         if (list!=null) {
-            for (int i=0; i<list.length; i++) {
+            for (String aList : list) {
                 //ij.IJ.write(path+"  "+list[i]);
-                f=new File(path, list[i]);
+                f = new File(path, aList);
                 if (f.isDirectory()) {
-                    byte [] buf = loadIt(path+list[i], name);
-                    if (buf!=null)
+                    byte[] buf = loadIt(path + aList, name);
+                    if (buf != null) {
                         return buf;
+                    }
                 }
             }
         }
@@ -342,17 +364,22 @@ public class PluginClassLoader extends ClassLoader {
                     int b=0, eofFlag=0;
                     while ((size - b) > 0) {
                         eofFlag = bis.read(data, b, size - b);
-                        if (eofFlag==-1) break;
+                        if (eofFlag==-1) {
+                            break;
+                        }
                         b += eofFlag;
                     }
 					return data;
 				}
 			}
 		}
-    	catch (Exception e) {}
+    	catch (Exception ignored) {}
     	finally {
-    		try {if (bis!=null) bis.close();}
-    		catch (IOException e) {}
+    		try {if (bis!=null) {
+                bis.close();
+            }
+            }
+    		catch (IOException ignored) {}
     	}
     	return null;
 	}

@@ -7,7 +7,6 @@ import ij.plugin.TextReader;
 import ij.plugin.frame.Recorder;
 import ij.util.Tools;
 import java.awt.*;
-import java.util.*;
 import java.awt.event.*;
 import java.io.*;
 
@@ -44,13 +43,14 @@ public class Convolver implements ExtendedPlugInFilter, DialogListener, ActionLi
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		if (imp == null) {
 			IJ.noImage();
 			return DONE;
 		}
-		if (arg.equals("final") && imp.getRoi() == null) {
+		if ("final".equals(arg) && imp.getRoi() == null) {
 			imp.getProcessor().resetMinAndMax();
 			imp.updateAndDraw();
 			return DONE;
@@ -69,7 +69,8 @@ public class Convolver implements ExtendedPlugInFilter, DialogListener, ActionLi
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		if (canceled) {
 			return;
 		}
@@ -93,7 +94,8 @@ public class Convolver implements ExtendedPlugInFilter, DialogListener, ActionLi
 	 *@param  pfr      Description of the Parameter
 	 *@return          Description of the Return Value
 	 */
-	public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
+	@Override
+    public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
 		//EU_HOU Bundle
 		gd = new GenericDialog("Convolver...", IJ.getInstance());
 		gd.addTextAreas(kernelText, null, 10, 30);
@@ -117,7 +119,8 @@ public class Convolver implements ExtendedPlugInFilter, DialogListener, ActionLi
 	 *@param  e   Description of the Parameter
 	 *@return     Description of the Return Value
 	 */
-	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
+	@Override
+    public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
 		kernelText = gd.getNextText();
 		normalizeFlag = gd.getNextBoolean();
 		normalize = normalizeFlag;
@@ -221,7 +224,7 @@ public class Convolver implements ExtendedPlugInFilter, DialogListener, ActionLi
 		int i = 0;
 			for (int y = 0; y < kh; y++) {
 				for (int x = 0; x < kw; x++) {
-					sb.append("" + kernel[i++]);
+					sb.append("").append(kernel[i++]);
 					if (x < kw - 1) {
 						sb.append(" ");
 					}
@@ -455,9 +458,9 @@ public class Convolver implements ExtendedPlugInFilter, DialogListener, ActionLi
 	double scale = 1.0;
 		if (normalize) {
 		double sum = 0.0;
-			for (int i = 0; i < kernel.length; i++) {
-				sum += kernel[i];
-			}
+            for (float aKernel : kernel) {
+                sum += aKernel;
+            }
 			if (sum != 0.0) {
 				scale = (float) (1.0 / sum);
 			}
@@ -570,7 +573,7 @@ public class Convolver implements ExtendedPlugInFilter, DialogListener, ActionLi
 				if (integers) {
 					sb.append(IJ.d2s(ip.getPixelValue(x, y), 0));
 				} else {
-					sb.append("" + ip.getPixelValue(x, y));
+					sb.append("").append(ip.getPixelValue(x, y));
 				}
 			}
 			if (y != height - 1) {
@@ -586,7 +589,8 @@ public class Convolver implements ExtendedPlugInFilter, DialogListener, ActionLi
 	 *
 	 *@param  nPasses  The new nPasses value
 	 */
-	public void setNPasses(int nPasses) {
+	@Override
+    public void setNPasses(int nPasses) {
 		this.nPasses = nPasses;
 		pass = 0;
 	}
@@ -608,7 +612,8 @@ public class Convolver implements ExtendedPlugInFilter, DialogListener, ActionLi
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 	Object source = e.getSource();
 		Recorder.disablePathRecording();
 		if (source == save) {

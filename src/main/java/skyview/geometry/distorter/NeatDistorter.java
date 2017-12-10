@@ -9,18 +9,22 @@ public class NeatDistorter extends Distorter {
     
     private  double x0, y0, scale;
     
+    @Override
     public String getName() {
 	return "NeatDistorter";
     }
     
+    @Override
     public String  getDescription() {
 	return "Invert a radial cubic distortion (find x from y where y=x+d x^3)";
     }
     
+    @Override
     public Distorter inverse() {
 	return new NeatInvDistorter();
     }
     
+    @Override
     public boolean isInverse(Transformer test) {
 	try {
 	    return test.inverse().inverse() == this;
@@ -35,6 +39,7 @@ public class NeatDistorter extends Distorter {
 	this.scale  = scale;
     }
     
+    @Override
     public void transform(double[] in, double[] out) {
 	
 	double x = in[0];
@@ -61,22 +66,26 @@ public class NeatDistorter extends Distorter {
     
     public class NeatInvDistorter extends Distorter {
 	
-	public String getName() {
+	@Override
+    public String getName() {
 	    return "NeatInvDistorter";
 	}
 	public String getDescrition() {
 	    return "Perform radial distortion y = x + d x^3";
 	}
 	
+        @Override
         public boolean isInverse(Transformer test) {
 	    return test == NeatDistorter.this;
 	}
 	
-	public Distorter inverse() {
+	@Override
+    public Distorter inverse() {
 	    return NeatDistorter.this;
 	}
 	
-	public void transform(double[] in, double[] out) {
+	@Override
+    public void transform(double[] in, double[] out) {
 	    
 	    double x = in[0];
 	    double y = in[1];

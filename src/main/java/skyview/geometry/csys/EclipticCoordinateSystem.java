@@ -14,6 +14,7 @@ public class EclipticCoordinateSystem extends CoordinateSystem
     /** 
      * Get the name of this component.
      */
+    @Override
     public String getName() {
 	return "E"+epoch;
     }
@@ -21,6 +22,7 @@ public class EclipticCoordinateSystem extends CoordinateSystem
     /** 
      * Get a description of this component.
      */
+    @Override
     public String getDescription() {
 	return "A coordinate system with the ecliptic as the equator at epoch of equinox"+epoch;
     }
@@ -46,6 +48,7 @@ public class EclipticCoordinateSystem extends CoordinateSystem
 	this.elon  = elon;
     }
       
+    @Override
     public Rotater getRotater() {
         double DAS2R = 4.84813681109535993589914102e-6;
 

@@ -188,12 +188,12 @@ public class WCS extends Converter {
 	    }
 	    
 	    if (lonAxis == -1) {
-	        if (axis.equals("RA--")  || axis.equals("GLON")  || axis.equals("ELON") || axis.equals("HLON")) {
+	        if ("RA--".equals(axis) || "GLON".equals(axis) || "ELON".equals(axis) || "HLON".equals(axis)) {
 		    lonAxis = i;
 		}
 	    }
 	    if (latAxis == -1) {
-	        if (axis.equals("DEC-")  || axis.equals("GLAT")  || axis.equals("ELAT") || axis.equals("HLAT")) {
+	        if ("DEC-".equals(axis) || "GLAT".equals(axis) || "ELAT".equals(axis) || "HLAT".equals(axis)) {
 		    latAxis = i;
 		}
 	    }
@@ -377,18 +377,18 @@ public class WCS extends Converter {
 	
 	CoordinateSystem coords;
 	
-	if (lonType.equals("RA--") && latType.equals("DEC-") ){
+	if ("RA--".equals(lonType) && "DEC-".equals(latType)){
 	    coordSym = frame()+equinox();
 	} else {
 	    if (lonType.charAt(0) != latType.charAt(0)) {
 	        throw new TransformationException("Inconsistent axes definitions:"+lonType+","+latType);
 	    }
 	
-	    if (lonType.equals("GLON")) {
+	    if ("GLON".equals(lonType)) {
 	        coordSym = "G";
-	    } else if (lonType.equals("ELON")) {
+	    } else if ("ELON".equals(lonType)) {
 	        coordSym = "E"+equinox();
-	    } else if (lonType.equals("HLON")) {
+	    } else if ("HLON".equals(lonType)) {
 	        coordSym = "H"+equinox();
 	    }
 	}
@@ -427,7 +427,7 @@ public class WCS extends Converter {
 		return "B";
 	    }
 	}
-	if (sys.length() > 3  && sys.substring(0,3).equals("FK4")) {
+	if (sys.length() > 3  && "FK4".equals(sys.substring(0, 3))) {
 	    return "B";
 	} else {
 	    return "J";
@@ -445,13 +445,13 @@ public class WCS extends Converter {
 	    throw new TransformationException("Inconsistent projection in FITS header: "+lonType+","+latType);
 	}
 	
-        if (lonType.equals("AIT")) {
+        if ("AIT".equals(lonType)) {
 	    proj = new Projection("Ait");
 	    
-	} else if (lonType.equals("CAR")) {
+	} else if ("CAR".equals(lonType)) {
 	    proj = new Projection("Car");
 	    
-	} else if (lonType.equals("CSC")) {
+	} else if ("CSC".equals(lonType)) {
 	    proj = new Projection("Csc");
 	    
 	} else {
@@ -467,7 +467,7 @@ public class WCS extends Converter {
 	    wcsKeys.put("CRVAL1", crval1);
 	    wcsKeys.put("CRVAL2", crval2);
 	
-	    if (lonType.equals("TAN")  || lonType.equals("SIN") || lonType.equals("ZEA") ) {
+	    if ("TAN".equals(lonType) || "SIN".equals(lonType) || "ZEA".equals(lonType)) {
 	    
 	    
 	        String type = lonType.substring(0,1)+lonType.substring(1,3).toLowerCase();
@@ -507,7 +507,7 @@ public class WCS extends Converter {
 	            }
 		}
 	    
-	    } else if (lonType.equals("NCP")) {
+	    } else if ("NCP".equals(lonType)) {
 		
 	        // Sin projection with projection centered at pole.
 		double[] xproj = new double[] {toRadians(crval1), Math.PI/2};
@@ -544,25 +544,22 @@ public class WCS extends Converter {
 
     /** Is this a DSS projection? */
     private boolean checkDSS() throws TransformationException {
-	
-        String origin = h.getStringValue("ORIGIN");
-	if (origin == null) {
-	    return false;
+
+		String origin = h.getStringValue("ORIGIN");
+		if (origin == null) {
+			return false;
+		}
+		wcsKeys.put("ORIGIN", origin);
+
+		// If we have a local solution use it unless told
+		// to prefer the DSS solution.
+		if (h.getStringValue("CTYPE1") != null && !preferDSS) {
+			return false;
+		}
+
+		return !(h.getDoubleValue("XPIXELSZ", -1) == -1) && (origin.startsWith("CASB") || origin.startsWith("STScI"));
+
 	}
-	wcsKeys.put("ORIGIN", origin);
-	
-	// If we have a local solution use it unless told
-	// to prefer the DSS solution.
-	if (h.getStringValue("CTYPE1") != null  && !preferDSS) {
-	    return false;
-	}
-	
-	if (h.getDoubleValue("XPIXELSZ", -1) == -1) {
-	    return false;
-	}
-	
-	return origin.startsWith("CASB") || origin.startsWith("STScI") ;
-    }
     
     /** Handle a DSS projection */
     private void doDSSWCS() throws TransformationException {
@@ -576,7 +573,7 @@ public class WCS extends Converter {
 	double plateDec = h.getDoubleValue("PLTDECD") + h.getDoubleValue("PLTDECM")/60 + h.getDoubleValue("PLTDECS")/3600;
 	plateDec        = toRadians(plateDec);
 	
-	if (h.getStringValue("PLTDECSN").substring(0,1).equals("-")) {
+	if ("-".equals(h.getStringValue("PLTDECSN").substring(0, 1))) {
 	    plateDec    = -plateDec;
 	}
 	wcsKeys.put("PLTDECD", h.getDoubleValue("PLTDECD"));
@@ -656,7 +653,7 @@ public class WCS extends Converter {
     
     /** Is this a NEAT special projection? */
     private boolean checkNeat() {
-	return h.getStringValue("CTYPE1").equals("RA---XTN");
+	return "RA---XTN".equals(h.getStringValue("CTYPE1"));
     }
     
     /** Handle the NEAT special projection */
@@ -748,18 +745,23 @@ public class WCS extends Converter {
 	coordString = coordString.toUpperCase();
 	String[] prefixes = new String[2];
 	char c = coordString.charAt(0);
-	if (c == 'J' || c == 'I') {
-	    h.addValue("RADESYS", "FK5", "Coordinate system");
-	    prefixes[0] = "RA--";
-	    prefixes[1] = "DEC-";
-	} else if (c == 'B') {
-	    h.addValue("RADESYS", "FK4", "Coordinate system");
-	    prefixes[0] = "RA--";
-	    prefixes[1] = "DEC-";
-	} else {
-	    prefixes[0] = c + "LON";
-	    prefixes[1] = c + "LAT";
-	}
+		switch (c) {
+			case 'J':
+			case 'I':
+				h.addValue("RADESYS", "FK5", "Coordinate system");
+				prefixes[0] = "RA--";
+				prefixes[1] = "DEC-";
+				break;
+			case 'B':
+				h.addValue("RADESYS", "FK4", "Coordinate system");
+				prefixes[0] = "RA--";
+				prefixes[1] = "DEC-";
+				break;
+			default:
+				prefixes[0] = c + "LON";
+				prefixes[1] = c + "LAT";
+				break;
+		}
 	
 	if (c != 'G'  && c != 'I') {
 	    try {
@@ -818,9 +820,9 @@ public class WCS extends Converter {
 	for(String key: srt) {
 	    Object o = wcsKeys.get(key);
 	    if (o instanceof Integer) {
-		h.addValue(key, ((Integer)o).intValue(), "Copied WCS eleemnt");
+		h.addValue(key, (Integer) o, "Copied WCS eleemnt");
 	    } else if (o instanceof Double) {
-		h.addValue(key, ((Double) o).doubleValue(), "Copied WCS element");
+		h.addValue(key, (Double) o, "Copied WCS element");
 	    } else if (o instanceof String) {
 		h.addValue(key, (String) o, "Copied WCS element");
 	    }

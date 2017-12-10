@@ -2,8 +2,6 @@
 
 package ij;
 import ij.process.*;
-import java.awt.*;
-import java.awt.image.*;
 import ij.gui.*;
 
 /** This class consists of static methods and
@@ -30,38 +28,48 @@ public class Undo {
 			return;
 		}
 		//IJ.log(imp.getTitle() + ": set up undo (" + what + ")");
-		if (what==FILTER && whatToUndo==COMPOUND_FILTER)
-				return;
+		if (what==FILTER && whatToUndo==COMPOUND_FILTER) {
+            return;
+        }
 		if (what==COMPOUND_FILTER_DONE) {
-			if (whatToUndo==COMPOUND_FILTER)
-				whatToUndo = what;
+			if (whatToUndo==COMPOUND_FILTER) {
+                whatToUndo = what;
+            }
 			return;
 		}
 		whatToUndo = what;
 		imageID = imp.getID();
-		if (what==TYPE_CONVERSION)
-			ipCopy = imp.getProcessor();
-		else if (what==TRANSFORM) {			
-			impCopy = new ImagePlus(imp.getTitle(), imp.getProcessor().duplicate());
-			Object fht  = imp.getProperty("FHT");
-			if (fht!=null) {
-				fht = new FHT((ImageProcessor)fht); // duplicate
-				impCopy.setProperty("FHT", fht);
-			}
-		} else if (what==COMPOUND_FILTER) {
-			ImageProcessor ip = imp.getProcessor();
-			if (ip!=null)
-				ipCopy = ip.duplicate();
-			else
-				ipCopy = null;
-		} else
-			ipCopy = null;
+        switch (what) {
+            case TYPE_CONVERSION:
+                ipCopy = imp.getProcessor();
+                break;
+            case TRANSFORM:
+                impCopy = new ImagePlus(imp.getTitle(), imp.getProcessor().duplicate());
+                Object fht = imp.getProperty("FHT");
+                if (fht != null) {
+                    fht = new FHT((ImageProcessor) fht); // duplicate
+                    impCopy.setProperty("FHT", fht);
+                }
+                break;
+            case COMPOUND_FILTER:
+                ImageProcessor ip = imp.getProcessor();
+                if (ip != null) {
+                    ipCopy = ip.duplicate();
+                } else {
+                    ipCopy = null;
+                }
+                break;
+            default:
+                ipCopy = null;
+                break;
+        }
 	}
 	
 	
 	public static void reset() {
-		if (whatToUndo==COMPOUND_FILTER)
-			return;
+		if (whatToUndo==COMPOUND_FILTER) {
+            return;
+        }
 		whatToUndo = NOTHING;
 		imageID = 0;
 		ipCopy = null;
@@ -88,23 +96,26 @@ public class Undo {
 			case TYPE_CONVERSION:
 			case COMPOUND_FILTER:
 			case COMPOUND_FILTER_DONE:
-				if (ipCopy!=null)
-					imp.setProcessor(null, ipCopy);
+				if (ipCopy!=null) {
+                    imp.setProcessor(null, ipCopy);
+                }
 	    		break;
 			case TRANSFORM:
 				if (impCopy!=null) {
 					imp.setProcessor(impCopy.getTitle(), impCopy.getProcessor());
 					Object fht  = impCopy.getProperty("FHT");
-					if (fht!=null)
-						imp.setProperty("FHT", fht);
-					else if (imp.getProperty("FHT")!=null)
-							imp.getProperties().remove("FHT");
+					if (fht!=null) {
+                        imp.setProperty("FHT", fht);
+                    } else if (imp.getProperty("FHT")!=null) {
+                        imp.getProperties().remove("FHT");
+                    }
 				}
 	    		break;
 			case PASTE:
 				Roi roi = imp.getRoi();
-				if (roi!=null)
-					roi.abortPaste();
+				if (roi!=null) {
+                    roi.abortPaste();
+                }
 	    		break;
     	}
     	reset();

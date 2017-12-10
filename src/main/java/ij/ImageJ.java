@@ -250,7 +250,7 @@ public class ImageJ extends Frame implements ActionListener,
         //if (IJ.isWindows()||IJ.isLinux()) {
         try {
             setIcon();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         //}
         setBounds(loc.x, loc.y, ijWidth, ijHeight);// needed for pack to work
@@ -430,6 +430,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if ((e.getSource() instanceof MenuItem)) {
             MenuItem item = (MenuItem) e.getSource();
@@ -461,12 +462,13 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void itemStateChanged(ItemEvent e) {
         MenuItem item = (MenuItem) e.getSource();
         MenuComponent parent = (MenuComponent) item.getParent();
         String cmd = e.getItem().toString();
 
-        if ((Menu) parent == Menus.window) {
+        if (parent == Menus.window) {
             WindowManager.activateWindow(cmd, item);
         } else {
             doCommand(cmd);
@@ -478,6 +480,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         Undo.reset();
         //EU_HOU Bundle
@@ -493,6 +496,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 
@@ -501,6 +505,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
@@ -509,6 +514,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
@@ -517,6 +523,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
@@ -525,12 +532,13 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
         IJ.setKeyDown(keyCode);
         hotkey = false;
-        if (keyCode == e.VK_CONTROL || keyCode == e.VK_SHIFT) {
+        if (keyCode == KeyEvent.VK_CONTROL || keyCode == KeyEvent.VK_SHIFT) {
             return;
         }
         char keyChar = e.getKeyChar();
@@ -542,10 +550,10 @@ public class ImageJ extends Frame implements ActionListener,
                     + "), char=\"" + keyChar + "\" (" + (int) keyChar + "), flags="
                     + KeyEvent.getKeyModifiersText(flags));
         }
-        boolean shift = (flags & e.SHIFT_MASK) != 0;
-        boolean control = (flags & e.CTRL_MASK) != 0;
-        boolean alt = (flags & e.ALT_MASK) != 0;
-        boolean meta = (flags & e.META_MASK) != 0;
+        boolean shift = (flags & InputEvent.SHIFT_MASK) != 0;
+        boolean control = (flags & InputEvent.CTRL_MASK) != 0;
+        boolean alt = (flags & InputEvent.ALT_MASK) != 0;
+        boolean meta = (flags & InputEvent.META_MASK) != 0;
         String cmd = "";
         ImagePlus imp = WindowManager.getCurrentImage();
         boolean isStack = (imp != null) && (imp.getStackSize() > 1);
@@ -554,7 +562,7 @@ public class ImageJ extends Frame implements ActionListener,
             Roi roi = imp.getRoi();
 
             if (roi instanceof TextRoi) {
-                if ((flags & e.META_MASK) != 0 && IJ.isMacOSX()) {
+                if ((flags & InputEvent.META_MASK) != 0 && IJ.isMacOSX()) {
                     return;
                 }
                 if (alt) {
@@ -580,9 +588,9 @@ public class ImageJ extends Frame implements ActionListener,
 
             if (macroShortcuts.size() > 0) {
                 if (shift) {
-                    cmd = (String) macroShortcuts.get(new Integer(keyCode + 200));
+                    cmd = (String) macroShortcuts.get(keyCode + 200);
                 } else {
-                    cmd = (String) macroShortcuts.get(new Integer(keyCode));
+                    cmd = (String) macroShortcuts.get(keyCode);
                 }
                 if (cmd != null) {
                     //MacroInstaller.runMacroCommand(cmd);
@@ -596,9 +604,9 @@ public class ImageJ extends Frame implements ActionListener,
             Hashtable shortcuts = Menus.getShortcuts();
 
             if (shift) {
-                cmd = (String) shortcuts.get(new Integer(keyCode + 200));
+                cmd = (String) shortcuts.get(keyCode + 200);
             } else {
-                cmd = (String) shortcuts.get(new Integer(keyCode));
+                cmd = (String) shortcuts.get(keyCode);
             }
         }
 
@@ -681,8 +689,8 @@ public class ImageJ extends Frame implements ActionListener,
             }
         }
 
-        if (cmd != null && !cmd.equals("")) {
-            if (cmd.equals("Fill")) {
+        if (cmd != null && !"".equals(cmd)) {
+            if ("Fill".equals(cmd)) {
                 hotkey = true;
             }
             if (cmd.charAt(0) == MacroInstaller.commandPrefix) {
@@ -700,6 +708,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void keyTyped(KeyEvent e) {
         char keyChar = e.getKeyChar();
         int flags = e.getModifiers();
@@ -723,6 +732,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void keyReleased(KeyEvent e) {
         IJ.setKeyUp(e.getKeyCode());
     }
@@ -753,6 +763,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowClosing(WindowEvent e) {
         doCommand("Quit");
     }
@@ -762,6 +773,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowActivated(WindowEvent e) {
         if (IJ.isMacintosh() && !quitting) {
             IJ.wait(10);// may be needed for Java 1.4 on OS X
@@ -774,6 +786,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowClosed(WindowEvent e) {
     }
 
@@ -782,6 +795,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowDeactivated(WindowEvent e) {
     }
 
@@ -790,6 +804,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowDeiconified(WindowEvent e) {
     }
 
@@ -798,6 +813,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowIconified(WindowEvent e) {
     }
 
@@ -806,6 +822,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void windowOpened(WindowEvent e) {
     }
 
@@ -940,7 +957,7 @@ public class ImageJ extends Frame implements ActionListener,
             } else if (macros == 0 && (arg.endsWith(".ijm") || arg.endsWith(".txt"))) {
                 IJ.runMacroFile(arg);
                 macros++;
-            } else if (arg.indexOf("ij.ImageJ") == -1) {
+            } else if (!arg.contains("ij.ImageJ")) {
                 File file = new File(arg);
                 IJ.open(file.getAbsolutePath());
             }
@@ -992,7 +1009,7 @@ public class ImageJ extends Frame implements ActionListener,
                 } else if (arg.startsWith("-run") && i + 1 < nArgs) {
                     cmd = "run " + args[i + 1];
                     args[i + 1] = null;
-                } else if (arg.indexOf("ij.ImageJ") == -1 && !arg.startsWith("-")) {
+                } else if (!arg.contains("ij.ImageJ") && !arg.startsWith("-")) {
                     cmd = "open " + arg;
                 }
                 if (cmd != null) {
@@ -1053,6 +1070,7 @@ public class ImageJ extends Frame implements ActionListener,
     /**
      * Quit using a separate thread, hopefully avoiding thread deadlocks.
      */
+    @Override
     public void run() {
         quitting = true;
 
@@ -1060,10 +1078,10 @@ public class ImageJ extends Frame implements ActionListener,
         int[] wList = WindowManager.getIDList();
 
         if (wList != null) {
-            for (int i = 0; i < wList.length; i++) {
-                ImagePlus imp = WindowManager.getImage(wList[i]);
+            for (int aWList : wList) {
+                ImagePlus imp = WindowManager.getImage(aWList);
 
-                if (imp != null && imp.changes == true) {
+                if (imp != null && imp.changes) {
                     changes = true;
                     break;
                 }
@@ -1130,6 +1148,7 @@ public class ImageJ extends Frame implements ActionListener,
      *
      * @return The locale value
      */
+    @Override
     public Locale getLocale() {
         return lang;
     }

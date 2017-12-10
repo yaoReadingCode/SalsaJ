@@ -15,7 +15,8 @@ import ij.process.*;
  */
 public class FITS_Writer implements PlugIn {
 
-	public void run(String path) {
+	@Override
+    public void run(String path) {
 		ImagePlus imp = IJ.getImage();
 		ImageProcessor ip = imp.getProcessor();
 		int numImages = imp.getImageStackSize();
@@ -36,26 +37,31 @@ public class FITS_Writer implements PlugIn {
 		File f = new File(path);
 		String directory = f.getParent()+File.separator;
 		String name = f.getName();
-		if (f.exists()) f.delete();
+		if (f.exists()) {
+            f.delete();
+        }
 		int numBytes = 0;
 
 		// GET IMAGE
-		if (bitDepth==8)
-			ip = ip.convertToShort(false);
-		else if (imp.getCalibration().isSigned16Bit())
-			ip = ip.convertToFloat();
-		if (ip instanceof ShortProcessor)
-			numBytes = 2;
-		else if (ip instanceof FloatProcessor)
-			numBytes = 4;
+		if (bitDepth==8) {
+            ip = ip.convertToShort(false);
+        } else if (imp.getCalibration().isSigned16Bit()) {
+            ip = ip.convertToFloat();
+        }
+		if (ip instanceof ShortProcessor) {
+            numBytes = 2;
+        } else if (ip instanceof FloatProcessor) {
+            numBytes = 4;
+        }
 		int fillerLength = 2880 - ( (numBytes * imp.getWidth() * imp.getHeight()) % 2880 );
 
 		// WRITE FITS HEADER
 		String[] hdr = getHeader(imp);
-		if (hdr == null)
-			createHeader(path, ip, numBytes);
-		else
-			copyHeader(hdr, path, ip, numBytes);
+		if (hdr == null) {
+            createHeader(path, ip, numBytes);
+        } else {
+            copyHeader(hdr, path, ip, numBytes);
+        }
 
 		// WRITE DATA
 		writeData(path, ip);
@@ -69,9 +75,17 @@ public class FITS_Writer implements PlugIn {
 	void createHeader(String path, ImageProcessor ip, int numBytes) {
 		int numCards = 5;
 		String bitperpix = "";
-		if      (numBytes==2) {bitperpix = "                  16";}
-		else if (numBytes==4) {bitperpix = "                 -32";}
-		else if (numBytes==1) {bitperpix = "                   8";}
+        switch (numBytes) {
+            case 2:
+                bitperpix = "                  16";
+                break;
+            case 4:
+                bitperpix = "                 -32";
+                break;
+            case 1:
+                bitperpix = "                   8";
+                break;
+        }
  		appendFile(writeCard("SIMPLE", "                   T", "Created by SalsaJ"), path);
  		appendFile(writeCard("BITPIX", bitperpix, ""), path);
  		appendFile(writeCard("NAXIS", "                   2", ""), path);
@@ -81,8 +95,9 @@ public class FITS_Writer implements PlugIn {
 		char[] end = new char[3];
 		end[0] = 'E'; end[1] = 'N'; end[2] = 'D';
 		char[] filler = new char[fillerSize];
-		for (int i = 0; i < fillerSize; i++)
-			filler[i] = ' ';
+		for (int i = 0; i < fillerSize; i++) {
+            filler[i] = ' ';
+        }
  		appendFile(end, path);
  		appendFile(filler, path);
 	}
@@ -92,8 +107,9 @@ public class FITS_Writer implements PlugIn {
 	 */ 
 	char[] writeCard(String title, String value, String comment) {
 		char[] card = new char[80];
-		for (int i = 0; i < 80; i++)
-			card[i] = ' ';
+		for (int i = 0; i < 80; i++) {
+            card[i] = ' ';
+        }
 		s2ch(title, card, 0);
 		card[8] = '=';
 		s2ch(value, card, 10);
@@ -108,8 +124,9 @@ public class FITS_Writer implements PlugIn {
 	 */
 	void s2ch (String str, char[] ch, int offset) {
 		int j = 0;
-		for (int i = offset; i < 80 && i < str.length()+offset; i++)
-			ch[i] = str.charAt(j++);
+		for (int i = offset; i < 80 && i < str.length()+offset; i++) {
+            ch[i] = str.charAt(j++);
+        }
 	}
 	
 	/**
@@ -123,8 +140,7 @@ public class FITS_Writer implements PlugIn {
 		}
 		catch (IOException e) {
 			IJ.showStatus("Error writing file!");
-			return;
-		}
+        }
 	}
 			
 	/**
@@ -138,8 +154,9 @@ public class FITS_Writer implements PlugIn {
 			short[] pixels = (short[])ip.getPixels();
 			try {   
 				DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(path,true)));
-				for (int i = 0; i < (pixels.length); i++)
-					dos.writeShort(pixels[i]);
+                for (short pixel : pixels) {
+                    dos.writeShort(pixel);
+                }
 				dos.close();
 			}
 			catch (IOException e) {
@@ -150,8 +167,9 @@ public class FITS_Writer implements PlugIn {
 			float[] pixels = (float[])ip.getPixels();
 			try {   
 				DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(path,true)));
-				for (int i = 0; i < (pixels.length); i++)	   
-					dos.writeFloat(pixels[i]);
+                for (float pixel : pixels) {
+                    dos.writeFloat(pixel);
+                }
 				dos.close();
 			}
 			catch (IOException e) {
@@ -177,17 +195,19 @@ public class FITS_Writer implements PlugIn {
 		int depth = img.getStackSize();
 		if (depth == 1) {
 			Properties props = img.getProperties();
-			if (props == null)
-				return null;
-			content = (String)props.getProperty ("Info");
+			if (props == null) {
+                return null;
+            }
+			content = props.getProperty ("Info");
 		}
 		else if (depth > 1) {
 			int slice = img.getCurrentSlice();
 			ImageStack stack = img.getStack();
 			content = stack.getSliceLabel(slice);
 		}
-		if (content == null)
-			return null;
+		if (content == null) {
+            return null;
+        }
 
 		// PARSE INTO LINES
 
@@ -197,21 +217,30 @@ public class FITS_Writer implements PlugIn {
 
 		int istart = 0;
 		for (; istart < lines.length; istart++) {
-			if (lines[istart].startsWith("SIMPLE") ) break;
+			if (lines[istart].startsWith("SIMPLE") ) {
+                break;
+            }
 		}
-		if (istart == lines.length) return null;
+		if (istart == lines.length) {
+            return null;
+        }
 
 		int iend = istart+1;
 		for (; iend < lines.length; iend++) {
 			String s = lines[iend].trim();
-			if ( s.equals ("END") || s.startsWith ("END ") ) break;
+			if ("END".equals(s) || s.startsWith ("END ") ) {
+                break;
+            }
 		}
-		if (iend >= lines.length) return null;
+		if (iend >= lines.length) {
+            return null;
+        }
 
 		int l = iend-istart+1;
 		String header = "";
-		for (int i=0; i < l; i++)
-			header += lines[istart+i]+"\n";
+		for (int i=0; i < l; i++) {
+            header += lines[istart+i]+"\n";
+        }
 		return header.split("\n");
 	}
 
@@ -221,10 +250,13 @@ public class FITS_Writer implements PlugIn {
 	char[] eighty(String s) {
 		char[] c = new char[80];
 		int l=s.length();
-		for (int i=0; i < l && i < 80; i++)
-			c[i]=s.charAt(i);
+		for (int i=0; i < l && i < 80; i++) {
+            c[i]=s.charAt(i);
+        }
 		if (l < 80) {
-			for (; l < 80; l++) c[l]=' ';
+			for (; l < 80; l++) {
+                c[l]=' ';
+            }
 		}
 		return c;
 	}
@@ -237,9 +269,17 @@ public class FITS_Writer implements PlugIn {
 		String bitperpix = "";
 
 		// THIS STUFF NEEDS TO BE MADE CONFORMAL WITH THE PRESENT IMAGE
-		if      (numBytes==2) {bitperpix = "                  16";}
-		else if (numBytes==4) {bitperpix = "                 -32";}
-		else if (numBytes==1) {bitperpix = "                   8";}
+        switch (numBytes) {
+            case 2:
+                bitperpix = "                  16";
+                break;
+            case 4:
+                bitperpix = "                 -32";
+                break;
+            case 1:
+                bitperpix = "                   8";
+                break;
+        }
  		appendFile(writeCard("SIMPLE", "                   T", "Created by ImageJ FITS_Writer 2008-12-15"), path);
  		appendFile(writeCard("BITPIX", bitperpix, ""), path);
  		appendFile(writeCard("NAXIS", "                   2", ""), path);
@@ -248,26 +288,26 @@ public class FITS_Writer implements PlugIn {
 
 		// APPEND THE REST OF THE HEADER
 		char[] card;
-		for (int i=0; i < hdr.length; i++) {
-			String s = hdr[i];
-			card = eighty(s);
-			if (!s.startsWith("SIMPLE") &&
-			    !s.startsWith("BITPIX") &&
-			    !s.startsWith("NAXIS")  &&
-			    !s.startsWith("END ")   &&
-			     s.trim().length() > 1) {
-				appendFile(card, path);
-				numCards++;
-			}
-		}
+        for (String s : hdr) {
+            card = eighty(s);
+            if (!s.startsWith("SIMPLE") &&
+                    !s.startsWith("BITPIX") &&
+                    !s.startsWith("NAXIS") &&
+                    !s.startsWith("END ") &&
+                    s.trim().length() > 1) {
+                appendFile(card, path);
+                numCards++;
+            }
+        }
  
 		// FINISH OFF THE HEADER
 		int fillerSize = 2880 - ((numCards*80+3) % 2880);
 		char[] end = new char[3];
 		end[0] = 'E'; end[1] = 'N'; end[2] = 'D';
 		char[] filler = new char[fillerSize];
-		for (int i = 0; i < fillerSize; i++)
-			filler[i] = ' ';
+		for (int i = 0; i < fillerSize; i++) {
+            filler[i] = ' ';
+        }
 		appendFile(end, path);
 		appendFile(filler, path);
 	}

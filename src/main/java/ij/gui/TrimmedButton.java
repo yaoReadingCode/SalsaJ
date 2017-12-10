@@ -10,10 +10,12 @@ public class TrimmedButton extends Button {
         this.trim = trim;
     }
 
+    @Override
     public Dimension getMinimumSize() {
         return new Dimension(super.getMinimumSize().width-trim, super.getMinimumSize().height);
     }
 
+    @Override
     public Dimension getPreferredSize() {
         return getMinimumSize();
     }

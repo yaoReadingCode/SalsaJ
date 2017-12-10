@@ -24,26 +24,32 @@ public class ByteStatistics extends ImageStatistics {
 		else
 			{minThreshold=(int)minT; maxThreshold=(int)ip.getMaxThreshold();}
 		float[] cTable = cal!=null?cal.getCTable():null;
-		if (cTable!=null)
-			getCalibratedStatistics(minThreshold,maxThreshold,cTable);
-		else
-			getRawStatistics(minThreshold,maxThreshold);
+		if (cTable!=null) {
+            getCalibratedStatistics(minThreshold,maxThreshold,cTable);
+        } else {
+            getRawStatistics(minThreshold,maxThreshold);
+        }
 		if ((mOptions&MIN_MAX)!=0) {
-			if (cTable!=null)
-				getCalibratedMinAndMax(minThreshold, maxThreshold, cTable);
-			else
-				getRawMinAndMax(minThreshold, maxThreshold);
+			if (cTable!=null) {
+                getCalibratedMinAndMax(minThreshold, maxThreshold, cTable);
+            } else {
+                getRawMinAndMax(minThreshold, maxThreshold);
+            }
 		}
-		if ((mOptions&ELLIPSE)!=0)
-			fitEllipse(ip);
-		else if ((mOptions&CENTROID)!=0)
-			getCentroid(ip, minThreshold, maxThreshold);
-		if ((mOptions&(CENTER_OF_MASS|SKEWNESS|KURTOSIS))!=0)
-			calculateMoments(ip, minThreshold, maxThreshold, cTable);
-		if ((mOptions&MEDIAN)!=0)
-			calculateMedian(histogram, 0, cal);
-		if ((mOptions&AREA_FRACTION)!=0)
-			calculateAreaFraction(ip, histogram);
+		if ((mOptions&ELLIPSE)!=0) {
+            fitEllipse(ip);
+        } else if ((mOptions&CENTROID)!=0) {
+            getCentroid(ip, minThreshold, maxThreshold);
+        }
+		if ((mOptions&(CENTER_OF_MASS|SKEWNESS|KURTOSIS))!=0) {
+            calculateMoments(ip, minThreshold, maxThreshold, cTable);
+        }
+		if ((mOptions&MEDIAN)!=0) {
+            calculateMedian(histogram, 0, cal);
+        }
+		if ((mOptions&AREA_FRACTION)!=0) {
+            calculateAreaFraction(ip, histogram);
+        }
 	}
 
 	void getCalibratedStatistics(int minThreshold, int maxThreshold, float[] cTable) {
@@ -157,8 +163,12 @@ public class ByteStatistics extends ImageStatistics {
 		for (int i=minThreshold; i<=maxThreshold; i++) {
 			if (histogram[i]>0) {
 				v = cTable[i];
-				if (v<min) min = v;
-				if (v>max) max = v;
+				if (v<min) {
+                    min = v;
+                }
+				if (v>max) {
+                    max = v;
+                }
 			}
 		}
 	}

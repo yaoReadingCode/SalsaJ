@@ -104,30 +104,35 @@ public final class CscProjecter extends skyview.geometry.Projecter {
     };
     
     /** Get the name of the component */
-    public String getName() {
+    @Override
+	public String getName() {
 	return "CscProjecter";
     }
     
     /** Get a descrption of the component */
-    public String getDescription() {
+    @Override
+	public String getDescription() {
 	return "Project from a sphere to the surface of a cube using the COBE projection.";
     }
     
     /** Get the inverse transformation */
-    public Deprojecter inverse() {
+    @Override
+	public Deprojecter inverse() {
 	return new CscProjecter.CscDeprojecter();
     }
     
     /** Is this an inverse of some other transformation? */
-    public boolean isInverse(Transformer t) {
-	return t.getName().equals("CscDeprojecter");
+    @Override
+	public boolean isInverse(Transformer t) {
+	return "CscDeprojecter".equals(t.getName());
     }
     
     /** Project a point from the sphere to the plane.
      *  @param sphere a double[3] unit vector
      *  @param plane  a double[2] preallocated vector.
      */
-    public final void transform(double[] sphere, double[] plane) {
+    @Override
+	public final void transform(double[] sphere, double[] plane) {
 	
 	if (Double.isNaN(sphere[2]) ) {
 	    
@@ -185,30 +190,35 @@ public final class CscProjecter extends skyview.geometry.Projecter {
     public class CscDeprojecter extends skyview.geometry.Deprojecter {
 	
 	/** Get the name of the component */
+	@Override
 	public String getName() {
 	    return "CscDeprojecter";
 	}
 	
 	/** Get a description of the component */
+	@Override
 	public String getDescription() {
 	    return "Transform from the surface of the plane to the celestial sphere using the COBE algorithm";
 	}
 	
 	
+	@Override
 	public Projecter inverse() {
 	    return CscProjecter.this;
 	}
 	
         /** Is this an inverse of some other transformation? */
-        public boolean isInverse(Transformer t) {
-	    return t.getName().equals("CsdProjecter");
+        @Override
+		public boolean isInverse(Transformer t) {
+	    return "CsdProjecter".equals(t.getName());
         }
 	
         /** Deproject a point from the plane to the sphere.
          *  @param plane a double[2] vector in the tangent plane.
          *  @param spehre a preallocated double[3] vector.
          */
-        public final void transform(double[] plane, double[] sphere) {
+        @Override
+		public final void transform(double[] plane, double[] sphere) {
 	
 	    if (Double.isNaN(plane[0])) {
 	        sphere[0] = Double.NaN;
@@ -245,7 +255,7 @@ public final class CscProjecter extends skyview.geometry.Projecter {
 	        // unit sphere.
 	        sphere[epsIndex[face]] = alpha*epsSign[face];
 	        sphere[zetIndex[face]] = beta*zetSign[face];
-	        sphere[etaIndex[face]] = 1*etaSign[face];
+	        sphere[etaIndex[face]] = etaSign[face];
 	    
 	        // Now normalize back to a unit vector.
 	        double norm = 1/Math.sqrt(alpha*alpha + beta*beta + 1);
@@ -257,7 +267,7 @@ public final class CscProjecter extends skyview.geometry.Projecter {
     
 
         /** Deprojection equation. */
-        private final double g(double x, double y) {
+        private double g(double x, double y) {
 	
 	    double sum = 0;
 	    double yp = 1;

@@ -12,12 +12,14 @@ public class ZAxisProfiler implements PlugInFilter, Measurements  {
 
 	ImagePlus imp;
 
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		return DOES_ALL+NO_CHANGES;
 	}
 
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		if (imp.getStackSize()<2) {
 			IJ.error("ZAxisProfiler", "This command requires a stack.");
 			return;
@@ -32,14 +34,16 @@ public class ZAxisProfiler implements PlugInFilter, Measurements  {
 		float[] y = getZAxisProfile(roi, minThreshold, maxThreshold);
 		if (y!=null) {
 			float[] x = new float[y.length];
-			for (int i=0; i<x.length; i++)
-				x[i] = i+1;
+			for (int i=0; i<x.length; i++) {
+                x[i] = i+1;
+            }
 			String title;
 			if (roi!=null) {
 				Rectangle r = imp.getRoi().getBounds();
 				title = imp.getTitle()+"-"+r.x+"-"+r.y;
-			} else
-				title = imp.getTitle()+"-0-0";
+			} else {
+                title = imp.getTitle()+"-0-0";
+            }
 			PlotWindow pw = new PlotWindow(title, "Slice", "Mean", x, y);
 			double ymin = ProfilePlot.getFixedMin();
 			double ymax= ProfilePlot.getFixedMax();
@@ -58,28 +62,35 @@ public class ZAxisProfiler implements PlugInFilter, Measurements  {
 		float[] values = new float[size];
 		Calibration cal = imp.getCalibration();
 		Analyzer analyzer = new Analyzer(imp);
-		int measurements = analyzer.getMeasurements();
+		int measurements = Analyzer.getMeasurements();
 		boolean showResults = measurements!=0 && measurements!=LIMIT;
 		boolean showingLabels = (measurements&LABELS)!=0 || (measurements&SLICE)!=0;
 		measurements |= MEAN;
 		if (showResults) {
-			if (!analyzer.resetCounter())
-				return null;
+			if (!Analyzer.resetCounter()) {
+                return null;
+            }
 		}
 		int current = imp.getCurrentSlice();
 		for (int i=1; i<=size; i++) {
-			if (showingLabels) imp.setSlice(i);
+			if (showingLabels) {
+                imp.setSlice(i);
+            }
 			ImageProcessor ip = stack.getProcessor(i);
-			if (minThreshold!=ImageProcessor.NO_THRESHOLD)
-				ip.setThreshold(minThreshold,maxThreshold,ImageProcessor.NO_LUT_UPDATE);
+			if (minThreshold!=ImageProcessor.NO_THRESHOLD) {
+                ip.setThreshold(minThreshold,maxThreshold,ImageProcessor.NO_LUT_UPDATE);
+            }
 			ip.setRoi(roi);
 			ImageStatistics stats = ImageStatistics.getStatistics(ip, measurements, cal);
 			analyzer.saveResults(stats, roi);
-			if (showResults)			
-				analyzer.displayResults();
+			if (showResults) {
+                analyzer.displayResults();
+            }
 			values[i-1] = (float)stats.mean;
 		}
-		if (showingLabels) imp.setSlice(current);
+		if (showingLabels) {
+            imp.setSlice(current);
+        }
 		return values;
 	}
 	

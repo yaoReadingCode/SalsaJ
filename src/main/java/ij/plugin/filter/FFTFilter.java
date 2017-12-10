@@ -5,7 +5,6 @@ import ij.gui.*;
 import ij.measure.*;
 import ij.plugin.ContrastEnhancer;
 import java.awt.*;
-import java.util.*;
 
 /** 
 This class implements the Process/FFT/bandpass Filter command. It started out as 
@@ -36,6 +35,7 @@ public class FFTFilter implements  PlugInFilter, Measurements {
 	private static boolean displayFilter;
 	private static boolean processStack;
 
+	@Override
 	public int setup(String arg, ImagePlus imp) {
 		this.arg = arg;
  		this.imp = imp;
@@ -47,12 +47,14 @@ public class FFTFilter implements  PlugInFilter, Measurements {
 			IJ.error("FFT Filter", "Spatial domain image required");
 			return DONE;
 		}
-		if (!showBandpassDialog(imp))
-			return DONE;
-		else
-			return processStack?DOES_ALL+DOES_STACKS:DOES_ALL;
+		if (!showBandpassDialog(imp)) {
+            return DONE;
+        } else {
+            return processStack?DOES_ALL+DOES_STACKS:DOES_ALL;
+        }
 	}
 
+	@Override
 	public void run(ImageProcessor ip) {
 		slice++;
 		filter(ip);
@@ -77,7 +79,9 @@ public class FFTFilter implements  PlugInFilter, Measurements {
 		  	factor of 1.5 to avoid wrap-around effects of Fourier Trafo */
 
 		int i=2;
-		while(i<1.5 * maxN) i *= 2;		
+		while(i<1.5 * maxN) {
+            i *= 2;
+        }
         
         // Calculate the inverse of the 1/e frequencies for large and small structures.
         double filterLarge = 2.0*filterLargeDia / (double)i;
@@ -151,10 +155,11 @@ public class FFTFilter implements  PlugInFilter, Measurements {
 	}
 	
 	void showStatus(String msg) {
-		if (stackSize>1 && processStack)
-			IJ.showStatus("FFT Filter: "+slice+"/"+stackSize);
-		else
-			IJ.showStatus(msg);
+		if (stackSize>1 && processStack) {
+            IJ.showStatus("FFT Filter: "+slice+"/"+stackSize);
+        } else {
+            IJ.showStatus(msg);
+        }
 	}
 
 	/** Puts imageprocessor (ROI) into a new imageprocessor of size width x height y at position (x,y).
@@ -179,10 +184,12 @@ public class FFTFilter implements  PlugInFilter, Measurements {
 		int j2 = (int) Math.ceil( (height - y) / (double) h2);		
 
 		//tile		
-		if ( (i1%2) > 0.5)
-			ip2.flipHorizontal();
-		if ( (j1%2) > 0.5)
-			ip2.flipVertical();
+		if ( (i1%2) > 0.5) {
+            ip2.flipHorizontal();
+        }
+		if ( (j1%2) > 0.5) {
+            ip2.flipVertical();
+        }
 					
 		for (int i=-i1; i<i2; i += 2) {
 			for (int j=-j1; j<j2; j += 2) {
@@ -230,8 +237,9 @@ public class FFTFilter implements  PlugInFilter, Measurements {
 			
 		float[] fht = (float[])ip.getPixels();
 		float[] filter = new float[maxN*maxN];
-		for (int i=0; i<maxN*maxN; i++)
-			filter[i]=1f;		
+		for (int i=0; i<maxN*maxN; i++) {
+            filter[i]=1f;
+        }
 
 		int row;
 		int backrow;
@@ -415,11 +423,13 @@ public class FFTFilter implements  PlugInFilter, Measurements {
 		gd.addCheckbox("Autoscale After Filtering", doScalingDia);
 		gd.addCheckbox("Saturate Image when Autoscaling", saturateDia);
 		gd.addCheckbox("Display Filter", displayFilter);
-		if (stackSize>1)
-			gd.addCheckbox("Process Entire Stack", processStack);	
+		if (stackSize>1) {
+            gd.addCheckbox("Process Entire Stack", processStack);
+        }
 		gd.showDialog();
-		if(gd.wasCanceled())
-			return false;
+		if(gd.wasCanceled()) {
+            return false;
+        }
 		if(gd.invalidNumber()) {
 			IJ.error("Error", "Invalid input number");
 			return false;
@@ -432,8 +442,9 @@ public class FFTFilter implements  PlugInFilter, Measurements {
 		doScalingDia = gd.getNextBoolean();
 		saturateDia = gd.getNextBoolean();
 		displayFilter = gd.getNextBoolean();
-		if (stackSize>1)
-			processStack = gd.getNextBoolean();
+		if (stackSize>1) {
+            processStack = gd.getNextBoolean();
+        }
 		return true;
 	}
 

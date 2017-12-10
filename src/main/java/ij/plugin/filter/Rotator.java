@@ -33,7 +33,8 @@ public class Rotator implements ExtendedPlugInFilter, DialogListener {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		if (imp != null) {
 			bitDepth = imp.getBitDepth();
@@ -50,7 +51,8 @@ public class Rotator implements ExtendedPlugInFilter, DialogListener {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		if (enlarge && gd.wasOKed()) {
 			synchronized (this) {
 				if (!isEnlarged) {
@@ -149,7 +151,8 @@ public class Rotator implements ExtendedPlugInFilter, DialogListener {
 	 *@param  pfr      Description of the Parameter
 	 *@return          Description of the Return Value
 	 */
-	public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
+	@Override
+    public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
 		this.pfr = pfr;
 		//EU_HOU Bundle
 		gd = new GenericDialog(IJ.getPluginBundle().getString("Rotate"), IJ.getInstance());
@@ -188,7 +191,8 @@ public class Rotator implements ExtendedPlugInFilter, DialogListener {
 	 *@param  e   Description of the Parameter
 	 *@return     Description of the Return Value
 	 */
-	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
+	@Override
+    public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
 		angle = gd.getNextNumber();
 		//only check for invalid input to "angle", don't care about gridLines
 		if (gd.invalidNumber()) {
@@ -215,7 +219,8 @@ public class Rotator implements ExtendedPlugInFilter, DialogListener {
 	 *
 	 *@param  nPasses  The new nPasses value
 	 */
-	public void setNPasses(int nPasses) {
+	@Override
+    public void setNPasses(int nPasses) {
 	}
 
 }

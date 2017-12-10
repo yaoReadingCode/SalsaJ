@@ -97,8 +97,9 @@ public class ProfilePlot {
 		units = cal.getUnits();
 		yLabel = cal.getValueUnit();
                 //by Oli
-                if (yLabel.equals("Gray Value"))
-                 yLabel=IJ.getPluginBundle().getString("IntensityRS");
+                if ("Gray Value".equals(yLabel)) {
+                    yLabel=IJ.getPluginBundle().getString("IntensityRS");
+                }
                 //end by Oli
 		ImageProcessor ip = imp.getProcessor();
 
@@ -167,8 +168,7 @@ public class ProfilePlot {
 	 */
 	public void createWindow() {
 		if (profile == null) {
-			return;
-		}else{
+        }else{
 		Dimension d = getPlotSize();
 		//EU_HOU Bundle
 		String xLabel = "Distance (" + units + ")";
@@ -456,15 +456,15 @@ public class ProfilePlot {
 		double max = -Double.MAX_VALUE;
 		double value;
 
-		for (int i = 0; i < profile.length; i++) {
-			value = profile[i];
-			if (value < min) {
-				min = value;
-			}
-			if (value > max) {
-				max = value;
-			}
-		}
+        for (double aProfile : profile) {
+            value = aProfile;
+            if (value < min) {
+                min = value;
+            }
+            if (value > max) {
+                max = value;
+            }
+        }
 		this.min = min;
 		this.max = max;
 	}

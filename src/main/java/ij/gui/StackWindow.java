@@ -3,7 +3,6 @@ package ij.gui;
 import ij.*;
 import ij.measure.Calibration;
 import java.awt.*;
-import java.awt.image.*;
 import java.awt.event.*;
 
 /**
@@ -162,7 +161,8 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public synchronized void adjustmentValueChanged(AdjustmentEvent e) {
+	@Override
+    public synchronized void adjustmentValueChanged(AdjustmentEvent e) {
 		if (!running2) {
 			//slice = sliceSelector.getValue();
 			if (e.getSource() == channelSelector) {
@@ -184,7 +184,8 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 	}
 
 
@@ -193,7 +194,8 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 	 *
 	 *@param  event  Description of the Parameter
 	 */
-	public void mouseWheelMoved(MouseWheelEvent event) {
+	@Override
+    public void mouseWheelMoved(MouseWheelEvent event) {
 		if (viewIn5D) {
 			return;
 		}
@@ -214,7 +216,8 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public boolean close() {
+	@Override
+    public boolean close() {
 		if (!super.close()) {
 			return false;
 		}
@@ -257,12 +260,13 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 	/**
 	 *  Main processing method for the StackWindow object
 	 */
-	public void run() {
+	@Override
+    public void run() {
 		while (!done) {
 			synchronized (this) {
 				try {
 					wait();
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException ignored) {}
 			}
 			if (done) {
 				return;
@@ -283,7 +287,8 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public String createSubtitle() {
+	@Override
+    public String createSubtitle() {
 	String s = super.createSubtitle();
 		if (!viewIn5D) {
 			return s;

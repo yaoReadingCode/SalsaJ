@@ -2,10 +2,8 @@ package ij.plugin.filter;
 import ij.*;
 import ij.process.*;
 import ij.gui.*;
-import ij.plugin.filter.PlugInFilter.*;
 import ij.plugin.filter.*;
-import ij.measure.Calibration;
-import ij.macro.Interpreter;
+
 import java.awt.*;
 import java.util.Hashtable;
 
@@ -171,7 +169,7 @@ public class PlugInFilterRunner implements Runnable, DialogListener {
 					Thread theThread = (Thread) slicesForThread.keys().nextElement();
 						try {
 							theThread.join();// wait until thread has finished
-						} catch (InterruptedException e) {}
+						} catch (InterruptedException ignored) {}
 						slicesForThread.remove(theThread);// and remove it from the list.
 					}
 				}
@@ -378,8 +376,7 @@ public class PlugInFilterRunner implements Runnable, DialogListener {
 			if ((flags & PlugInFilter.STACK_REQUIRED) != 0 && imp.getStackSize() == 1) {
 				//EU_HOU Bundle
 				IJ.error(cmd + ": Stack required");
-				;
-				return false;
+                return false;
 			}
 		}// if imageRequired
 		return true;
@@ -422,7 +419,7 @@ public class PlugInFilterRunner implements Runnable, DialogListener {
 	 */
 	private void announceSliceNumber(int slice) {
 		synchronized (sliceForThread) {
-		Integer number = new Integer(slice);
+		Integer number = slice;
 			sliceForThread.put(Thread.currentThread(), number);
 		}
 	}
@@ -436,7 +433,7 @@ public class PlugInFilterRunner implements Runnable, DialogListener {
 	public int getSliceNumber() {
 		synchronized (sliceForThread) {
 		Integer number = (Integer) sliceForThread.get(Thread.currentThread());
-			return (number == null) ? -1 : number.intValue();
+			return (number == null) ? -1 : number;
 		}
 	}
 
@@ -444,7 +441,8 @@ public class PlugInFilterRunner implements Runnable, DialogListener {
 	/**
 	 *  The dispatcher for the background threads
 	 */
-	public void run() {
+	@Override
+    public void run() {
 	Thread thread = Thread.currentThread();
 		try {
 			if (thread == previewThread) {
@@ -577,7 +575,7 @@ public class PlugInFilterRunner implements Runnable, DialogListener {
 		if (previewThread.isAlive()) {
 			try {//a NullPointerException is possible if the thread finishes in the meanwhile
 				previewThread.setPriority(Thread.currentThread().getPriority());
-			} catch (Exception e) {}
+			} catch (Exception ignored) {}
 		}
 		synchronized (this) {
 			bgPreviewOn = false;//tell a possible background thread to terminate
@@ -586,7 +584,7 @@ public class PlugInFilterRunner implements Runnable, DialogListener {
 		try {
 			previewThread.join();
 		} //wait until the background thread is done
-		catch (InterruptedException e) {}
+		catch (InterruptedException ignored) {}
 		previewThread = null;
 	}
 
@@ -623,7 +621,8 @@ public class PlugInFilterRunner implements Runnable, DialogListener {
 	 *@return     Always true. (The return value determines whether the dialog will
 	 *      enable the OK button)
 	 */
-	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
+	@Override
+    public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
 		//IJ.log("PlugInFilterRunner: dialogItemChanged: "+e);
 		if (previewCheckbox == null || imp == null) {
 			return true;

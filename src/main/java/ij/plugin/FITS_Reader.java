@@ -1,5 +1,4 @@
 package ij.plugin;
-import java.awt.*;
 import java.io.*;
 import java.util.zip.GZIPInputStream;
 import ij.*;
@@ -12,18 +11,20 @@ import ij.measure.*;
 */
 public class FITS_Reader extends ImagePlus implements PlugIn {
 
+    @Override
     public void run(String arg) {
         int olibadbit = 0;
         OpenDialog od = new OpenDialog("Open FITS...", arg);
         String directory = od.getDirectory();
         String fileName = od.getFileName();
-        if (fileName==null)
+        if (fileName==null) {
             return;
+        }
         IJ.showStatus("Opening: " + directory + fileName);
         OLIFitsDecod fd = new OLIFitsDecod(directory, fileName);
         FileInfo fi = null;
         try {fi = fd.getInfo();}
-        catch (IOException e) {}
+        catch (IOException ignored) {}
         if (fi!=null && fi.width>0 && fi.height>0 && fi.offset>0) {
             FileOpener fo = new FileOpener(fi);
             ImagePlus imp = fo.open(false);
@@ -33,13 +34,15 @@ public class FITS_Reader extends ImagePlus implements PlugIn {
               setProcessor(fileName, ip);
             } else {
               ImageStack stack = imp.getStack(); // origin is at bottom left corner              
-              for(int i=1; i<=stack.getSize(); i++)
+              for(int i=1; i<=stack.getSize(); i++) {
                   stack.getProcessor(i).flipVertical();
+              }
               setStack(fileName, stack);
             }
             Calibration cal = imp.getCalibration();
-            if (fi.fileType==FileInfo.GRAY16_SIGNED && fd.bscale==1.0 && fd.bzero==32768.0)
+            if (fi.fileType==FileInfo.GRAY16_SIGNED && fd.bscale==1.0 && fd.bzero==32768.0) {
                 cal.setFunction(Calibration.NONE, null, "Gray Value");
+            }
 
             if (fi.fileType==FileInfo.GRAY16_SIGNED && olibadbit==-16) {
 
@@ -49,9 +52,12 @@ public class FITS_Reader extends ImagePlus implements PlugIn {
             setCalibration(cal);
             setProperty("Info", fd.getHeaderInfo());
 			setFileInfo(fi); // needed for File->Revert
-            if (arg.equals("")) show();
-        } else
+            if ("".equals(arg)) {
+                show();
+            }
+        } else {
             IJ.error("This does not appear to be a FITS file.");
+        }
         IJ.showStatus("");
     }
 
@@ -78,25 +84,28 @@ class OLIFitsDecod {
         fi.offset = 0;
 
         InputStream is = new FileInputStream(directory + fileName);
-        if (fileName.toLowerCase().endsWith(".gz")) is = new GZIPInputStream(is);
+        if (fileName.toLowerCase().endsWith(".gz")) {
+            is = new GZIPInputStream(is);
+        }
         f = new DataInputStream(is);
         String line = getString(80);
-        info.append(line+"\n");
+        info.append(line).append("\n");
         if (!line.startsWith("SIMPLE"))
             {f.close(); return null;}
         int count = 1;
         while ( true ) {
             count++;
             line = getString(80);
-			info.append(line+"\n");
+			info.append(line).append("\n");
   
             // Cut the key/value pair
 			int index = line.indexOf ( "=" );
 
 			// Strip out comments
 			int commentIndex = line.indexOf ( "/", index );
-			if ( commentIndex < 0 )
-				commentIndex = line.length ();
+			if ( commentIndex < 0 ) {
+                commentIndex = line.length ();
+            }
 			
 			// Split that values
 			String key;
@@ -110,39 +119,50 @@ class OLIFitsDecod {
 			}
 
 			// Time to stop ?
-			if (key.equals ("END") ) break;
+			if ("END".equals(key)) {
+                break;
+            }
 
 			// Look for interesting information			
-            if (key.equals("BITPIX")) {
+            if ("BITPIX".equals(key)) {
                 int bitsPerPixel = Integer.parseInt ( value );
-               if (bitsPerPixel==8)
-                    fi.fileType = FileInfo.GRAY8;
-                else if (bitsPerPixel==16)
-                    fi.fileType = FileInfo.GRAY16_SIGNED;
-                else if (bitsPerPixel==-16) {
-                    fi.fileType = FileInfo.GRAY16_SIGNED;
-                    int olibadbit = -16; }
-                else if (bitsPerPixel==32)
-                    fi.fileType = FileInfo.GRAY32_INT;
-                else if (bitsPerPixel==-32)
-                    fi.fileType = FileInfo.GRAY32_FLOAT;
-                else if (bitsPerPixel==-64)
-                    fi.fileType = FileInfo.GRAY64_FLOAT;
-                else {
-                    IJ.error("BITPIX must be 8, 16, 32, -32 (float) or -64 (double).");
-                    f.close();
-                    return null;
+                switch (bitsPerPixel) {
+                    case 8:
+                        fi.fileType = FileInfo.GRAY8;
+                        break;
+                    case 16:
+                        fi.fileType = FileInfo.GRAY16_SIGNED;
+                        break;
+                    case -16:
+                        fi.fileType = FileInfo.GRAY16_SIGNED;
+                        int olibadbit = -16;
+                        break;
+                    case 32:
+                        fi.fileType = FileInfo.GRAY32_INT;
+                        break;
+                    case -32:
+                        fi.fileType = FileInfo.GRAY32_FLOAT;
+                        break;
+                    case -64:
+                        fi.fileType = FileInfo.GRAY64_FLOAT;
+                        break;
+                    default:
+                        IJ.error("BITPIX must be 8, 16, 32, -32 (float) or -64 (double).");
+                        f.close();
+                        return null;
                 }
-            } else if (key.equals("NAXIS1"))
+            } else if ("NAXIS1".equals(key)) {
                 fi.width = Integer.parseInt ( value );
-            else if (key.equals("NAXIS2"))
+            } else if ("NAXIS2".equals(key)) {
                 fi.height = Integer.parseInt( value );
-            else if (key.equals("NAXIS3")) //for multi-frame fits
+            } else if ("NAXIS3".equals(key)) //for multi-frame fits
+            {
                 fi.nImages = Integer.parseInt ( value );
-            else if (key.equals("BSCALE"))
+            } else if ("BSCALE".equals(key)) {
                 bscale = parseDouble ( value );
-            else if (key.equals("BZERO"))
+            } else if ("BZERO".equals(key)) {
                 bzero = parseDouble ( value );
+            }
 
 			if (count>360 && fi.width==0)
 				{f.close(); return null;}
@@ -167,7 +187,7 @@ class OLIFitsDecod {
 
 	double parseDouble(String s) throws NumberFormatException {
 		Double d = new Double(s);
-		return d.doubleValue();
+		return d;
 	}
 
     String getHeaderInfo() {

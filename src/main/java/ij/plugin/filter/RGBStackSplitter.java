@@ -1,9 +1,7 @@
 package ij.plugin.filter;
 import ij.*;
 import ij.process.*;
-import ij.gui.*;
 import ij.measure.Calibration;
-import java.awt.*;
 
 /** Splits an RGB image or stack into three 8-bit grayscale images or stacks. */
 public class RGBStackSplitter implements PlugInFilter {
@@ -12,11 +10,13 @@ public class RGBStackSplitter implements PlugInFilter {
     public ImageStack red, green, blue;
 
 
+    @Override
     public int setup(String arg, ImagePlus imp) {
         this.imp = imp;
         return DOES_RGB+NO_UNDO;
     }
 
+    @Override
     public void run(ImageProcessor ip) {
         split(imp);
     }
@@ -32,11 +32,15 @@ public class RGBStackSplitter implements PlugInFilter {
         ImagePlus rImp = new ImagePlus(title+" (red)",red);
         rImp.setCalibration(cal);
         rImp.show();
-        if (IJ.isMacOSX()) IJ.wait(500);
+        if (IJ.isMacOSX()) {
+            IJ.wait(500);
+        }
         ImagePlus gImp = new ImagePlus(title+" (green)",green);
         gImp.setCalibration(cal);
         gImp.show();
-        if (IJ.isMacOSX()) IJ.wait(500);
+        if (IJ.isMacOSX()) {
+            IJ.wait(500);
+        }
         ImagePlus bImp = new ImagePlus(title+" (blue)",blue);
         bImp.setCalibration(cal);
         bImp.show();
@@ -63,8 +67,9 @@ public class RGBStackSplitter implements PlugInFilter {
              cp = (ColorProcessor)rgb.getProcessor(slice);
              slice += inc;
              cp.getRGB(r,g,b);
-             if (!keepSource)
-             	rgb.deleteSlice(1);
+             if (!keepSource) {
+                 rgb.deleteSlice(1);
+             }
              red.addSlice(null,r);
              green.addSlice(null,g);
              blue.addSlice(null,b);

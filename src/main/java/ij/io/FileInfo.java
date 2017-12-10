@@ -1,6 +1,5 @@
 package ij.io;
 import java.io.*;
-import java.util.Properties;
 
 /** This class consists of public fields that describe an image file. */
 public class FileInfo {
@@ -153,6 +152,7 @@ public class FileInfo {
 		}
 	}
 
+    @Override
     public String toString() {
     	return
     		"name=" + fileName

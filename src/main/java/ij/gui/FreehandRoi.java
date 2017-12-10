@@ -1,8 +1,6 @@
 //EU_HOU
 package ij.gui;
 
-import java.awt.*;
-import java.awt.image.*;
 import ij.*;
 
 /**
@@ -48,7 +46,8 @@ public class FreehandRoi extends PolygonRoi {
 	 *@param  sx  Description of the Parameter
 	 *@param  sy  Description of the Parameter
 	 */
-	protected void grow(int sx, int sy) {
+	@Override
+    protected void grow(int sx, int sy) {
 	int ox = ic.offScreenX(sx);
 	int oy = ic.offScreenY(sy);
 
@@ -107,7 +106,8 @@ public class FreehandRoi extends PolygonRoi {
 	 *@param  screenX  Description of the Parameter
 	 *@param  screenY  Description of the Parameter
 	 */
-	protected void handleMouseUp(int screenX, int screenY) {
+	@Override
+    protected void handleMouseUp(int screenX, int screenY) {
 		if (state == CONSTRUCTING) {
 			addOffset();
 			finishPolygon();

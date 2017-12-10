@@ -27,9 +27,10 @@ public class Selection implements PlugIn, Measurements {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		imp = WindowManager.getCurrentImage();
-		if (arg.equals("add")) {
+		if ("add".equals(arg)) {
 			addToRoiManager(imp);
 			return;
 		}
@@ -37,23 +38,23 @@ public class Selection implements PlugIn, Measurements {
 			IJ.noImage();
 			return;
 		}
-		if (arg.equals("all")) {
+		if ("all".equals(arg)) {
 			imp.setRoi(0, 0, imp.getWidth(), imp.getHeight());
-		} else if (arg.equals("none")) {
+		} else if ("none".equals(arg)) {
 			imp.killRoi();
-		} else if (arg.equals("restore")) {
+		} else if ("restore".equals(arg)) {
 			imp.restoreRoi();
-		} else if (arg.equals("spline")) {
+		} else if ("spline".equals(arg)) {
 			fitSpline();
-		} else if (arg.equals("ellipse")) {
+		} else if ("ellipse".equals(arg)) {
 			drawEllipse(imp);
-		} else if (arg.equals("hull")) {
+		} else if ("hull".equals(arg)) {
 			convexHull(imp);
-		} else if (arg.equals("mask")) {
+		} else if ("mask".equals(arg)) {
 			createMask(imp);
-		} else if (arg.equals("from")) {
+		} else if ("from".equals(arg)) {
 			createSelectionFromMask(imp);
-		} else if (arg.equals("inverse")) {
+		} else if ("inverse".equals(arg)) {
 			invert(imp);
 		} else {
 			runMacro(arg);
@@ -74,18 +75,18 @@ public class Selection implements PlugIn, Measurements {
 			return;
 		}
 		roi = (Roi) roi.clone();
-		if (arg.equals("rotate")) {
+		if ("rotate".equals(arg)) {
 		String value = IJ.runMacroFile("ij.jar:RotateSelection", angle);
 			if (value != null) {
 				angle = value;
 			}
-		} else if (arg.equals("enlarge")) {
+		} else if ("enlarge".equals(arg)) {
 		String value = IJ.runMacroFile("ij.jar:EnlargeSelection", enlarge);
 			if (value != null) {
 				enlarge = value;
 			}
 			Roi.previousRoi = roi;
-		} else if (arg.equals("band")) {
+		} else if ("band".equals(arg)) {
 		String value = IJ.runMacroFile("ij.jar:MakeSelectionBand", bandSize);
 			if (value != null) {
 				bandSize = value;
@@ -124,8 +125,7 @@ public class Selection implements PlugIn, Measurements {
 			if (mag < 1.0) {
 				evaluationPoints *= mag;
 			}
-			;
-		}
+        }
 		if (evaluationPoints < 100) {
 			evaluationPoints = 100;
 		}
@@ -286,7 +286,7 @@ public class Selection implements PlugIn, Measurements {
 	EllipseFitter ef = new EllipseFitter();
 		ef.fit(ip, stats);
 		ef.makeRoi(ip);
-		imp.setRoi(new PolygonRoi(ef.xCoordinates, ef.yCoordinates, ef.nCoordinates, roi.FREEROI));
+		imp.setRoi(new PolygonRoi(ef.xCoordinates, ef.yCoordinates, ef.nCoordinates, Roi.FREEROI));
 		IJ.showStatus("");
 	}
 
@@ -370,7 +370,7 @@ public class Selection implements PlugIn, Measurements {
 			}
 			p1 = p2;
 		} while (p1 != pstart);
-		return new PolygonRoi(xx, yy, n2, roi.POLYGON);
+		return new PolygonRoi(xx, yy, n2, Roi.POLYGON);
 	}
 
 	// Finds the index of the upper right point that is guaranteed to be on convex hull

@@ -3,18 +3,14 @@ package ij;
 
 import java.awt.*;
 import java.awt.image.*;
-import java.net.URL;
 import java.util.*;
 import ij.process.*;
 import ij.io.*;
 import ij.gui.*;
 import ij.measure.*;
-import ij.plugin.filter.Analyzer;
-import ij.util.Tools;
 import ij.macro.Interpreter;
 import ij.plugin.ContrastEnhancer;
 import ij.plugin.frame.ContrastAdjuster;
-import ij.plugin.Converter;
 
 /**
  *  This is an extended image class that supports 8-bit, 16-bit, 32-bit (real)
@@ -1552,7 +1548,6 @@ public class ImagePlus implements ImageObserver, Measurements {
                     } catch (InterruptedException e) {
                         return pvalue;
                     }
-                    ;
                     pixels8 = (byte[]) (pg.getPixels());
                     index = pixels8 != null ? pixels8[0] & 0xff : 0;
                 }
@@ -1575,7 +1570,6 @@ public class ImagePlus implements ImageObserver, Measurements {
                 } catch (InterruptedException e) {
                     return pvalue;
                 }
-                ;
 
                 int c = pixels32[0];
                 int r = (c & 0xff0000) >> 16;
@@ -1934,7 +1928,7 @@ public class ImagePlus implements ImageObserver, Measurements {
             roi.endPaste();
         }
         trimProcessor();
-        if (isFileInfo && !(url != null && (fi.directory == null || fi.directory.equals("")))) {
+        if (isFileInfo && !(url != null && (fi.directory == null || "".equals(fi.directory)))) {
             new FileOpener(fi).revertToSaved(this);
         } else if (url != null) {
             //EU_HOU Bundle
@@ -1948,7 +1942,7 @@ public class ImagePlus implements ImageObserver, Measurements {
                 if (imp != null) {
                     setProcessor(null, imp.getProcessor());
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             if (getType() == COLOR_RGB && getTitle().endsWith(".jpg")) {
                 Opener.convertGrayJpegTo8Bits(this);
@@ -2030,16 +2024,16 @@ public class ImagePlus implements ImageObserver, Measurements {
                 break;
             case GRAY16:
                 if (compositeImage && fi.nImages == 3) {
-                    fi.fileType = fi.RGB48;
+                    fi.fileType = FileInfo.RGB48;
                 } else {
-                    fi.fileType = fi.GRAY16_UNSIGNED;
+                    fi.fileType = FileInfo.GRAY16_UNSIGNED;
                 }
                 break;
             case GRAY32:
-                fi.fileType = fi.GRAY32_FLOAT;
+                fi.fileType = FileInfo.GRAY32_FLOAT;
                 break;
             case COLOR_RGB:
-                fi.fileType = fi.RGB;
+                fi.fileType = FileInfo.RGB;
                 break;
             default:
         }
@@ -2106,6 +2100,7 @@ public class ImagePlus implements ImageObserver, Measurements {
      *@param  h      Description of the Parameter
      *@return        Description of the Return Value
      */
+    @Override
     public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h) {
         imageUpdateY = y;
         imageUpdateW = w;
@@ -2480,7 +2475,7 @@ public class ImagePlus implements ImageObserver, Measurements {
 		/*
          *  EU_HOU END
          */
-        if (roi != null && roi.getType() != roi.LINE) {
+        if (roi != null && roi.getType() != Roi.LINE) {
             roi2 = (Roi) roi.clone();
 
             Rectangle r = roi.getBounds();
@@ -2505,7 +2500,7 @@ public class ImagePlus implements ImageObserver, Measurements {
 			/*
              *  EU_HOU END
              */
-            if (roi != null && roi.getType() != roi.LINE) {
+            if (roi != null && roi.getType() != Roi.LINE) {
                 getMask();
                 ip.reset(ip.getMask());
             }
@@ -2713,6 +2708,7 @@ public class ImagePlus implements ImageObserver, Measurements {
      *
      *@return    Description of the Return Value
      */
+    @Override
     public Object clone() {
         try {
             return super.clone();
@@ -2726,6 +2722,7 @@ public class ImagePlus implements ImageObserver, Measurements {
      *
      *@return    Description of the Return Value
      */
+    @Override
     public String toString() {
         return "imp[" + getTitle() + " " + width + "x" + height + "x" + getStackSize() + "]";
     }

@@ -1,7 +1,6 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
 import ij.measure.Calibration;
 
 /**
@@ -28,7 +27,8 @@ public class Animator implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		imp = WindowManager.getCurrentImage();
 		if (imp == null) {
 			IJ.noImage();
@@ -49,12 +49,12 @@ public class Animator implements PlugIn {
 		slice = imp.getCurrentSlice();
 		IJ.register(Animator.class);
 
-		if (arg.equals("options")) {
+		if ("options".equals(arg)) {
 			doOptions();
 			return;
 		}
 
-		if (arg.equals("start")) {
+		if ("start".equals(arg)) {
 			startAnimation();
 			return;
 		}
@@ -63,24 +63,23 @@ public class Animator implements PlugIn {
 			stopAnimation();
 		}
 
-		if (arg.equals("stop")) {
+		if ("stop".equals(arg)) {
 			return;
 		}
 
-		if (arg.equals("next")) {
+		if ("next".equals(arg)) {
 			nextSlice();
 			return;
 		}
 
-		if (arg.equals("previous")) {
+		if ("previous".equals(arg)) {
 			previousSlice();
 			return;
 		}
 
-		if (arg.equals("set")) {
+		if ("set".equals(arg)) {
 			setSlice();
-			return;
-		}
+        }
 	}
 
 
@@ -157,7 +156,7 @@ public class Animator implements PlugIn {
 	Calibration cal = imp.getCalibration();
 		if (cal.fps != 0.0) {
 			animationRate = cal.fps;
-		} else if (cal.frameInterval != 0.0 && cal.getTimeUnit().equals("sec")) {
+		} else if (cal.frameInterval != 0.0 && "sec".equals(cal.getTimeUnit())) {
 			animationRate = 1.0 / cal.frameInterval;
 		}
 	int decimalPlaces = (int) animationRate == animationRate ? 0 : 1;

@@ -1,6 +1,5 @@
 package ij.gui;
 import java.awt.*;
-import ij.*;
 
 /**
  *  This is a custom layout manager that supports resizing of zoomed images.
@@ -35,7 +34,8 @@ public class ImageLayout implements LayoutManager {
 	 *@param  name  The feature to be added to the LayoutComponent attribute
 	 *@param  comp  The feature to be added to the LayoutComponent attribute
 	 */
-	public void addLayoutComponent(String name, Component comp) {
+	@Override
+    public void addLayoutComponent(String name, Component comp) {
 	}
 
 
@@ -44,7 +44,8 @@ public class ImageLayout implements LayoutManager {
 	 *
 	 *@param  comp  Description of the Parameter
 	 */
-	public void removeLayoutComponent(Component comp) {
+	@Override
+    public void removeLayoutComponent(Component comp) {
 	}
 
 
@@ -54,7 +55,8 @@ public class ImageLayout implements LayoutManager {
 	 *@param  target  Description of the Parameter
 	 *@return         Description of the Return Value
 	 */
-	public Dimension preferredLayoutSize(Container target) {
+	@Override
+    public Dimension preferredLayoutSize(Container target) {
 	Dimension dim = new Dimension(0, 0);
 	int nmembers = target.getComponentCount();
 		for (int i = 0; i < nmembers; i++) {
@@ -79,7 +81,8 @@ public class ImageLayout implements LayoutManager {
 	 *@param  target  Description of the Parameter
 	 *@return         Description of the Return Value
 	 */
-	public Dimension minimumLayoutSize(Container target) {
+	@Override
+    public Dimension minimumLayoutSize(Container target) {
 		return preferredLayoutSize(target);
 	}
 
@@ -115,7 +118,8 @@ public class ImageLayout implements LayoutManager {
 	 *
 	 *@param  target  Description of the Parameter
 	 */
-	public void layoutContainer(Container target) {
+	@Override
+    public void layoutContainer(Container target) {
 	Insets insets = target.getInsets();
 	int nmembers = target.getComponentCount();
 	Dimension d;

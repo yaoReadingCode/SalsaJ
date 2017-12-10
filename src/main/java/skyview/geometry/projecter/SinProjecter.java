@@ -15,30 +15,35 @@ public final class SinProjecter extends Projecter {
     
 
     /** Get the name of the component */
-    public String getName() {
+    @Override
+	public String getName() {
 	return "SinProjecter";
     }
     
     /** Get a description of the component */
-    public String getDescription () {
+    @Override
+	public String getDescription () {
 	return "Project as if seeing the sphere from a great distance";
     }
     
     /** Get the inverse transformation */
-    public Deprojecter inverse() {
+    @Override
+	public Deprojecter inverse() {
 	return new SinProjecter.SinDeprojecter();
     }
     
     /** Is this an inverse of some other transformation? */
-    public boolean isInverse(Transformer t) {
-	return t.getName().equals("SinDeprojecter");
+    @Override
+	public boolean isInverse(Transformer t) {
+	return "SinDeprojecter".equals(t.getName());
     }
     
     /** Project a point from the sphere to the plane.
      *  @param sphere a double[3] unit vector
      *  @param plane  a double[2] preallocated vector.
      */
-    public final void transform(double[] sphere, double[] plane) {
+    @Override
+	public final void transform(double[] sphere, double[] plane) {
 	
 	if (Double.isNaN(sphere[2]) || sphere[2] <= 0) {
 	    plane[0] = Double.NaN;
@@ -52,23 +57,27 @@ public final class SinProjecter extends Projecter {
     public class SinDeprojecter extends skyview.geometry.Deprojecter {
 	
 	/** Get the name of the component */
+	@Override
 	public String getName() {
 	    return "SinDeprojection";
 	}
 	
 	/** Get a description of the component */
+	@Override
 	public String getDescription() {
 	    return "Invert the sine projection";
 	}
 	
 	/** Get the inverse transformation */
+	@Override
 	public Projecter inverse() {
 	    return SinProjecter.this;
 	}
 
         /** Is this an inverse of some other transformation? */
-        public boolean isInverse(Transformer t) {
-            return t.getName().equals("SinProjecter");
+        @Override
+		public boolean isInverse(Transformer t) {
+            return "SinProjecter".equals(t.getName());
         }
 
     
@@ -76,7 +85,8 @@ public final class SinProjecter extends Projecter {
          *  @param plane a double[2] vector in the tangent plane.
          *  @param spehre a preallocated double[3] vector.
          */
-        public final void transform(double[] plane, double[] sphere) {
+        @Override
+		public final void transform(double[] plane, double[] sphere) {
 	
 	    if (Double.isNaN(plane[0])) {
 	        sphere[0] = Double.NaN;

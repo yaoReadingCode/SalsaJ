@@ -3,9 +3,6 @@ import ij.*;
 import ij.process.*;
 import ij.gui.*;
 import ij.measure.*;
-import ij.plugin.ContrastEnhancer;
-import java.awt.*;
-import java.util.*;
 
 /**
  *  This class implements the Process/FFT/Custom Filter command.
@@ -34,7 +31,8 @@ public class FFTCustomFilter implements PlugInFilter, Measurements {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		if (imp == null) {
 			IJ.noImage();
@@ -55,7 +53,8 @@ public class FFTCustomFilter implements PlugInFilter, Measurements {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		slice++;
 		if (done) {
 			return;
@@ -68,7 +67,7 @@ public class FFTCustomFilter implements PlugInFilter, Measurements {
 				return;
 			}
 		}
-		((FHT) fht).transform();
+		fht.transform();
 		customFilter(fht);
 		doInverseTransform(fht, ip);
 		if (slice == 1) {

@@ -32,31 +32,35 @@ public class Rotater extends Transformer implements skyview.Component {
 	    throw new TransformationException("Rotation not 3x3 matrix");
 	}
 	
-	matrix = (double[][]) vectors.clone();
+	matrix = vectors.clone();
        	
 	for (int i=0; i<matrix.length; i += 1) {
 	    if (vectors[i].length != 3) {
 	        throw new TransformationException("Rotation not 3x3 matrix");
 	    }
-	    matrix[i] = (double[]) vectors[i].clone();
+	    matrix[i] = vectors[i].clone();
 	}
     }
     
     /** Get the input dimension to a Rotater */
+    @Override
     protected int getInputDimension() {
 	return 3;
     }
     /** Get the output dimension to a Rotater */
+    @Override
     protected int getOutputDimension() {
 	return 3;
     }
     
     /** Get the name of the component */
+    @Override
     public String getName() {
 	return "Rotater";
     }
     
     /** Get a description of the component */
+    @Override
     public String getDescription() {
 	return "An object that rotates 3-d vectors in space.";
     }
@@ -93,6 +97,7 @@ public class Rotater extends Transformer implements skyview.Component {
     }
     
     /** This isn't really right... We should check this is a rotation matrix better! */
+    @Override
     public Rotater inverse() {
 	return transpose();
     }
@@ -144,6 +149,7 @@ public class Rotater extends Transformer implements skyview.Component {
     
     
     /** Multiple a vector by the matrix.*/
+    @Override
     public void  transform(double[] in, double[] out) {
 	
 	// Handle aliased arguments.
@@ -235,48 +241,56 @@ public class Rotater extends Transformer implements skyview.Component {
 
 //          Pick up the appropriate Euler angle and take sine & cosine
             double angle;
-            if (n == 0) {
-               angle = phi;
-            } else if (n == 1) {
-               angle = theta;
-            } else {
-               angle = psi;
-	    }
+          switch (n) {
+              case 0:
+                  angle = phi;
+                  break;
+              case 1:
+                  angle = theta;
+                  break;
+              default:
+                  angle = psi;
+                  break;
+          }
             double s = Math.sin(angle);
             double c = Math.cos(angle);
 
 //          Identify the axis
             axis = order.charAt(n);
-            if (axis == 'x' ||
-               axis == 'X'  ||
-               axis == '1') {
+          switch (axis) {
+              case 'x':
+              case 'X':
+              case '1':
 
 //             Matrix for x-rotation
-               rotn[1][1] =  c;
-               rotn[1][2] =  s;
-               rotn[2][1] = -s;
-               rotn[2][2] =  c;
-	    } else if (axis == 'y' ||
-                       axis == 'Y' ||
-                       axis == '2') {
+                  rotn[1][1] = c;
+                  rotn[1][2] = s;
+                  rotn[2][1] = -s;
+                  rotn[2][2] = c;
+                  break;
+              case 'y':
+              case 'Y':
+              case '2':
 
 //             Matrix for y-rotation
-               rotn[0][0] =  c;
-               rotn[0][2] = -s;
-               rotn[2][0] =  s;
-               rotn[2][2] =  c;
+                  rotn[0][0] = c;
+                  rotn[0][2] = -s;
+                  rotn[2][0] = s;
+                  rotn[2][2] = c;
 
-            } else if (axis == 'z' ||
-                       axis == 'Z' ||
-                       axis == '3') {
+                  break;
+              case 'z':
+              case 'Z':
+              case '3':
 
 //             Matrix for z-rotation
-               rotn[0][0] =  c;
-               rotn[0][1] =  s;
-               rotn[1][0] = -s;
-               rotn[1][1] =  c;
+                  rotn[0][0] = c;
+                  rotn[0][1] = s;
+                  rotn[1][0] = -s;
+                  rotn[1][1] = c;
 
-            }
+                  break;
+          }
 
 //          Apply the current rotation (matrix ROTN x matrix RESULT)
             double[][] wm = new double[3][3];
@@ -301,6 +315,7 @@ public class Rotater extends Transformer implements skyview.Component {
     }
     
     /** Is this the inverse rotation? */
+    @Override
     public boolean isInverse(Transformer trans) {
 	if (! (trans instanceof Rotater) ) {
 	    return false;

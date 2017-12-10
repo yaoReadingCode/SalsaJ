@@ -68,15 +68,15 @@ public class Tools {
 	double min = Double.MAX_VALUE;
 	double max = -Double.MAX_VALUE;
 	double value;
-		for (int i = 0; i < a.length; i++) {
-			value = a[i];
-			if (value < min) {
-				min = value;
-			}
-			if (value > max) {
-				max = value;
-			}
-		}
+        for (double anA : a) {
+            value = anA;
+            if (value < min) {
+                min = value;
+            }
+            if (value > max) {
+                max = value;
+            }
+        }
 	double[] minAndMax = new double[2];
 		minAndMax[0] = min;
 		minAndMax[1] = max;
@@ -94,15 +94,15 @@ public class Tools {
 	double min = Double.MAX_VALUE;
 	double max = -Double.MAX_VALUE;
 	double value;
-		for (int i = 0; i < a.length; i++) {
-			value = a[i];
-			if (value < min) {
-				min = value;
-			}
-			if (value > max) {
-				max = value;
-			}
-		}
+        for (float anA : a) {
+            value = anA;
+            if (value < min) {
+                min = value;
+            }
+            if (value > max) {
+                max = value;
+            }
+        }
 	double[] minAndMax = new double[2];
 		minAndMax[0] = min;
 		minAndMax[1] = max;
@@ -176,8 +176,8 @@ public class Tools {
 		}
 		try {
 		Double d = new Double(s);
-			defaultValue = d.doubleValue();
-		} catch (NumberFormatException e) {}
+			defaultValue = d;
+		} catch (NumberFormatException ignored) {}
 		return defaultValue;
 	}
 
@@ -255,7 +255,7 @@ public class Tools {
 	 *@return        Description of the Return Value
 	 */
 	public static String[] split(String str, String delim) {
-		if (delim.equals("\n")) {
+		if ("\n".equals(delim)) {
 			return splitLines(str);
 		}
 	StringTokenizer t = new StringTokenizer(str, delim);
@@ -294,9 +294,9 @@ public class Tools {
 				v.addElement(line);
 			}
 			br.close();
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 	String[] lines = new String[v.size()];
-		v.copyInto((String[]) lines);
+		v.copyInto(lines);
 		return lines;
 	}
 
@@ -347,9 +347,7 @@ public class Tools {
 		}
 
 		for (int i = 0; i < dim; i++) {
-			for (int j = 0; j < dim; j++) {
-				arraytest[i][j] = array[i][j];
-			}
+            System.arraycopy(array[i], 0, arraytest[i], 0, dim);
 		}
 		for (int i = 0; i < dim; i++) {
 			aux = (float) 1.0 / array[i][i];
@@ -756,7 +754,7 @@ interface IFunctionTools {
 	 *@param  na    Description of the Parameter
 	 *@return       Description of the Return Value
 	 */
-	public double run(double x, double[] a, double[] dyda, int na);
+    double run(double x, double[] a, double[] dyda, int na);
 }
 
 /**
@@ -777,7 +775,8 @@ class FgaussTools implements IFunctionTools {
 	 *@param  na    Description of the Parameter
 	 *@return       Description of the Return Value
 	 */
-	public double run(double x, double[] a, double[] dyda, int na) {
+	@Override
+    public double run(double x, double[] a, double[] dyda, int na) {
 	int i;
 	double fac;
 	double ex;

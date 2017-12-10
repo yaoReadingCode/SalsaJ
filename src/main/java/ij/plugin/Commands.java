@@ -1,6 +1,5 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.io.*;
 import ij.plugin.frame.*;
@@ -23,12 +22,13 @@ public class Commands implements PlugIn {
 	 *
 	 *@param  cmd  Description of the Parameter
 	 */
-	public void run(String cmd) {
+	@Override
+    public void run(String cmd) {
 		System.out.println("Commands.run :" + cmd);
-		if (cmd.equals("new")) {
+		if ("new".equals(cmd)) {
 			System.out.println("Commands.new");
 			new NewImage();
-		} else if (cmd.equals("open")) {
+		} else if ("open".equals(cmd)) {
 			if (Prefs.useJFileChooser && !IJ.macroRunning()) {
 				System.out.println("Commands.run2");
 				new Opener().openMultiple();
@@ -36,36 +36,36 @@ public class Commands implements PlugIn {
 				System.out.println("Commands.run3");
 				new Opener().open();
 			}
-		} else if (cmd.equals("close")) {
+		} else if ("close".equals(cmd)) {
 			System.out.println("Commands.run4");
 			close();
-		} else if (cmd.equals("save")) {
+		} else if ("save".equals(cmd)) {
 			System.out.println("Commands.run5");
 			save();
-		} else if (cmd.equals("ij")) {
+		} else if ("ij".equals(cmd)) {
 			System.out.println("Commands.run6");
 		ImageJ ij = IJ.getInstance();
 			if (ij != null) {
 				System.out.println("Commands.run7");
 				ij.toFront();
 			}
-		} else if (cmd.equals("tab")) {
+		} else if ("tab".equals(cmd)) {
 			System.out.println("Commands.run8");
 			WindowManager.putBehind();
-		} else if (cmd.equals("quit")) {
+		} else if ("quit".equals(cmd)) {
 			System.out.println("Commands.run9");
 		ImageJ ij = IJ.getInstance();
 			if (ij != null) {
 				System.out.println("Commands.run10");
 				ij.quit();
 			}
-		} else if (cmd.equals("revert")) {
+		} else if ("revert".equals(cmd)) {
 			System.out.println("Commands.run11");
 			revert();
-		} else if (cmd.equals("undo")) {
+		} else if ("undo".equals(cmd)) {
 			System.out.println("Commands.run12");
 			undo();
-		} else if (cmd.equals("startup")) {
+		} else if ("startup".equals(cmd)) {
 			System.out.println("Commands.run13");
 			openStartupMacros();
 		}

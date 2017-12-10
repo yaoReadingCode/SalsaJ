@@ -3,17 +3,18 @@ import ij.*;
 import ij.text.*;
 import ij.util.*;
 import java.util.*;
-import java.awt.*;
 import java.awt.event.*;
 
 /** Lists ImageJ commands or keyboard shortcuts in a text window. */
 public class CommandLister implements PlugIn {
 
-	public void run(String arg) {
-		if (arg.equals("shortcuts"))
-			listShortcuts();
-		else
-			listCommands();
+	@Override
+    public void run(String arg) {
+		if ("shortcuts".equals(arg)) {
+            listShortcuts();
+        } else {
+            listCommands();
+        }
 	}
 	
 	public void listCommands() {
@@ -21,7 +22,7 @@ public class CommandLister implements PlugIn {
 		Vector v = new Vector();
 		for (Enumeration en=commands.keys(); en.hasMoreElements();) {
 			String command = (String)en.nextElement();
-			v.addElement(command+"\t"+(String)commands.get(command));
+			v.addElement(command+"\t"+ commands.get(command));
 		}
 		showList("Commands", "Command\tPlugin", v);
 	}
@@ -38,7 +39,7 @@ public class CommandLister implements PlugIn {
 	void addShortcutsToVector(Hashtable shortcuts, Vector v) {
 		for (Enumeration en=shortcuts.keys(); en.hasMoreElements();) {
 			Integer key = (Integer)en.nextElement();
-			int keyCode = key.intValue();
+			int keyCode = key;
 			boolean upperCase = false;
 			if (keyCode>200) {
 				upperCase = true;
@@ -47,27 +48,29 @@ public class CommandLister implements PlugIn {
 			String shortcut = KeyEvent.getKeyText(keyCode);
 			if (!upperCase && shortcut.length()==1) {
 				char c = shortcut.charAt(0);
-				if (c>=65 && c<=90)
-					c += 32;
+				if (c>=65 && c<=90) {
+                    c += 32;
+                }
 				char[] chars = new char[1];
 				chars[0] = c;
 				shortcut = new String(chars);
 			}
-			if (shortcut.length()>1)
-				shortcut = " " + shortcut; 
-			v.addElement(shortcut+"\t"+(String)shortcuts.get(key));
+			if (shortcut.length()>1) {
+                shortcut = " " + shortcut;
+            }
+			v.addElement(shortcut+"\t"+ shortcuts.get(key));
 		}
 	}
 
 	void showList(String title, String headings, Vector v) {
 		String[] list = new String[v.size()];
-		v.copyInto((String[])list);
+		v.copyInto(list);
 		StringSorter.sort(list);
-		StringBuffer sb = new StringBuffer();
-		for (int i=0; i<list.length; i++) {
-			sb.append(list[i]);
-			sb.append("\n");
-		}
+		StringBuilder sb = new StringBuilder();
+        for (String aList : list) {
+            sb.append(aList);
+            sb.append("\n");
+        }
 		TextWindow tw = new TextWindow(title, headings, sb.toString(), 600, 500);
 	}
 }

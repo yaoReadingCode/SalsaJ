@@ -1,13 +1,11 @@
 package ij.plugin.filter;
 import ij.*;
 import ij.process.*;
-import ij.gui.*;
 import ij.io.*;
 import ij.plugin.Animator;
-import java.awt.*;
+
 import java.awt.image.*;
 import java.io.*;
-import java.util.*;
 
 /**
 This plugin saves stacks in AVI format. It is based on the FileAvi class written by
@@ -29,11 +27,13 @@ public class AVIWriter implements PlugInFilter {
     private int[]         dcLength = null;
     
     
+    @Override
     public int setup(String arg, ImagePlus imp) {
         this.imp = imp;
         return DOES_ALL+NO_CHANGES;
     }
 
+    @Override
     public void run(ImageProcessor ip) {
         try {
             writeImage(imp);
@@ -83,16 +83,18 @@ public class AVIWriter implements PlugInFilter {
         long savemovi;
         int xMod;
          
-        if (imp.getType()==ImagePlus.COLOR_RGB)
+        if (imp.getType()==ImagePlus.COLOR_RGB) {
             bytesPerPixel = 3;
-        else
+        } else {
             bytesPerPixel = 1;
+        }
                 
         lutBufferRemapped = new int[1];
         SaveDialog sd = new SaveDialog("Save as AVI...", imp.getTitle(), ".avi");
         String fileName = sd.getFileName();
-        if (fileName == null)
+        if (fileName == null) {
             return;
+        }
         String fileDir = sd.getDirectory();
         file = new File(fileDir + fileName);
         raFile = new RandomAccessFile(file, "rw");
@@ -212,10 +214,11 @@ public class AVIWriter implements PlugInFilter {
        writeInt(0); // biXPelsPerMeter - horizontal resolution in pixels
        writeInt(0); // biYPelsPerMeter - vertical resolution in pixels
                                              // per meter
-       if (bitsPerPixel==8)
-           writeInt(256); // biClrUsed 
-       else
-           writeInt(0); // biClrUsed 
+       if (bitsPerPixel==8) {
+           writeInt(256); // biClrUsed
+       } else {
+           writeInt(0); // biClrUsed
+       }
        writeInt(0); // biClrImportant - specifies that the first x colors of the color table 
                               // are important to the DIB.  If the rest of the colors are not available,
                               // the image still retains its meaning in an acceptable manner.  When this
@@ -248,8 +251,9 @@ public class AVIWriter implements PlugInFilter {
        writeString("JUNK");
        paddingBytes = (int)(4084 - (saveJUNKsignature + 8));
        writeInt(paddingBytes);
-       for (i = 0; i < (paddingBytes/2); i++)
-         writeShort((short)0);
+       for (i = 0; i < (paddingBytes/2); i++) {
+           writeShort((short)0);
+       }
        
         // Write the second LIST chunk, which contains the actual data
         writeString("LIST");
@@ -276,14 +280,17 @@ public class AVIWriter implements PlugInFilter {
         
          for (z = 0; z < zDim; z++) {
               IJ.showProgress(z, zDim);
-              if ((z%10)==0) IJ.showStatus("AVI...: "+z+"/"+zDim);
+              if ((z%10)==0) {
+                  IJ.showStatus("AVI...: "+z+"/"+zDim);
+              }
               raFile.write(dataSignature);
               savedbLength[z] = raFile.getFilePointer();
               writeInt(bytesPerPixel*xDim*yDim); // Write the data length
-              if (bytesPerPixel==1)
+              if (bytesPerPixel==1) {
                   writeByteFrame(z+1);
-              else
+              } else {
                   writeRGBFrame(z+1);
+              }
          }
                  
         // Write the idx1 CHUNK
@@ -338,10 +345,12 @@ public class AVIWriter implements PlugInFilter {
         int c, offset, index = 0;
         for (int y=height-1; y>=0; y--) {
             offset = y*width;
-            for (int x=0; x<width; x++)
+            for (int x=0; x<width; x++) {
                 bufferWrite[index++] = pixels[offset++];
-            for (int i = 0; i<xPad; i++)
+            }
+            for (int i = 0; i<xPad; i++) {
                 bufferWrite[index++] = (byte)0;
+            }
         }
         raFile.write(bufferWrite);
     }
@@ -386,10 +395,15 @@ public class AVIWriter implements PlugInFilter {
     
     double getFrameRate() {
     	double rate = imp.getCalibration().fps;
-    	if (rate==0.0)
- 			rate = Animator.getFrameRate();
-		if (rate<=1.0) rate = 1.0;
-		if (rate>60.0) rate = 60.0;
+    	if (rate==0.0) {
+            rate = Animator.getFrameRate();
+        }
+		if (rate<=1.0) {
+            rate = 1.0;
+        }
+		if (rate>60.0) {
+            rate = 60.0;
+        }
 		return rate;
     }
     

@@ -25,7 +25,8 @@ public class ScaleDialog implements PlugInFilter {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		IJ.register(ScaleDialog.class);
 		return DOES_ALL + NO_CHANGES;
@@ -37,7 +38,8 @@ public class ScaleDialog implements PlugInFilter {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 	double measured = 0.0;
 	double known = 1.0;
 	double aspectRatio = 1.0;
@@ -86,9 +88,9 @@ public class ScaleDialog implements PlugInFilter {
 		known = gd.getNextNumber();
 		aspectRatio = gd.getNextNumber();
 		unit = gd.getNextString();
-		if (unit.equals("um")) {
+		if ("um".equals(unit)) {
 			unit = IJ.micronSymbol + "m";
-		} else if (unit.equals("A")) {
+		} else if ("A".equals(unit)) {
 			unit = "" + IJ.angstromSymbol;
 		}
 		global2 = gd.getNextBoolean();
@@ -96,7 +98,7 @@ public class ScaleDialog implements PlugInFilter {
 			imp.setGlobalCalibration(global2 ? cal : null);
 			return;
 		}
-		if (measured <= 0.0 || unit.startsWith("pixel") || unit.startsWith("Pixel") || unit.equals("")) {
+		if (measured <= 0.0 || unit.startsWith("pixel") || unit.startsWith("Pixel") || "".equals(unit)) {
 			cal.pixelWidth = 1.0;
 			cal.pixelHeight = 1.0;
 			cal.pixelDepth = 1.0;
@@ -170,7 +172,8 @@ class SetScaleDialog extends GenericDialog {
 	/**
 	 *  Description of the Method
 	 */
-	protected void setup() {
+	@Override
+    protected void setup() {
 		initialScale += "          ";
 		setScale(initialScale);
 	}
@@ -181,22 +184,23 @@ class SetScaleDialog extends GenericDialog {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void textValueChanged(TextEvent e) {
+	@Override
+    public void textValueChanged(TextEvent e) {
 	Double d = getValue(((TextField) numberField.elementAt(0)).getText());
 		if (d == null) {
 			setScale(NO_SCALE);
 			return;
 		}
-	double measured = d.doubleValue();
+	double measured = d;
 		d = getValue(((TextField) numberField.elementAt(1)).getText());
 		if (d == null) {
 			setScale(NO_SCALE);
 			return;
 		}
-	double known = d.doubleValue();
+	double known = d;
 	String theScale;
 	String unit = ((TextField) stringField.elementAt(0)).getText();
-	boolean noScale = measured <= 0 || known <= 0 || unit.startsWith("pixel") || unit.startsWith("Pixel") || unit.equals("");
+	boolean noScale = measured <= 0 || known <= 0 || unit.startsWith("pixel") || unit.startsWith("Pixel") || "".equals(unit);
 		if (noScale) {
 			theScale = NO_SCALE;
 		} else {
@@ -213,7 +217,8 @@ class SetScaleDialog extends GenericDialog {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
 		if (e.getSource() == unscaleButton) {
 			((TextField) numberField.elementAt(0)).setText("0.00");

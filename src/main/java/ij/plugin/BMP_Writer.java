@@ -1,10 +1,9 @@
 package ij.plugin;
 import ij.*;
 import ij.io.*;
-import ij.process.*;
+
 import java.awt.*;
 import java.io.*;
-import java.awt.image.*;
 
 /**
  *  Implements the File/Save As/BMP command. Based on BMPFile class from
@@ -54,7 +53,8 @@ public class BMP_Writer implements PlugIn {
 	 *
 	 *@param  path  Description of the Parameter
 	 */
-	public void run(String path) {
+	@Override
+    public void run(String path) {
 		IJ.showProgress(0);
 		imp = WindowManager.getCurrentImage();
 		if (imp == null) {
@@ -65,7 +65,7 @@ public class BMP_Writer implements PlugIn {
 			writeImage(imp, path);
 		} catch (Exception e) {
 		String msg = e.getMessage();
-			if (msg == null || msg.equals("")) {
+			if (msg == null || "".equals(msg)) {
 				msg = "" + e;
 			}
 			//EU_HOU Bundle
@@ -92,7 +92,7 @@ public class BMP_Writer implements PlugIn {
 			biClrUsed = lut.getMapSize();// 8 bit color image may use less
 			bfOffBits += biClrUsed * 4;
 		}
-		if (path == null || path.equals("")) {
+		if (path == null || "".equals(path)) {
 		//EU_HOU Bundle
 		String prompt = "Save as " + biBitCount + " bit BMP";
 		SaveDialog sd = new SaveDialog(prompt, imp.getTitle(), ".bmp");

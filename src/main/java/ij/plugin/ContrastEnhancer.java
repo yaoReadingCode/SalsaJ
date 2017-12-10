@@ -4,7 +4,6 @@ import ij.*;
 import ij.process.*;
 import ij.gui.*;
 import ij.measure.*;
-import java.awt.*;
 
 /** Implements ImageJ's Process/Enhance Contrast command. */
 public class ContrastEnhancer implements PlugIn, Measurements {
@@ -20,6 +19,7 @@ public class ContrastEnhancer implements PlugIn, Measurements {
     static boolean entireImage;
     static double saturated = 0.5;
 
+    @Override
     public void run(String arg) {
         ImagePlus imp = IJ.getImage();
         stackSize = imp.getStackSize();
@@ -70,11 +70,7 @@ public class ContrastEnhancer implements PlugIn, Measurements {
             return false;
         }
         saturated = gd.getNextNumber();
-        if (bitDepth != 24) {
-            normalize = gd.getNextBoolean();
-        } else {
-            normalize = false;
-        }
+        normalize = bitDepth != 24 && gd.getNextBoolean();
         if (areaRoi) {
             entireImage = gd.getNextBoolean();
             updateSelectionOnly = !entireImage;
@@ -83,8 +79,8 @@ public class ContrastEnhancer implements PlugIn, Measurements {
             }
         }
         equalize = gd.getNextBoolean();
-        processStack = stackSize > 1 ? gd.getNextBoolean() : false;
-        useStackHistogram = stackSize > 1 ? gd.getNextBoolean() : false;
+        processStack = stackSize > 1 && gd.getNextBoolean();
+        useStackHistogram = stackSize > 1 && gd.getNextBoolean();
         if (saturated < 0.0) {
             saturated = 0.0;
         }
@@ -109,7 +105,9 @@ public class ContrastEnhancer implements PlugIn, Measurements {
                 IJ.showProgress(i, stackSize);
                 ImageProcessor ip = stack.getProcessor(i);
                 roi=imp.getRoi();
-                if(roi != null) ip.setRoi(roi);
+                if(roi != null) {
+                    ip.setRoi(roi);
+                }
                 if (!useStackHistogram) {
                     stats = ImageStatistics.getStatistics(ip, MIN_MAX, null);
                 }
@@ -118,7 +116,9 @@ public class ContrastEnhancer implements PlugIn, Measurements {
         } else {
             ImageProcessor ip = imp.getProcessor();
             roi=imp.getRoi();
-            if(roi != null) ip.setRoi(roi);
+            if(roi != null) {
+                ip.setRoi(roi);
+            }
             if (stats == null) {
                 stats = ImageStatistics.getStatistics(ip, MIN_MAX, null);
             }
@@ -205,7 +205,7 @@ public class ContrastEnhancer implements PlugIn, Measurements {
             } else if (i >= max) {
                 lut[i] = max2;
             } else {
-                lut[i] = (int) (((double) (i - min) / (max - min)) * max2);
+                lut[i] = (int) (((i - min) / (max - min)) * max2);
             }
         }
         applyTable(ip, lut);

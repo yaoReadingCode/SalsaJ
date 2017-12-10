@@ -1,7 +1,6 @@
 //EU_HOU
 package ij.gui;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.*;
 import java.io.File;
 import java.util.Hashtable;
@@ -347,7 +346,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 * @param  height  Description of the Parameter
 	 * @param  raised  Description of the Parameter
 	 */
-	private void fill3DRect(Graphics g, int x, int y, int width, int height, boolean raised) {
+	private void fill3DRect(Graphics g, int x, int y, @SuppressWarnings("SameParameterValue") int width, int height, boolean raised) {
 		//System.out.println("fill3DRect" + raised);
 		if (null == g) {
 			return;
@@ -564,9 +563,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			return;
 		}
 		icon = icons[tool];
-		this.icon = icon;
 
-		int length = icon.length();
+        int length = icon.length();
 		int x1;
 		int y1;
 		int x2;
@@ -758,8 +756,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 							return;
 						default:
 							IJ.showStatus("");
-							return;
-		}
+        }
 	}
 
 
@@ -818,7 +815,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @param  g  Description of the Parameter
 	 */
-	public void paint(Graphics g) {
+	@Override
+    public void paint(Graphics g) {
 		//System.out.println("paint");
 		if (null == g) {
 			return;
@@ -842,7 +840,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			if (names[tool] == null) {
 				names[tool] = "Spare tool";
 			}// enable tool
-			if (names[tool].indexOf("Action Tool") != -1) {
+			if (names[tool].contains("Action Tool")) {
 				return;
 			}
 		}
@@ -906,11 +904,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 		if (tool < 0 || tool >= NUM_TOOLS) {
 			return false;
 		}
-		if ((tool == SPARE1 || (tool >= SPARE2 && tool <= SPARE9)) && names[tool] == null) {
-			return false;
-		}
-		return true;
-	}
+        return (tool != SPARE1 && (tool < SPARE2 || tool > SPARE9)) || names[tool] != null;
+    }
 
 
 	/**
@@ -1085,7 +1080,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @param  e  Description of the Parameter
 	 */
-	public void mousePressed(MouseEvent e) {
+	@Override
+    public void mousePressed(MouseEvent e) {
 		/*
 		 *  EU_HOU CHANGES
 		 */
@@ -1124,10 +1120,10 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			if (isMacroTool(newTool)) {
 				String name = names[newTool];
 
-				if (name.indexOf("Unused Tool") != -1) {
+				if (name.contains("Unused Tool")) {
 					return;
 				}
-				if (name.indexOf("Action Tool") != -1) {
+				if (name.contains("Action Tool")) {
 					drawTool(newTool, true);
 					IJ.wait(50);
 					drawTool(newTool, false);
@@ -1220,12 +1216,12 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 
 		boolean stackTools = false;
 
-		for (int i = 0; i < list.length; i++) {
-			if (list[i].equals("Stack Tools.txt")) {
-				stackTools = true;
-				break;
-			}
-		}
+        for (String aList1 : list) {
+            if ("Stack Tools.txt".equals(aList1)) {
+                stackTools = true;
+                break;
+            }
+        }
 		switchPopup.removeAll();
 		//Permet de changer le nom de la macro de demarrage ?
 		path = IJ.getDirectory("macros") + "StartupMacros.txt";
@@ -1238,17 +1234,17 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 		if (!stackTools) {
 			addItem("Stack Tools*");
 		}
-		for (int i = 0; i < list.length; i++) {
-			String name = list[i];
+        for (String aList : list) {
+            String name = aList;
 
-			if (name.endsWith(".txt")) {
-				name = name.substring(0, name.length() - 4);
-				addItem(name);
-			} else if (name.endsWith(".ijm")) {
-				name = name.substring(0, name.length() - 4) + " ";
-				addItem(name);
-			}
-		}
+            if (name.endsWith(".txt")) {
+                name = name.substring(0, name.length() - 4);
+                addItem(name);
+            } else if (name.endsWith(".ijm")) {
+                name = name.substring(0, name.length() - 4) + " ";
+                addItem(name);
+            }
+        }
 		//EU_HOU bundle
 		addItem("Help...");
 		//add(ovalPopup);
@@ -1354,7 +1350,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @param  e  Description of the Parameter
 	 */
-	public void mouseReleased(MouseEvent e) { }
+	@Override
+    public void mouseReleased(MouseEvent e) { }
 
 
 	/**
@@ -1362,7 +1359,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @param  e  Description of the Parameter
 	 */
-	public void mouseExited(MouseEvent e) { }
+	@Override
+    public void mouseExited(MouseEvent e) { }
 
 
 	/**
@@ -1370,7 +1368,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @param  e  Description of the Parameter
 	 */
-	public void mouseClicked(MouseEvent e) { }
+	@Override
+    public void mouseClicked(MouseEvent e) { }
 
 
 	/**
@@ -1378,7 +1377,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @param  e  Description of the Parameter
 	 */
-	public void mouseEntered(MouseEvent e) { }
+	@Override
+    public void mouseEntered(MouseEvent e) { }
 
 
 	/**
@@ -1386,7 +1386,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @param  e  Description of the Parameter
 	 */
-	public void mouseDragged(MouseEvent e) { }
+	@Override
+    public void mouseDragged(MouseEvent e) { }
 
 
 	/**
@@ -1395,7 +1396,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 * @param  e  Description of the Parameter
 	 */
 	//EU_HOU multibouton
-	public void itemStateChanged(ItemEvent e) {
+	@Override
+    public void itemStateChanged(ItemEvent e) {
 		CheckboxMenuItem item = (CheckboxMenuItem) e.getSource();
 
 		//System.out.println("itemStateChanged" + e + " " + item);
@@ -1426,12 +1428,12 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 		} else {
 			String label = item.getActionCommand();
 
-			if (!label.equals("Help...")) {
+			if (!"Help...".equals(label)) {
 				currentSet = label;
 			}
 			String path;
 			//EU_HOU Bundle
-			if (label.equals("Help...")) {
+			if ("Help...".equals(label)) {
 				//EU_HOU Bundle
 				IJ.showMessage("Tool Switcher",
 						"Use this drop down menu to switch to macro tool\n" +
@@ -1446,8 +1448,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 						"Several example tool sets are available at\n" +
 						"<http://rsb.info.nih.gov/ij/macros/toolsets/>."
 						);
-				return;
-			} else if (label.endsWith("*")) {
+            } else if (label.endsWith("*")) {
 				// load from ij.jar
 				MacroInstaller mi = new MacroInstaller();
 
@@ -1465,7 +1466,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 				}
 			} else {
 				// load from ImageJ/macros/toolsets
-				if (label.equals("Startup Macros")) {
+				if ("Startup Macros".equals(label)) {
 					path = IJ.getDirectory("macros") + "StartupMacros.txt";
 				} else if (label.endsWith(" ")) {
 					path = IJ.getDirectory("macros") + "toolsets/" + label.substring(0, label.length() - 1) + ".ijm";
@@ -1479,7 +1480,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 					} else {
 						new MacroInstaller().run(path);
 					}
-				} catch (Exception ex) {}
+				} catch (Exception ignored) {}
 			}
 		}
 	}
@@ -1490,7 +1491,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @param  e  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 
 		MenuItem item = (MenuItem) e.getSource();
 
@@ -1520,7 +1522,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @return    The preferredSize value
 	 */
-	public Dimension getPreferredSize() {
+	@Override
+    public Dimension getPreferredSize() {
 		return ps;
 	}
 
@@ -1530,7 +1533,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @return    The minimumSize value
 	 */
-	public Dimension getMinimumSize() {
+	@Override
+    public Dimension getMinimumSize() {
 		return ps;
 	}
 
@@ -1540,7 +1544,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	 *
 	 * @param  e  Description of the Parameter
 	 */
-	public void mouseMoved(MouseEvent e) {
+	@Override
+    public void mouseMoved(MouseEvent e) {
 		int x = e.getX();
 
 		x = toolID(x / SIZE);
@@ -1593,7 +1598,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			}
 			names[tool] = toolTip;
 		}
-		if (tool == current && (names[tool].indexOf("Action Tool") != -1 || names[tool].indexOf("Unused Tool") != -1)) {
+		if (tool == current && (names[tool].contains("Action Tool") || names[tool].contains("Unused Tool"))) {
 			//EU_HOU Chnages
 			setTool(LINE);
 		}
@@ -1630,16 +1635,16 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 		} else {
 			menus[tool].removeAll();
 		}
-		for (int i = 0; i < commands.length; i++) {
-			if (commands[i].equals("-")) {
-				menus[tool].addSeparator();
-			} else {
-				MenuItem mi = new MenuItem(commands[i]);
+        for (String command : commands) {
+            if ("-".equals(command)) {
+                menus[tool].addSeparator();
+            } else {
+                MenuItem mi = new MenuItem(command);
 
-				mi.addActionListener(this);
-				menus[tool].add(mi);
-			}
-		}
+                mi.addActionListener(this);
+                menus[tool].add(mi);
+            }
+        }
 		if (tool == current) {
 			//EU_HOU Chnages
 			setTool(LINE);

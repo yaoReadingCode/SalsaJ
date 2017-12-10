@@ -9,12 +9,8 @@
 package ij.plugin;
 import ij.*;
 import ij.process.*;
-import ij.gui.*;
-import java.awt.*;
 import ij.io.SaveDialog;
 import java.io.*;
-import java.util.*;
-import java.awt.image.*;
 
 /**
  *  Description of the Class
@@ -29,7 +25,8 @@ public class PNM_Writer implements PlugIn {
 	 *
 	 *@param  path  Description of the Parameter
 	 */
-	public void run(String path) {
+	@Override
+    public void run(String path) {
 	ImagePlus img = IJ.getImage();
 	boolean isGray = false;
 	String extension = null;
@@ -54,7 +51,7 @@ public class PNM_Writer implements PlugIn {
 			}
 		}
 
-		if (path == null || path.equals("")) {
+		if (path == null || "".equals(path)) {
 		SaveDialog od = new SaveDialog("PNM Writer", title, extension);
 		String dir = od.getDirectory();
 		String name = od.getFileName();
@@ -89,7 +86,7 @@ public class PNM_Writer implements PlugIn {
 				for (int j = 0; j < h; j++) {
 					for (int i = 0; i < w; i++) {
 					int c = proc.getPixel(i, j);
-						pixels[3 * (i + w * j) + 0] =
+						pixels[3 * (i + w * j)] =
 								(byte) ((c & 0xff0000) >> 16);
 						pixels[3 * (i + w * j) + 1] =
 								(byte) ((c & 0xff00) >> 8);

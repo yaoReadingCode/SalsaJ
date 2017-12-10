@@ -1,7 +1,4 @@
 package ij.plugin;
-import java.awt.*;
-import java.io.*;
-import java.text.DecimalFormat;
 import java.util.*;
 import ij.*;
 import ij.io.*;
@@ -29,7 +26,8 @@ public class StackWriter implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	ImagePlus imp = WindowManager.getCurrentImage();
 		if (imp == null || (imp != null && imp.getStackSize() < 2)) {
 			//EU_HOU Bundle
@@ -76,19 +74,19 @@ public class StackWriter implements PlugIn {
 			return;
 		}
 	String format = fileType.toLowerCase(Locale.US);
-		if (format.equals("gif") && !FileSaver.okForGif(imp)) {
+		if ("gif".equals(format) && !FileSaver.okForGif(imp)) {
 			return;
-		} else if (format.equals("fits") && !FileSaver.okForFits(imp)) {
+		} else if ("fits".equals(format) && !FileSaver.okForFits(imp)) {
 			return;
 		}
 
-		if (format.equals("text")) {
+		if ("text".equals(format)) {
 			format = "text image";
 		}
 	String extension = "." + format;
-		if (format.equals("tiff")) {
+		if ("tiff".equals(format)) {
 			extension = ".tif";
-		} else if (format.equals("text image")) {
+		} else if ("text image".equals(format)) {
 			extension = ".txt";
 		}
 
@@ -114,7 +112,7 @@ public class StackWriter implements PlugIn {
 			IJ.showProgress((double) i / nSlices);
 			imp2.setProcessor(null, stack.getProcessor(i));
 		String label2 = stack.getSliceLabel(i);
-			if (label2 != null && label2.indexOf("\n") != -1) {
+			if (label2 != null && label2.contains("\n")) {
 				imp2.setProperty("Info", label2);
 			} else {
 			Properties props = imp2.getProperties();
@@ -126,7 +124,7 @@ public class StackWriter implements PlugIn {
 			digits = getDigits(number++);
 			if (useLabels) {
 				label = stack.getShortSliceLabel(i);
-				if (label != null && label.equals("")) {
+				if (label != null && "".equals(label)) {
 					label = null;
 				}
 			}

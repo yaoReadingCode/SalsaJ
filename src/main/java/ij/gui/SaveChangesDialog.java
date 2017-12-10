@@ -86,7 +86,8 @@ public class SaveChangesDialog extends Dialog implements ActionListener, KeyList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == cancel) {
 			cancelPressed = true;
 		} else if (e.getSource() == save) {
@@ -133,7 +134,8 @@ public class SaveChangesDialog extends Dialog implements ActionListener, KeyList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void keyPressed(KeyEvent e) {
+	@Override
+    public void keyPressed(KeyEvent e) {
 	int keyCode = e.getKeyCode();
 
 		IJ.setKeyDown(keyCode);
@@ -152,7 +154,8 @@ public class SaveChangesDialog extends Dialog implements ActionListener, KeyList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void keyReleased(KeyEvent e) { }
+	@Override
+    public void keyReleased(KeyEvent e) { }
 
 
 	/**
@@ -160,7 +163,8 @@ public class SaveChangesDialog extends Dialog implements ActionListener, KeyList
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void keyTyped(KeyEvent e) { }
+	@Override
+    public void keyTyped(KeyEvent e) { }
 
 }
 

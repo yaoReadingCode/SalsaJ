@@ -3,13 +3,10 @@ package ij;
 
 import ij.process.*;
 import ij.util.*;
-import ij.gui.ImageWindow;
 import ij.plugin.MacroInstaller;
 import java.awt.*;
 import java.awt.image.*;
-import java.awt.event.*;
 //EU_HOU Changes
-import java.awt.color.*;
 import java.util.*;
 import java.io.*;
 import java.applet.Applet;
@@ -393,10 +390,10 @@ public class Menus {
         } else {
             if (shift) {
                 item = new MenuItem(label, new MenuShortcut(shortcut, true));
-                shortcuts.put(new Integer(shortcut + 200), label);
+                shortcuts.put(shortcut + 200, label);
             } else {
                 item = new MenuItem(label, new MenuShortcut(shortcut));
-                shortcuts.put(new Integer(shortcut), label);
+                shortcuts.put(shortcut, label);
             }
         }
         if (addSorted) {
@@ -490,7 +487,7 @@ public class Menus {
             if (count == 1) {
                 menu.add(submenu);
             }
-            if (value.equals("-")) {
+            if ("-".equals(value)) {
                 submenu.addSeparator();
             } else {
                 addPluginItem(submenu, value);
@@ -523,8 +520,8 @@ public class Menus {
             StringSorter.sort(list);
         }
         submenu.addSeparator();
-        for (int i = 0; i < list.length; i++) {
-            String name = list[i];
+        for (String aList : list) {
+            String name = aList;
 
             if (name.endsWith(".lut")) {
                 name = name.substring(0, name.length() - 4);
@@ -580,7 +577,7 @@ public class Menus {
             }
         }
         if (keyCode >= KeyEvent.VK_F1 && keyCode <= KeyEvent.VK_F12) {
-            shortcuts.put(new Integer(keyCode), command);
+            shortcuts.put(keyCode, command);
             keyCode = 0;
         } else if (keyCode >= 265 && keyCode <= 290) {
             keyCode -= 200;
@@ -629,22 +626,26 @@ public class Menus {
             }
             char firstChar = value.charAt(0);
             //System.out.println(("firstChar = " + firstChar + " , count = " + count);
-            if (firstChar == '-') {
-                pluginsMenu.addSeparator();
-            } else if (firstChar == '>') {
-                String submenu = value.substring(2, value.length() - 1);
-                //System.out.println("menus :" + pluginsMenu + " " + submenu);
-                Menu menu = addSubMenu(pluginsMenu, submenu);
+            switch (firstChar) {
+                case '-':
+                    pluginsMenu.addSeparator();
+                    break;
+                case '>':
+                    String submenu = value.substring(2, value.length() - 1);
+                    //System.out.println("menus :" + pluginsMenu + " " + submenu);
+                    Menu menu = addSubMenu(pluginsMenu, submenu);
 
-                if (submenu.equals("Shortcuts")) {
-                    shortcutsMenu = menu;
-                } else if (submenu.equals("Utilities")) {
-                    utilitiesMenu = menu;
-                } else if (submenu.equals("Macros")) {
-                    macrosMenu = menu;
-                }
-            } else {
-                addPluginItem(pluginsMenu, value);
+                    if ("Shortcuts".equals(submenu)) {
+                        shortcutsMenu = menu;
+                    } else if ("Utilities".equals(submenu)) {
+                        utilitiesMenu = menu;
+                    } else if ("Macros".equals(submenu)) {
+                        macrosMenu = menu;
+                    }
+                    break;
+                default:
+                    addPluginItem(pluginsMenu, value);
+                    break;
             }
         }
         userPluginsIndex = pluginsMenu.getItemCount();
@@ -723,8 +724,8 @@ public class Menus {
                 if (plugins2 == null) {
                     plugins2 = getStrippedPlugins(plugins);
                 }
-                for (int i = 0; i < plugins2.length; i++) {
-                    if (className.startsWith(plugins2[i])) {
+                for (String aPlugins2 : plugins2) {
+                    if (className.startsWith(aPlugins2)) {
                         found = true;
                         break;
                     }
@@ -744,9 +745,9 @@ public class Menus {
             }
         }
         if (plugins != null) {
-            for (int i = 0; i < plugins.length; i++) {
-                if (!skipList.containsKey(plugins[i])) {
-                    installUserPlugin(plugins[i]);
+            for (String plugin : plugins) {
+                if (!skipList.containsKey(plugin)) {
+                    installUserPlugin(plugin);
                 }
             }
         }
@@ -857,13 +858,13 @@ public class Menus {
                     installJarPlugin(jar, s);
                     //System.out.println(("apres installJarPlugin");
                 }
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             } finally {
                 try {
                     if (lnr != null) {
                         lnr.close();
                     }
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
             }
         }
@@ -971,7 +972,7 @@ public class Menus {
      */
     void addJarErrorHeading(String jar) {
         if (!isJarErrorHeading) {
-            if (!jarError.equals("")) {
+            if (!"".equals(jarError)) {
                 jarError += " \n";
             }
             jarError += "Plugin configuration error: " + jar + "\n";
@@ -1027,7 +1028,7 @@ public class Menus {
             return null;
         }
         name = name.substring(index + 1);
-        if (name.equals("plugins")) {
+        if ("plugins".equals(name)) {
             return null;
         }
         return name;
@@ -1088,7 +1089,7 @@ public class Menus {
                     return jarFile.getInputStream(entry);
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return autoGenerateConfigFile(jar);
     }
@@ -1110,8 +1111,8 @@ public class Menus {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
                 String name = entry.getName();
 
-                if (name.endsWith(".class") && name.indexOf("_") > 0 && name.indexOf("$") == -1
-                        && name.indexOf("/_") == -1 && !name.startsWith("_")) {
+                if (name.endsWith(".class") && name.indexOf("_") > 0 && !name.contains("$")
+                        && !name.contains("/_") && !name.startsWith("_")) {
                     if (sb == null) {
                         sb = new StringBuffer();
                     }
@@ -1127,10 +1128,10 @@ public class Menus {
                     }
                     name = name.replace('_', ' ');
                     className = className.replace('/', '.');
-                    sb.append(plugins + ", \"" + name + "\", " + className + "\n");
+                    sb.append(plugins).append(", \"").append(name).append("\", ").append(className).append("\n");
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         //IJ.log(""+(sb!=null?sb.toString():"null"));
         if (sb == null) {
@@ -1183,7 +1184,7 @@ public class Menus {
 
             if (pluginsDir == null) {
                 pluginsDir = homeDir;
-            } else if (pluginsDir.equals("user.home")) {
+            } else if ("user.home".equals(pluginsDir)) {
                 pluginsDir = System.getProperty("user.home");
                 if (!(new File(pluginsDir + Prefs.separator + "plugins")).isDirectory()) {
                     pluginsDir = pluginsDir + Prefs.separator + "ImageJ";
@@ -1222,8 +1223,8 @@ public class Menus {
 
         jarFiles = null;
         macroFiles = null;
-        for (int i = 0; i < list.length; i++) {
-            String name = list[i];
+        for (String aList : list) {
+            String name = aList;
             boolean isClassFile = name.endsWith(".class");
             boolean hasUnderscore = name.indexOf('_') >= 0;
 
@@ -1247,7 +1248,7 @@ public class Menus {
             }
         }
         list = new String[v.size()];
-        v.copyInto((String[]) list);
+        v.copyInto(list);
         StringSorter.sort(list);
         return list;
     }
@@ -1274,8 +1275,8 @@ public class Menus {
             return;
         }
         dir += "/";
-        for (int i = 0; i < list.length; i++) {
-            String name = list[i];
+        for (String aList : list) {
+            String name = aList;
             boolean hasUnderscore = name.indexOf('_') >= 0;
 
             if (hasUnderscore && name.endsWith(".class") && name.indexOf('$') < 0) {
@@ -1360,9 +1361,9 @@ public class Menus {
             if (s == null) {
                 break;
             }
-            if (s.equals("-")) {
+            if ("-".equals(s)) {
                 popup.addSeparator();
-            } else if (!s.equals("")) {
+            } else if (!"".equals(s)) {
                 mi = new MenuItem(s);
                 mi.addActionListener(ij);
                 popup.add(mi);
@@ -1469,7 +1470,7 @@ public class Menus {
 
                 item.setState(i == index);
             }
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
         }
     }
 
@@ -1615,7 +1616,6 @@ public class Menus {
                 size *= 2;
                 break;
             default:// 8-bit
-                ;
         }
 
         CheckboxMenuItem item = new CheckboxMenuItem(name + " " + size + "K");
@@ -1656,11 +1656,10 @@ public class Menus {
         if (oldLabel.equals(newLabel)) {
             return;
         }
-        int first = WINDOW_MENU_ITEMS;
         int last = window.getItemCount() - 1;
         //IJ.write("updateWindowMenuItem: "+" "+first+" "+last+" "+oldLabel+" "+newLabel);
         try {// workaround for Linux/Java 5.0/bug
-            for (int i = first; i <= last; i++) {
+            for (int i = WINDOW_MENU_ITEMS; i <= last; i++) {
                 MenuItem item = window.getItem(i);
                 //IJ.write(i+" "+item.getLabel()+" "+newLabel);
                 String label = item.getLabel();
@@ -1677,7 +1676,7 @@ public class Menus {
                     return;
                 }
             }
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
         }
     }
 
@@ -1726,7 +1725,7 @@ public class Menus {
      */
     public static int installPlugin(String plugin, char menuCode, String command, String shortcut, ImageJ ij) {
         //System.out.println(("installPlugin ok");
-        if (command.equals("")) {//uninstall
+        if ("".equals(command)) {//uninstall
             //Object o = pluginsPrefs.remove(plugin);
             //if (o==null)
             //	return NOT_INSTALLED;
@@ -1791,10 +1790,10 @@ public class Menus {
             item = new MenuItem(command);
         } else if (functionKey) {
             command += " [F" + (code - KeyEvent.VK_F1 + 1) + "]";
-            shortcuts.put(new Integer(code), command);
+            shortcuts.put(code, command);
             item = new MenuItem(command);
         } else {
-            shortcuts.put(new Integer(code), command);
+            shortcuts.put(code, command);
 
             int keyCode = code;
             boolean shift = false;
@@ -1827,7 +1826,7 @@ public class Menus {
             String cmd = (String) en.nextElement();
 
             if (cmd.indexOf(command) > 0) {
-                pluginsPrefs.removeElement((Object) cmd);
+                pluginsPrefs.removeElement(cmd);
                 found = true;
                 break;
             }
@@ -1847,11 +1846,7 @@ public class Menus {
      * @return          Description of the Return Value
      */
     public static boolean commandInUse(String command) {
-        if (pluginsTable.get(command) != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return pluginsTable.get(command) != null;
     }
 
     /**
@@ -1974,7 +1969,7 @@ public class Menus {
             }
             mi.installFile(path);
             nMacros += mi.getMacroCount();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -1987,15 +1982,11 @@ public class Menus {
     static boolean validShortcut(String shortcut) {
         int len = shortcut.length();
 
-        if (shortcut.equals("")) {
+        if ("".equals(shortcut)) {
             return true;
         } else if (len == 1) {
             return true;
-        } else if (shortcut.startsWith("F") && (len == 2 || len == 3)) {
-            return true;
-        } else {
-            return false;
-        }
+        } else return shortcut.startsWith("F") && (len == 2 || len == 3);
     }
 
     /**
@@ -2007,11 +1998,7 @@ public class Menus {
     public static boolean shortcutInUse(String shortcut) {
         int code = convertShortcutToCode(shortcut);
 
-        if (shortcuts.get(new Integer(code)) != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return shortcuts.get(new Integer(code)) != null;
     }
 
     /**

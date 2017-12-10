@@ -4,7 +4,6 @@ import ij.ImagePlus;
 import ij.WindowManager;
 import ij.gui.GenericDialog;
 import ij.gui.NewImage;
-import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import ij.measure.Calibration;
 import ij.plugin.PlugIn;
@@ -343,7 +342,7 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 			int v1 = (int) (255 * Math.exp(-r2 * r2));
 			int v2 = (int) (255 * Math.exp(-r1 * r1));
 
-				pixels[y * imageWidth + x] = 0xFF000000 | ((int) (v2 + v1) << 16) | (int) ((v2) << 8) | (y / 4);
+				pixels[y * imageWidth + x] = 0xFF000000 | (v2 + v1 << 16) | (v2) << 8 | (y / 4);
 			}
 		}
 	MemoryImageSource source = new MemoryImageSource(imageWidth, imageHeight, pixels, 0, imageWidth);
@@ -386,7 +385,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		if (IJ.versionLessThan("1.36b")) {
 			return;
 		}
@@ -492,8 +492,7 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	int gridHeight;
 
 	int gridWidth;
-		;
-		if (imageHeight > imageWidth) {
+        if (imageHeight > imageWidth) {
 			gridHeight = grid;
 			gridWidth = grid * imageWidth / imageHeight;
 		} else {
@@ -544,7 +543,7 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 			zRatioInit = (maxVal - minVal) / (255 * scaledWidth / imageWidth);
 
 			//  determine initial scale factor
-			scaleInit = 0.55 * Math.max(startWindowHeight, startWindowWidth) / (double) Math.max(imageWidth, Math.max(255 * zRatioInit, imageHeight));
+			scaleInit = 0.55 * Math.max(startWindowHeight, startWindowWidth) / Math.max(imageWidth, Math.max(255 * zRatioInit, imageHeight));
 		} else {
 			scaleInit = 0.55 * Math.max(startWindowHeight, startWindowWidth) / (double) Math.max(imageHeight, imageWidth);
 			zRatioInit = 0.55 * startWindowHeight / (256 * scaleInit);
@@ -619,7 +618,7 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 			}
 			// unit String for the last position
 			if (value + stepValue > scaledHeight || value == scaledHeight) {
-				if (!units.equals("pixels")) {
+				if (!"pixels".equals(units)) {
 					s = "y/" + units;
 				} else {
 					s = "y";
@@ -652,7 +651,7 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 				s = "" + (int) Math.round(value * 1000) / 1000.;
 			}
 			if (value + stepValue > scaledWidth || value == scaledWidth) {
-				if (!units.equals("pixels")) {
+				if (!"pixels".equals(units)) {
 					s = "x/" + units;
 				} else {
 					s = "x";
@@ -728,7 +727,7 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 
 	// Get the magnitude of the step size
 	double mag = Math.floor(Math.log(tempStep) / Math.log(10.));
-	double magPow = Math.pow((double) 10.0, mag);
+	double magPow = Math.pow(10.0, mag);
 
 	// Calculate most significant digit of the new step size
 	double magMsd = ((int) (tempStep / magPow + .5));
@@ -765,7 +764,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	 *@param  arg0  Description of the Parameter
 	 */
 
-	public void mouseClicked(MouseEvent arg0) {
+	@Override
+    public void mouseClicked(MouseEvent arg0) {
 	Object source = arg0.getSource();
 		if (source == imageRegion) {// top view
 
@@ -786,7 +786,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	 *
 	 *@param  arg0  Description of the Parameter
 	 */
-	public void mouseMoved(MouseEvent arg0) { }
+	@Override
+    public void mouseMoved(MouseEvent arg0) { }
 
 
 
@@ -795,7 +796,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	 *
 	 *@param  arg0  Description of the Parameter
 	 */
-	public void mousePressed(MouseEvent arg0) {
+	@Override
+    public void mousePressed(MouseEvent arg0) {
 	Object source = arg0.getSource();
 
 		if (source == imageRegion) {
@@ -815,7 +817,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	 *
 	 *@param  arg0  Description of the Parameter
 	 */
-	public void mouseReleased(MouseEvent arg0) {
+	@Override
+    public void mouseReleased(MouseEvent arg0) {
 		//Object source = arg0.getSource();
 		drag = false;
 		setPlotType(plotType);
@@ -830,10 +833,11 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	 *
 	 *@param  arg0  Description of the Parameter
 	 */
-	public void mouseDragged(MouseEvent arg0) {
+	@Override
+    public void mouseDragged(MouseEvent arg0) {
 	Object source = arg0.getSource();
 		if (source == imageRegion) {
-			if (drag == true) {
+			if (drag) {
 				jRenderer3D.setSurfacePlotMode(JRenderer3D.SURFACEPLOT_DOTSNOLIGHT);
 
 			int xAct = arg0.getX();
@@ -856,7 +860,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	 *
 	 *@param  arg0  Description of the Parameter
 	 */
-	public void mouseEntered(MouseEvent arg0) { }
+	@Override
+    public void mouseEntered(MouseEvent arg0) { }
 
 
 	/**
@@ -864,7 +869,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	 *
 	 *@param  arg0  Description of the Parameter
 	 */
-	public void mouseExited(MouseEvent arg0) { }
+	@Override
+    public void mouseExited(MouseEvent arg0) { }
 
 
 
@@ -1064,7 +1070,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 		// add window listener
 		frame.addWindowListener(
 			new WindowAdapter() {
-				public void windowClosing(WindowEvent event) {
+				@Override
+                public void windowClosing(WindowEvent event) {
 					frame.dispose();
 				}
 			});
@@ -1085,7 +1092,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 		frame.addComponentListener(
 			new ComponentAdapter() {
 
-				public void componentResized(ComponentEvent event) {
+				@Override
+                public void componentResized(ComponentEvent event) {
 				Insets insetsFrame = frame.getInsets();
 					windowWidth = frame.getWidth() - insetsFrame.left - insetsFrame.right - settingsPanel2.getWidth();
 					windowHeight = frame.getHeight() - insetsFrame.bottom - insetsFrame.top - settingsPanel1.getHeight();
@@ -1239,7 +1247,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 
 		comboDisplayColors.addActionListener(
 			new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
+				@Override
+                public void actionPerformed(ActionEvent evt) {
 					setColorType(comboDisplayColors.getSelectedItem().toString());
 				}
 			});
@@ -1265,7 +1274,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 
 		comboDisplayType.addActionListener(
 			new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
+				@Override
+                public void actionPerformed(ActionEvent evt) {
 					plotType = comboDisplayType.getSelectedItem().toString();
 					setPlotType(plotType);
 				}
@@ -1277,7 +1287,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	JButton saveButton = new JButton("Save Plot");
 		saveButton.addActionListener(
 			new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+                public void actionPerformed(ActionEvent e) {
 					imageRegion.saveToImageJImage();
 				}
 			});
@@ -1286,7 +1297,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	JButton textureButton = new JButton("Load Texture");
 		textureButton.addActionListener(
 			new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+                public void actionPerformed(ActionEvent e) {
 					loadTextureImage();
 				}
 			});
@@ -1347,14 +1359,14 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 				return;
 			}
 		int index = gd.getNextChoiceIndex();
-			if (titles[index].equals("\"Load File from Disk\"")) {
+			if ("\"Load File from Disk\"".equals(titles[index])) {
 				loadFromDisk = true;
 			} else {
 				impTexture = WindowManager.getImage(wList[index]);
 			}
 		}
 
-		if (loadFromDisk == true) {
+		if (loadFromDisk) {
 		JFileChooser fc = new JFileChooser();// open texture image
 
 			if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -1412,7 +1424,7 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	int grid = 128;
 
 	int smooth = (isExamplePlot) ? 5 : 3;
-	String str = "Smoothing: " + (int) ((smooth) * 100) / 100.;
+	String str = "Smoothing: " + (smooth) * 100 / 100.;
 		smooth *= (512 / grid);
 		sliderSmoothing = createSliderHorizontal(str, 0, 100, smooth);
 
@@ -1471,15 +1483,12 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public synchronized void itemStateChanged(ItemEvent e) {
+	@Override
+    public synchronized void itemStateChanged(ItemEvent e) {
 		//Object source = e.getItemSelectable();
 
 		if (e.getSource() == checkInverse) {
-			if (checkInverse.isSelected()) {
-				invertZ = true;
-			} else {
-				invertZ = false;
-			}
+            invertZ = checkInverse.isSelected();
 			jRenderer3D.setInverse(invertZ);
 			maxS = sliderMax.getValue();
 			minS = sliderMin.getValue();
@@ -1509,11 +1518,7 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 			}
 		}
 		if (e.getSource() == checkAuto) {
-			if (checkAuto.isSelected()) {
-				isEqualxyzRatio = true;
-			} else {
-				isEqualxyzRatio = false;
-			}
+            isEqualxyzRatio = checkAuto.isSelected();
 
 			setScaleAndZRatio();
 			renderAndUpdateDisplay();
@@ -1574,7 +1579,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 
 		slider.addChangeListener(
 			new ChangeListener() {
-				public void stateChanged(ChangeEvent event) {
+				@Override
+                public void stateChanged(ChangeEvent event) {
 					sliderChange((JSlider) event.getSource());
 				}
 			});
@@ -1609,7 +1615,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 
 		slider.addChangeListener(
 			new ChangeListener() {
-				public void stateChanged(ChangeEvent event) {
+				@Override
+                public void stateChanged(ChangeEvent event) {
 					sliderChange((JSlider) event.getSource());
 				}
 			});
@@ -1663,7 +1670,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 		 *
 		 *@return    The preferredSize value
 		 */
-		public Dimension getPreferredSize() {
+		@Override
+        public Dimension getPreferredSize() {
 			return new Dimension(width, height);
 		}
 
@@ -1673,7 +1681,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 		 *
 		 *@return    The minimumSize value
 		 */
-		public Dimension getMinimumSize() {
+		@Override
+        public Dimension getMinimumSize() {
 			return new Dimension(width, height);
 		}
 
@@ -1705,10 +1714,11 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 		 *
 		 *@param  g  Description of the Parameter
 		 */
-		public void paint(Graphics g) {
+		@Override
+        public void paint(Graphics g) {
 
 			if (image != null) {
-				g.drawImage(image, 0, 0, width, height, (ImageObserver) this);
+				g.drawImage(image, 0, 0, width, height, this);
 			}
 		}
 
@@ -1740,7 +1750,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 		 *
 		 *@param  g  Description of the Parameter
 		 */
-		public void update(Graphics g) {
+		@Override
+        public void update(Graphics g) {
 			paint(g);
 		}
 
@@ -1750,7 +1761,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 		 *
 		 *@return    The height value
 		 */
-		public int getHeight() {
+		@Override
+        public int getHeight() {
 			return height;
 		}
 
@@ -1770,7 +1782,8 @@ public class Interactive_3D_Surface_Plot implements PlugIn, MouseListener, Mouse
 		 *
 		 *@return    The width value
 		 */
-		public int getWidth() {
+		@Override
+        public int getWidth() {
 			return width;
 		}
 

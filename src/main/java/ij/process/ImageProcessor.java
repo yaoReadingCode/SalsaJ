@@ -1,10 +1,9 @@
 //EU_HOU
 package ij.process;
 
-import java.util.*;
 import java.awt.*;
 import java.awt.image.*;
-import java.lang.reflect.*;
+
 import ij.gui.*;
 import ij.util.*;
 
@@ -19,7 +18,7 @@ import ij.util.*;
  * @see        FloatProcessor
  * @see        ColorProcessor
  */
-public abstract class ImageProcessor extends Object {
+public abstract class ImageProcessor {
 
     /**
      *  Value of pixels included in masks.
@@ -637,47 +636,51 @@ public abstract class ImageProcessor extends Object {
         int t2 = (int) maxThreshold;
         int index;
 
-        if (lutUpdate == RED_LUT) {
-            for (int i = 0; i < 256; i++) {
-                if (i >= t1 && i <= t2) {
-                    rLUT2[i] = (byte) 255;
-                    gLUT2[i] = (byte) 0;
-                    bLUT2[i] = (byte) 0;
-                } else {
-                    rLUT2[i] = rLUT1[i];
-                    gLUT2[i] = gLUT1[i];
-                    bLUT2[i] = bLUT1[i];
+        switch (lutUpdate) {
+            case RED_LUT:
+                for (int i = 0; i < 256; i++) {
+                    if (i >= t1 && i <= t2) {
+                        rLUT2[i] = (byte) 255;
+                        gLUT2[i] = (byte) 0;
+                        bLUT2[i] = (byte) 0;
+                    } else {
+                        rLUT2[i] = rLUT1[i];
+                        gLUT2[i] = gLUT1[i];
+                        bLUT2[i] = bLUT1[i];
+                    }
                 }
-            }
-        } else if (lutUpdate == BLACK_AND_WHITE_LUT) {
-            for (int i = 0; i < 256; i++) {
-                if (i >= t1 && i <= t2) {
-                    rLUT2[i] = (byte) 0;
-                    gLUT2[i] = (byte) 0;
-                    bLUT2[i] = (byte) 0;
-                } else {
-                    rLUT2[i] = (byte) 255;
-                    gLUT2[i] = (byte) 255;
-                    bLUT2[i] = (byte) 255;
+                break;
+            case BLACK_AND_WHITE_LUT:
+                for (int i = 0; i < 256; i++) {
+                    if (i >= t1 && i <= t2) {
+                        rLUT2[i] = (byte) 0;
+                        gLUT2[i] = (byte) 0;
+                        bLUT2[i] = (byte) 0;
+                    } else {
+                        rLUT2[i] = (byte) 255;
+                        gLUT2[i] = (byte) 255;
+                        bLUT2[i] = (byte) 255;
+                    }
                 }
-            }
-        } else {
-            for (int i = 0; i < 256; i++) {
-                if (i >= t1 && i <= t2) {
-                    rLUT2[i] = rLUT1[i];
-                    gLUT2[i] = gLUT1[i];
-                    bLUT2[i] = bLUT1[i];
+                break;
+            default:
+                for (int i = 0; i < 256; i++) {
+                    if (i >= t1 && i <= t2) {
+                        rLUT2[i] = rLUT1[i];
+                        gLUT2[i] = gLUT1[i];
+                        bLUT2[i] = bLUT1[i];
 
-                } else if (i > t2) {
-                    rLUT2[i] = (byte) 0;
-                    gLUT2[i] = (byte) 255;
-                    bLUT2[i] = (byte) 0;
-                } else {
-                    rLUT2[i] = (byte) 0;
-                    gLUT2[i] = (byte) 0;
-                    bLUT2[i] = (byte) 255;
+                    } else if (i > t2) {
+                        rLUT2[i] = (byte) 0;
+                        gLUT2[i] = (byte) 255;
+                        bLUT2[i] = (byte) 0;
+                    } else {
+                        rLUT2[i] = (byte) 0;
+                        gLUT2[i] = (byte) 0;
+                        bLUT2[i] = (byte) 255;
+                    }
                 }
-            }
+                break;
         }
 
         cm = new IndexColorModel(8, 256, rLUT2, gLUT2, bLUT2);
@@ -1181,7 +1184,7 @@ public abstract class ImageProcessor extends Object {
      * @param  width  The new lineWidth value
      */
     public void setLineWidth(int width) {
-        lineWidth = width - width + 1;
+        lineWidth = 0 + 1;
         if (lineWidth < 1) {
             lineWidth = 1;
         }
@@ -1211,12 +1214,16 @@ public abstract class ImageProcessor extends Object {
             return;
         }
         do {
-            if (lineWidth == 1) {
-                drawPixel((int) x, (int) y);
-            } else if (lineWidth == 2) {
-                drawDot2((int) x, (int) y);
-            } else {
-                drawDot((int) x, (int) y);
+            switch (lineWidth) {
+                case 1:
+                    drawPixel((int) x, (int) y);
+                    break;
+                case 2:
+                    drawDot2((int) x, (int) y);
+                    break;
+                default:
+                    drawDot((int) x, (int) y);
+                    break;
             }
             x += xinc;
             y += yinc;
@@ -1406,20 +1413,20 @@ public abstract class ImageProcessor extends Object {
      * @param  s  Description of the Parameter
      */
     public void drawString(String s) {
-        if (s == null || s.equals("")) {
+        if (s == null || "".equals(s)) {
             return;
         }
         setupFontMetrics();
         if (ij.IJ.isMacOSX()) {
             s += " ";
         }
-        if (s.indexOf("\n") == -1) {
+        if (!s.contains("\n")) {
             drawString2(s);
         } else {
             String[] s2 = Tools.split(s, "\n");
 
-            for (int i = 0; i < s2.length; i++) {
-                drawString2(s2[i]);
+            for (String aS2 : s2) {
+                drawString2(aS2);
             }
         }
     }
@@ -1538,11 +1545,7 @@ public abstract class ImageProcessor extends Object {
      * @param  antialiasedText  The new antialiasedText value
      */
     public void setAntialiasedText(boolean antialiasedText) {
-        if (antialiasedText && (((this instanceof ByteProcessor) && getMin() == 0.0 && getMax() == 255.0) || (this instanceof ColorProcessor))) {
-            this.antialiasedText = true;
-        } else {
-            this.antialiasedText = false;
-        }
+        this.antialiasedText = antialiasedText && (((this instanceof ByteProcessor) && getMin() == 0.0 && getMax() == 255.0) || (this instanceof ColorProcessor));
     }
 
     /**
@@ -1692,6 +1695,7 @@ public abstract class ImageProcessor extends Object {
      *
      * @return    Description of the Return Value
      */
+    @Override
     public String toString() {
         return ("ip[width=" + width + ", height=" + height + ", min=" + getMin() + ", max=" + getMax() + "]");
     }
@@ -2062,7 +2066,7 @@ public abstract class ImageProcessor extends Object {
      * @param  y  Description of the Parameter
      * @return    The interpolatedEdgeValue value
      */
-    private final double getInterpolatedEdgeValue(double x, double y) {
+    private double getInterpolatedEdgeValue(double x, double y) {
         int xbase = (int) x;
         int ybase = (int) y;
         double xFraction = x - xbase;

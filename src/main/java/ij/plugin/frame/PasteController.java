@@ -50,7 +50,8 @@ public class PasteController extends PlugInFrame implements PlugIn, ItemListener
 		show();
 	}
 	
-	public void itemStateChanged(ItemEvent e) {
+	@Override
+    public void itemStateChanged(ItemEvent e) {
 		int index = pasteMode.getSelectedIndex();
 		int mode = Blitter.COPY;
 		switch (index) {
@@ -69,16 +70,19 @@ public class PasteController extends PlugInFrame implements PlugIn, ItemListener
 			case 12: mode = Blitter.MAX; break;
 		}
 		Roi.setPasteMode(mode);
-		if (Recorder.record)
-			Recorder.record("setPasteMode", pasteMode.getSelectedItem());
+		if (Recorder.record) {
+            Recorder.record("setPasteMode", pasteMode.getSelectedItem());
+        }
 		ImagePlus imp = WindowManager.getCurrentImage();
 	}
 	
+    @Override
     public void windowClosing(WindowEvent e) {
     	close();
 	}
 
-	public void close() {
+	@Override
+    public void close() {
 		super.close();
 		instance = null;
 	}

@@ -1,7 +1,6 @@
 package skyview.geometry.csys;
 
 import static java.lang.Math.*;
-import skyview.geometry.CoordinateSystem;
 
 /** A helioecliptic coordinate system at a given epoch.
  *  This gives a coordinate system where the Sun is at the
@@ -17,6 +16,7 @@ public class HelioeclipticCoordinateSystem extends EclipticCoordinateSystem
     /**
      * Get the name of the component.
      */
+    @Override
     public String getName() {
 	return "H"+epoch;
     }
@@ -24,6 +24,7 @@ public class HelioeclipticCoordinateSystem extends EclipticCoordinateSystem
     /**
      * Get a description of the component.
      */
+    @Override
     public String getDescription() {
 	return "A coordinate system with the equator along  the ecliptic and the Sun at the center. "+
 	       "The position of the sun is inferred from the epoch.";
@@ -104,10 +105,9 @@ public class HelioeclipticCoordinateSystem extends EclipticCoordinateSystem
        l  += longterm;
 	
        l  =  ( l + 2592000.0)  %  1296000.0;
-       double longmed = l/3600.0 * dtor;
-	
-       // Don't perform rest of calculation from Sunpos -- we've
+
+        // Don't perform rest of calculation from Sunpos -- we've
        // got what we're after.
-       return longmed;
+       return l/3600.0 * dtor;
     }
 }

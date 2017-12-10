@@ -1,6 +1,5 @@
 package ij.plugin.filter;
 import java.awt.*;
-import java.util.Vector;
 import java.util.Properties;
 import ij.*;
 import ij.gui.*;
@@ -8,7 +7,6 @@ import ij.process.*;
 import ij.measure.*;
 import ij.text.*;
 import ij.plugin.MeasurementsWriter;
-import ij.util.Tools;
 import ij.macro.Interpreter;
 
 /**
@@ -105,17 +103,18 @@ public class Analyzer implements PlugInFilter, Measurements {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
+	@Override
 	public int setup(String arg, ImagePlus imp) {
 		this.arg = arg;
 		this.imp = imp;
 		IJ.register(Analyzer.class);
-		if (arg.equals("set")) {
+		if ("set".equals(arg)) {
 			doSetDialog();
 			return DONE;
-		} else if (arg.equals("sum")) {
+		} else if ("sum".equals(arg)) {
 			summarize();
 			return DONE;
-		} else if (arg.equals("clear")) {
+		} else if ("clear".equals(arg)) {
 			if (IJ.macroRunning()) {
 				unsavedMeasurements = false;
 			}
@@ -132,6 +131,7 @@ public class Analyzer implements PlugInFilter, Measurements {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
+	@Override
 	public void run(ImageProcessor ip) {
 		measure();
 	}
@@ -257,14 +257,14 @@ public class Analyzer implements PlugInFilter, Measurements {
 	int previous = 0;
 	boolean b = false;
 
-		for (int i = 0; i < list.length; i++) {
+		for (int aList : list) {
 			//if (list[i]!=previous)
 			b = gd.getNextBoolean();
-			previous = list[i];
+			previous = aList;
 			if (b) {
-				systemMeasurements |= list[i];
+				systemMeasurements |= aList;
 			} else {
-				systemMeasurements &= ~list[i];
+				systemMeasurements &= ~aList;
 			}
 		}
 		if ((oldMeasurements & (~LIMIT)) != (systemMeasurements & (~LIMIT))) {
@@ -414,7 +414,7 @@ public class Analyzer implements PlugInFilter, Measurements {
 		}
 	ImageProcessor ip = redirectImp.getProcessor();
 
-		if (imp.getTitle().equals("mask") && imp.getBitDepth() == 8) {
+		if ("mask".equals(imp.getTitle()) && imp.getBitDepth() == 8) {
 			ip.setMask(imp.getProcessor());
 			ip.setRoi(0, 0, imp.getWidth(), imp.getHeight());
 		} else {
@@ -723,9 +723,9 @@ public class Analyzer implements PlugInFilter, Measurements {
 			ImageStack stack = imp.getStack();
 			int currentSlice = imp.getCurrentSlice();
 			String label = stack.getShortSliceLabel(currentSlice);
-			String colon = s.equals("") ? "" : ":";
+			String colon = "".equals(s) ? "" : ":";
 
-				if (label != null && !label.equals("")) {
+				if (label != null && !"".equals(label)) {
 					s += colon + label;
 				} else {
 					s += colon + currentSlice;
@@ -774,7 +774,7 @@ public class Analyzer implements PlugInFilter, Measurements {
 		StringBuffer sb = new StringBuffer(n * tableHeadings.length());
 
 			for (int i = 0; i < n; i++) {
-				sb.append(rt.getRowAsString(i) + "\n");
+				sb.append(rt.getRowAsString(i)).append("\n");
 			}
 			tp.append(new String(sb));
 		}
@@ -838,14 +838,19 @@ public class Analyzer implements PlugInFilter, Measurements {
 			mean.append("\t");
 			sd.append("\t");
 		}
-		if (mode == POINTS) {
-			summarizePoints(rt);
-		} else if (mode == LENGTHS) {
-			summarizeLengths(rt);
-		} else if (mode == ANGLES) {
-			add2(rt.getColumnIndex("Angle"));
-		} else {
-			summarizeAreas();
+		switch (mode) {
+			case POINTS:
+				summarizePoints(rt);
+				break;
+			case LENGTHS:
+				summarizeLengths(rt);
+				break;
+			case ANGLES:
+				add2(rt.getColumnIndex("Angle"));
+				break;
+			default:
+				summarizeAreas();
+				break;
 		}
 
 	TextPanel tp = IJ.getTextPanel();
@@ -853,7 +858,7 @@ public class Analyzer implements PlugInFilter, Measurements {
 		if (tp != null) {
 		String worksheetHeadings = tp.getColumnHeadings();
 
-			if (worksheetHeadings.equals("")) {
+			if ("".equals(worksheetHeadings)) {
 				IJ.setColumnHeadings(rt.getColumnHeadings());
 			}
 		}

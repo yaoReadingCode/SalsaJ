@@ -46,6 +46,7 @@ public class RadioSpectrum_Reader implements PlugIn {
      *
      * @param arg Description of the Parameter
      */
+    @Override
     public void run(String arg) {
         //EU_HOU Bundle
         OpenDialog od = new OpenDialog(IJ.getBundle().getString("Open"), arg);
@@ -76,11 +77,7 @@ public class RadioSpectrum_Reader implements PlugIn {
             return;
         }
         // TEST DATA SPECTRUM
-        if (fileName.endsWith(".dat") || fileName.endsWith(".data") || fileName.endsWith(".csv")) {
-            spectdata = true;
-        } else {
-            spectdata = false;
-        }
+        spectdata = fileName.endsWith(".dat") || fileName.endsWith(".data") || fileName.endsWith(".csv");
 
         //IJ.log("freq 0 "+wave_ref);
         ///////////////// SPECTDATA OPTIQUE //////////////////////////////////////
@@ -210,7 +207,7 @@ public class RadioSpectrum_Reader implements PlugIn {
                 for (int j = 1; j <= m; ++j) {
                     IRad res = (IRad) results.get(String.valueOf(j));
                     if (res != null) {
-                        sb.append(j + "\t" + res.toString() + "\n");
+                        sb.append(j).append("\t").append(res.toString()).append("\n");
                     }
                 }
 
@@ -262,9 +259,8 @@ public class RadioSpectrum_Reader implements PlugIn {
                 index = Integer.parseInt(st.nextToken());
                 img = st.nextToken();
                 results.remove(String.valueOf(index));
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
-            ;
         }
     }
 
@@ -302,7 +298,7 @@ public class RadioSpectrum_Reader implements PlugIn {
          * @param bb Description of the Parameter
          */
         public IRad(String i, double xx, double yy, double ww, double aa, double ll, double bb) {
-            this.title = new String(i);
+            this.title = i;
             this.xx = xx;
             this.yy = yy;
             this.ww = ww;
@@ -316,9 +312,10 @@ public class RadioSpectrum_Reader implements PlugIn {
          *
          * @return Description of the Return Value
          */
+        @Override
         public String toString() {
-            return new String(title + "\t" + IJ.d2s(ll) + "\t" + IJ.d2s(bb) + "\t" + IJ.d2s(xx) + "\t" + IJ.d2s(yy) + "\t" + IJ.d2s(ww)
-                    + "\t" + IJ.d2s(aa));
+            return title + "\t" + IJ.d2s(ll) + "\t" + IJ.d2s(bb) + "\t" + IJ.d2s(xx) + "\t" + IJ.d2s(yy) + "\t" + IJ.d2s(ww)
+                    + "\t" + IJ.d2s(aa);
         }
     }
 
@@ -336,8 +333,8 @@ public class RadioSpectrum_Reader implements PlugIn {
         widthGauss = a[2];
         xGaussCenter = a[1];
         yGaussCenter = a[0];
-        res.append(new String(rdindex + "\t" + t + "\t" + IJ.d2s(l) + "\t" + IJ.d2s(b) + "\t" + IJ.d2s(xGaussCenter) + "\t" + IJ.d2s(yGaussCenter)
-                + "\t" + IJ.d2s(widthGauss) + "\t" + IJ.d2s(area)));
+        res.append(rdindex + "\t" + t + "\t" + IJ.d2s(l) + "\t" + IJ.d2s(b) + "\t" + IJ.d2s(xGaussCenter) + "\t" + IJ.d2s(yGaussCenter)
+                + "\t" + IJ.d2s(widthGauss) + "\t" + IJ.d2s(area));
         res.getTextPanel().resetSelection();
         results.put(String.valueOf(rdindex), new IRad(t, xGaussCenter, yGaussCenter, widthGauss, area, l, b));
         rdindex++;
@@ -364,15 +361,15 @@ public class RadioSpectrum_Reader implements PlugIn {
                 // chiffres séparés part des espaces
                 sp = line.split(" ");
                 xx = false;
-                for (int i = 0; i < sp.length; i++) {
-                    s = sp[i];
+                for (String aSp : sp) {
+                    s = aSp;
                     if (s.length() > 0) {
                         //System.out.println(i + " " + s + " " + cpt);
                         if (!xx) {
-                            xarray.add(Float.parseFloat(sp[i]));
+                            xarray.add(Float.parseFloat(aSp));
                             xx = true;
                         } else {
-                            yarray.add(Float.parseFloat(sp[i]));
+                            yarray.add(Float.parseFloat(aSp));
                         }
                     }
                 }
@@ -381,8 +378,8 @@ public class RadioSpectrum_Reader implements PlugIn {
             double[] xtemp = new double[cpt];
             double[] ytemp = new double[cpt];
             for (int i = 0; i < cpt; i++) {
-                xtemp[i] = ((Float) xarray.get(i)).floatValue();
-                ytemp[i] = ((Float) yarray.get(i)).floatValue();
+                xtemp[i] = (Float) xarray.get(i);
+                ytemp[i] = (Float) yarray.get(i);
             }
             /////////////////// COMPUTE VALUES
             double tmp_wave, tmp_freq, tmp_freq0;
@@ -452,9 +449,8 @@ public class RadioSpectrum_Reader implements PlugIn {
             PlotWindow.Base_Line_subtracted = false;
             PlotWindow.Base_Line = false;
             PlotWindow.ZERO_LINE = false;
-            PlotWindow pw = new PlotWindow(IJ.getBundle().getString("PlotWinTitle") + "  " + fileName, xLabel, yLabel, xValues, yValues, impdata);
 
-            return pw;
+            return new PlotWindow(IJ.getBundle().getString("PlotWinTitle") + "  " + fileName, xLabel, yLabel, xValues, yValues, impdata);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(RadioSpectrum_Reader.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -471,7 +467,7 @@ public class RadioSpectrum_Reader implements PlugIn {
 
         try {
             fi = fd.getInfo();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
         System.out.print(fi.width + " " + fi.height + " " + fi.nImages);
 
@@ -715,9 +711,8 @@ public class RadioSpectrum_Reader implements PlugIn {
                 PlotWindow.ZERO_LINE = false;
                 //EU_HOU Bundle
                 //IJ.log("spectre info " + impdata + " " + impdata.getOriginalFileInfo());
-                PlotWindow pw = new PlotWindow(IJ.getBundle().getString("PlotWinTitle") + "  " + fileName, xLabel, yLabel, xValues, yValues, impdata);
 
-                return pw;
+                return new PlotWindow(IJ.getBundle().getString("PlotWinTitle") + "  " + fileName, xLabel, yLabel, xValues, yValues, impdata);
 
                 //               pw.draw();
                 //Plot pw = new Plot(IJ.getBundle().getString("PlotWinTitle") + "  " + fileName, xLabel, yLabel, xValues, yValues, null, null);
@@ -841,9 +836,8 @@ public class RadioSpectrum_Reader implements PlugIn {
                 PlotWindow.Base_Line = false;
                 PlotWindow.ZERO_LINE = false;
                 //EU_HOU Bundle
-                PlotWindow pw = new PlotWindow(IJ.getBundle().getString("PlotWinTitle") + "  " + fileName, xLabel, yLabel, xValues, yValues, imp);
 
-                return pw;
+                return new PlotWindow(IJ.getBundle().getString("PlotWinTitle") + "  " + fileName, xLabel, yLabel, xValues, yValues, imp);
 
                 // pw.draw();
             }//optique

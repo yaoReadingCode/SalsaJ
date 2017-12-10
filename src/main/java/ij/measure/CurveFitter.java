@@ -116,9 +116,7 @@ public class CurveFitter {
 		fit = fitType;
 		initialize();
 		if (initialParams != null) {
-			for (int i = 0; i < numParams; i++) {
-				simp[0][i] = initialParams[i];
-			}
+			System.arraycopy(initialParams, 0, simp[0], 0, numParams);
 			initialParams = null;
 		}
 		if (showSettings) {
@@ -339,9 +337,7 @@ public class CurveFitter {
 	 */
 	void restart(int n) {
 		// Copy nth vertice of simplex to first vertice
-		for (int i = 0; i < numParams; i++) {
-			simp[0][i] = simp[n][i];
-		}
+		System.arraycopy(simp[n], 0, simp[0], 0, numParams);
 		sumResiduals(simp[0]);// Get sum of residuals^2 for first vertex
 	double[] step = new double[numParams];
 		for (int i = 0; i < numParams; i++) {
@@ -547,8 +543,7 @@ public class CurveFitter {
 	 *@return    The sumResidualsSqr value
 	 */
 	public double getSumResidualsSqr() {
-	double sumResidualsSqr = (getParams())[getNumParams()];
-		return sumResidualsSqr;
+        return (getParams())[getNumParams()];
 	}
 
 
@@ -562,9 +557,9 @@ public class CurveFitter {
 	int n = residuals.length;
 	double sum = 0.0;
 	double sum2 = 0.0;
-		for (int i = 0; i < n; i++) {
-			sum += residuals[i];
-			sum2 += residuals[i] * residuals[i];
+		for (double residual : residuals) {
+			sum += residual;
+			sum2 += residual * residual;
 		}
 	double stdDev = (n * sum2 - sum * sum) / n;
 		return Math.sqrt(stdDev / (n - 1.0));
@@ -630,7 +625,7 @@ public class CurveFitter {
 	 */
 	public String getResultString() {
 	//EU_HOU Bundle
-	StringBuffer results = new StringBuffer("\nNumber of iterations: " + getIterations() +
+	StringBuilder results = new StringBuilder("\nNumber of iterations: " + getIterations() +
 				"\nMaximum number of iterations: " + getMaxIterations() +
 				"\nSum of residuals squared: " + IJ.d2s(getSumResidualsSqr(), 4) +
 				"\nStandard deviation: " + IJ.d2s(getSD(), 4) +
@@ -639,7 +634,7 @@ public class CurveFitter {
 	char pChar = 'a';
 	double[] pVal = getParams();
 		for (int i = 0; i < numParams; i++) {
-			results.append("\n  " + pChar + " = " + IJ.d2s(pVal[i], 4));
+			results.append("\n  ").append(pChar).append(" = ").append(IJ.d2s(pVal[i], 4));
 			pChar++;
 		}
 		return results.toString();
@@ -675,9 +670,7 @@ public class CurveFitter {
 	 *  Keep the "next" vertex
 	 */
 	void newVertex() {
-		for (int i = 0; i < numVertices; i++) {
-			simp[worst][i] = next[i];
-		}
+		System.arraycopy(next, 0, simp[worst], 0, numVertices);
 	}
 
 

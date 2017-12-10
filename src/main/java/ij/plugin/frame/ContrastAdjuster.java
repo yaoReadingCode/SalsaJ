@@ -4,7 +4,6 @@ package ij.plugin.frame;
 import java.awt.*;
 import java.awt.event.*;
 import ij.*;
-import ij.plugin.filter.LutViewer.*;
 import ij.process.*;
 import ij.gui.*;
 import ij.measure.*;
@@ -109,8 +108,8 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 	 */
         @Override
 	public void run(String arg) {
-		windowLevel = arg.equals("wl");
-		balance = arg.equals("balance");
+		windowLevel = "wl".equals(arg);
+		balance = "balance".equals(arg);
 		if (windowLevel) {
 			//EU_HOU Bundle
 			setTitle(bun.getString("WLTitle"));
@@ -182,9 +181,9 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 			c.gridy = y++;
 			c.insets = new Insets(5, 10, 0, 10);
 			choice = new Choice();
-			for (int i = 0; i < channelLabels.length; i++) {
-				choice.addItem(channelLabels[i]);
-			}
+            for (String channelLabel : channelLabels) {
+                choice.addItem(channelLabel);
+            }
 			gridbag.setConstraints(choice, c);
 			choice.addItemListener(this);
 			choice.addKeyListener(ij);
@@ -410,7 +409,8 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public synchronized void adjustmentValueChanged(AdjustmentEvent e) {
+	@Override
+    public synchronized void adjustmentValueChanged(AdjustmentEvent e) {
 		Object source = e.getSource();
 
 		if (source == minSlider) {
@@ -434,7 +434,8 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public synchronized void actionPerformed(ActionEvent e) {
+	@Override
+    public synchronized void actionPerformed(ActionEvent e) {
 		Button b = (Button) e.getSource();
 
 		if (b == null) {
@@ -474,7 +475,7 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 
 		RGBImage = type == ImagePlus.COLOR_RGB;
 
-		boolean snapshotChanged = RGBImage && previousSnapshot != null && ((ColorProcessor) ip).getSnapshotPixels() != previousSnapshot;
+		boolean snapshotChanged = RGBImage && previousSnapshot != null && ip.getSnapshotPixels() != previousSnapshot;
 
 		if (imp.getID() != previousImageID || snapshotChanged || type != previousType || slice != previousSlice) {
 			setupNewImage(imp, ip);
@@ -498,7 +499,7 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 		previousMax = max;
 		if (RGBImage) {
 			ip.snapshot();
-			previousSnapshot = ((ColorProcessor) ip).getSnapshotPixels();
+			previousSnapshot = ip.getSnapshotPixels();
 		}
 		else {
 			previousSnapshot = null;
@@ -898,15 +899,17 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 
 			byte[] pixels = null;
 
-			if (channels == 4) {
-				pixels = r;
-			}
-			else if (channels == 2) {
-				pixels = g;
-			}
-			else if (channels == 1) {
-				pixels = b;
-			}
+            switch (channels) {
+                case 4:
+                    pixels = r;
+                    break;
+                case 2:
+                    pixels = g;
+                    break;
+                case 1:
+                    pixels = b;
+                    break;
+            }
 			ImageProcessor ip = new ByteProcessor(w, h, pixels, null);
 
 			stats = ImageStatistics.getStatistics(ip, 0, imp.getCalibration());
@@ -1079,7 +1082,7 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 		if (!(ip instanceof ByteProcessor)) {
 			return;
 		}
-		if (((ByteProcessor) ip).isInvertedLut()) {
+		if (ip.isInvertedLut()) {
 			ip.setThreshold(max, 255, ImageProcessor.NO_LUT_UPDATE);
 		}
 		else {
@@ -1293,13 +1296,14 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 	/**
 	 *  Main processing method for the ContrastAdjuster object
 	 */
-	public void run() {
+	@Override
+    public void run() {
 		while (!done) {
 			synchronized (this) {
 				try {
 					wait();
 				}
-				catch (InterruptedException e) {}
+				catch (InterruptedException ignored) {}
 			}
 			doUpdate();
 		}
@@ -1408,7 +1412,8 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowClosing(WindowEvent e) {
+	@Override
+    public void windowClosing(WindowEvent e) {
 		close();
 		Prefs.saveLocation(LOC_KEY, getLocation());
 	}
@@ -1417,7 +1422,8 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 	/**
 	 *  Overrides close() in PlugInFrame.
 	 */
-	public void close() {
+	@Override
+    public void close() {
 		super.close();
 		instance = null;
 		done = true;
@@ -1432,7 +1438,8 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowActivated(WindowEvent e) {
+	@Override
+    public void windowActivated(WindowEvent e) {
 		super.windowActivated(e);
 		setup();
 		WindowManager.setWindow(this);
@@ -1444,7 +1451,8 @@ public class ContrastAdjuster extends PlugInFrame implements Runnable,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public synchronized void itemStateChanged(ItemEvent e) {
+	@Override
+    public synchronized void itemStateChanged(ItemEvent e) {
 		channels = channelConstants[choice.getSelectedIndex()];
 		doReset = true;
 		notify();
@@ -1515,7 +1523,8 @@ class ColorTable extends Canvas {
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void paint(Graphics g) {
+	@Override
+    public void paint(Graphics g) {
 		/*
 		    min = newmin;
 		    max = newmax;
@@ -1613,7 +1622,8 @@ class ColorTable extends Canvas {
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void update(Graphics g) {
+	@Override
+    public void update(Graphics g) {
 		if (min == newmin && max == newmax) {
 			return;
 		}
@@ -1714,7 +1724,8 @@ class ContrastPlot extends Canvas implements MouseListener {
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void update(Graphics g) {
+	@Override
+    public void update(Graphics g) {
 		paint(g);
 	}
 
@@ -1724,7 +1735,8 @@ class ContrastPlot extends Canvas implements MouseListener {
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void paint(Graphics g) {
+	@Override
+    public void paint(Graphics g) {
 		int x1;
 		int y1;
 		int x2;
@@ -1795,7 +1807,7 @@ class ContrastPlot extends Canvas implements MouseListener {
 					idx = 255;
 				}
 				else {
-					idx = (int) (255 * (i - x1) / (x2 - x1 - 1));
+					idx = 255 * (i - x1) / (x2 - x1 - 1);
 				}
 				//System.out.println("i=" + i + " idx=" + idx + " r=" + (reds[idx] & 0xff) + " g=" + (greens[idx] & 0xff) + " b=" + (blues[idx] & 0xff));
 				if (reds != null) {
@@ -1804,7 +1816,7 @@ class ContrastPlot extends Canvas implements MouseListener {
 				else {
 					osg.setColor(new Color(idx, idx, idx));
 				}
-				osg.drawLine(i, HEIGHT, i, HEIGHT - ((int) (HEIGHT * histogram[i]) / hmax));
+				osg.drawLine(i, HEIGHT, i, HEIGHT - (HEIGHT * histogram[i] / hmax));
 			}
 			osg.dispose();
 			//}
@@ -1840,7 +1852,8 @@ class ContrastPlot extends Canvas implements MouseListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mousePressed(MouseEvent e) { }
+	@Override
+    public void mousePressed(MouseEvent e) { }
 
 
 	/**
@@ -1848,7 +1861,8 @@ class ContrastPlot extends Canvas implements MouseListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseReleased(MouseEvent e) { }
+	@Override
+    public void mouseReleased(MouseEvent e) { }
 
 
 	/**
@@ -1856,7 +1870,8 @@ class ContrastPlot extends Canvas implements MouseListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseExited(MouseEvent e) { }
+	@Override
+    public void mouseExited(MouseEvent e) { }
 
 
 	/**
@@ -1864,7 +1879,8 @@ class ContrastPlot extends Canvas implements MouseListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseClicked(MouseEvent e) { }
+	@Override
+    public void mouseClicked(MouseEvent e) { }
 
 
 	/**
@@ -1872,7 +1888,8 @@ class ContrastPlot extends Canvas implements MouseListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mouseEntered(MouseEvent e) { }
+	@Override
+    public void mouseEntered(MouseEvent e) { }
 
 }// ContrastPlot class
 
@@ -1903,7 +1920,8 @@ class TrimmedLabel extends Label {
 	 *
 	 *@return    The minimumSize value
 	 */
-	public Dimension getMinimumSize() {
+	@Override
+    public Dimension getMinimumSize() {
 		return new Dimension(super.getMinimumSize().width, super.getMinimumSize().height - trim);
 	}
 
@@ -1913,7 +1931,8 @@ class TrimmedLabel extends Label {
 	 *
 	 *@return    The preferredSize value
 	 */
-	public Dimension getPreferredSize() {
+	@Override
+    public Dimension getPreferredSize() {
 		return getMinimumSize();
 	}
 

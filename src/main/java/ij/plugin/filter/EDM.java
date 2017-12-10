@@ -1,8 +1,6 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.plugin.*;
 import ij.process.*;
-import ij.gui.*;
 
 /**
  *  This plugin implements the Euclidean Distance Map (EDM), Ultimate Eroded
@@ -43,6 +41,7 @@ public class EDM implements PlugInFilter {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
+	@Override
 	public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		this.arg = arg;
@@ -59,6 +58,7 @@ public class EDM implements PlugInFilter {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
+	@Override
 	public void run(ImageProcessor ip) {
 		imp.killRoi();//otherwise invert won't work as expected
 	int[] histogram;
@@ -73,9 +73,9 @@ public class EDM implements PlugInFilter {
 		if (invertImage) {
 			ip.invert();
 		}// independent of settings, now 255=foreground, 0=background
-		if (arg.equals("points") || arg.equals("watershed")) {
+		if ("points".equals(arg) || "watershed".equals(arg)) {
 		int outputType;
-			if (arg.equals("watershed")) {
+			if ("watershed".equals(arg)) {
 				outputType = MaximumFinder.SEGMENTED;
 			} else {// output ultimate points: one per maximum
 				outputType = MaximumFinder.SINGLE_POINTS;
@@ -89,7 +89,7 @@ public class EDM implements PlugInFilter {
 		//reasonable values are 0.3 ... 0.8 * ONE.
 		ByteProcessor maxIp = fm.findMaxima(ip16, 0.5 * ONE, ImageProcessor.NO_THRESHOLD, outputType, false, true);
 			if (maxIp != null) {//no further action if cancelled by user
-				if (arg.equals("watershed")) {
+				if ("watershed".equals(arg)) {
 					ip.copyBits(maxIp, 0, 0, Blitter.COPY);
 
 				} else {// output ultimate points
@@ -162,7 +162,7 @@ public class EDM implements PlugInFilter {
 					}
 				}
 			}// for x
-			if ((inc & 0) == 0) {
+			if ((0) == 0) {
 				IJ.showProgress(y / 2, height);
 			}
 		}// for y
@@ -178,7 +178,7 @@ public class EDM implements PlugInFilter {
 					}
 				}
 			}// for x
-			if ((inc & 0) == 0) {
+			if ((0) == 0) {
 				IJ.showProgress(height / 2 + (height - y) / 2, height);
 			}
 		}// for y

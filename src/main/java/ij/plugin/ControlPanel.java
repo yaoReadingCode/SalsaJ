@@ -4,20 +4,14 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
-import java.net.*;
-import java.net.URL;
 import javax.swing.*;
 import javax.swing.tree.*;
 import javax.swing.event.*;
 //import javax.swing.plaf.*;
 import ij.*;
 import ij.gui.*;
-import ij.io.*;
 import ij.plugin.*;
-import ij.plugin.filter.*;
-import ij.plugin.frame.PlugInFrame;
 import ij.util.*;
-import ij.text.TextWindow;
 
 /**ControlPanel.
  *
@@ -108,7 +102,8 @@ public class ControlPanel implements PlugIn
 	 * tree will be called "Control Panel"
 	 *
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		currentArg = (arg.length()==0) ? defaultArg : arg;
 		argLength = currentArg.length();
 		load();
@@ -124,7 +119,9 @@ public class ControlPanel implements PlugIn
 		commands = Menus.getCommands();
 		pluginsArray = Menus.getPlugins();
 		root=buildTree(currentArg);
-		if(root==null || root.getChildCount()==0 ) return; // do nothing if there's no tree or a root w/o children
+		if(root==null || root.getChildCount()==0 ) {
+            return; // do nothing if there's no tree or a root w/o children
+        }
 		loadProperties();
 		restoreVisiblePanels();
 		if(panels.isEmpty())
@@ -146,7 +143,9 @@ public class ControlPanel implements PlugIn
 	DefaultMutableTreeNode buildTree(String arg)
 	{
 		DefaultMutableTreeNode rootNode = null;
-		if(arg.length()==0) return doRootFromMenus();
+		if(arg.length()==0) {
+            return doRootFromMenus();
+        }
 		StringTokenizer argParser = new StringTokenizer(arg,";");
 		int tokens = argParser.countTokens();
 		if(tokens==1)
@@ -160,7 +159,9 @@ public class ControlPanel implements PlugIn
 			{
 				String token = argParser.nextToken();
 				DefaultMutableTreeNode node = doRoot(token);
-				if(node!=null) rootNode.add(node);
+				if(node!=null) {
+                    rootNode.add(node);
+                }
 			}
 		}
 		return rootNode;
@@ -179,24 +180,30 @@ public class ControlPanel implements PlugIn
 	private DefaultMutableTreeNode doRoot(String arg)
 	{
 		DefaultMutableTreeNode node = null;
-		if(arg==null || arg.length()==0) node = new DefaultMutableTreeNode("");
-		if(arg.equals("user plugins"))
+		if(arg==null || arg.length()==0) {
+            node = new DefaultMutableTreeNode("");
+        }
+		if("user plugins".equals(arg))
 		{
 			node = new DefaultMutableTreeNode("User Plugins");
-			if(argLength==0) node.setUserObject("Control Panel");
+			if(argLength==0) {
+                node.setUserObject("Control Panel");
+            }
 			populateNode(pluginsArray,null,node);
 		}
-		if(arg.equals("imagej menus"))
+		if("imagej menus".equals(arg))
 		{
 			node=doRootFromMenus();
 		}
-		if(arg.equals("imagej commands"))
+		if("imagej commands".equals(arg))
 		{
 			node = new DefaultMutableTreeNode("ImageJ Commands");
-			if(argLength==0) node.setUserObject("Control Panel");
+			if(argLength==0) {
+                node.setUserObject("Control Panel");
+            }
 			populateNode(commands,node);
 		}
-		if(arg.equals("about"))
+		if("about".equals(arg))
 		{
 			showHelp();
 		}
@@ -212,7 +219,9 @@ public class ControlPanel implements PlugIn
 	private synchronized DefaultMutableTreeNode doRootFromMenus()
 	{
 		DefaultMutableTreeNode node = new DefaultMutableTreeNode("ImageJ Menus");
-		if(argLength==0) node.setUserObject("Control Panel");
+		if(argLength==0) {
+            node.setUserObject("Control Panel");
+        }
 		MenuBar menuBar = Menus.getMenuBar();
 		for (int i=0; i<menuBar.getMenuCount(); i++)
 		{
@@ -240,7 +249,9 @@ public class ControlPanel implements PlugIn
 	private void recurseSubMenu(Menu menu, DefaultMutableTreeNode node)
 	{
 		int items = menu.getItemCount();
-		if(items==0) return;
+		if(items==0) {
+            return;
+        }
 		for (int i=0; i<items; i++)
 		{
 			MenuItem mItem = menu.getItem(i);
@@ -253,12 +264,14 @@ public class ControlPanel implements PlugIn
 			}
 			else if(mItem instanceof MenuItem)
 			{
-				if(!(label.equals("-")))
+				if(!("-".equals(label)))
 				{
 					DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(label);
 					node.add(leaf);
-					if(treeCommands==null) treeCommands = new Hashtable();
-					if(label.equals("Reload Plugins"))
+					if(treeCommands==null) {
+                        treeCommands = new Hashtable();
+                    }
+					if("Reload Plugins".equals(label))
 					{
 						reloadMI = mItem;
 						treeCommands.put(label,"Reload Plugins From Panel");
@@ -291,7 +304,7 @@ public class ControlPanel implements PlugIn
 		}
 		String[] labels = new String[labelVector.size()];
 		String[] items = new String[labelVector.size()];
-		labelVector.copyInto((String[])labels); // keys into labels[]
+		labelVector.copyInto(labels); // keys into labels[]
 		StringSorter.sort(labels);
 		for(int i=0; i<labels.length; i++)
 		{
@@ -315,12 +328,15 @@ public class ControlPanel implements PlugIn
 		DefaultMutableTreeNode node
 	)
 	{
-		if(items.length==0 || items.length!=labels.length) return;
+		if(items.length==0 || items.length!=labels.length) {
+            return;
+        }
 		String label=null;
 		for (int i=0; i<items.length; i++)
 		{
-			if(labels!=null && i<labels.length)
-				label = labels[i];
+			if(labels!=null && i<labels.length) {
+                label = labels[i];
+            }
 			buildTreePath(items[i], label, node);
 		}
 	}
@@ -410,16 +426,19 @@ public class ControlPanel implements PlugIn
 			tokens--;
 			if(topNode.isLeaf()&&topNode.getAllowsChildren())
 			{
-				if(token.indexOf("ControlPanel")==-1)// avoid showing this up in the tree
+				if(!token.contains("ControlPanel"))// avoid showing this up in the tree
 				{
 					// when at leaf level the user object for the node is the `label' if not null,
 					// else is the `token'
 					if(tokens==0)
 					{
-						if(label!=null) token=label; // if label is not null use it instead of token
+						if(label!=null) {
+                            token=label; // if label is not null use it instead of token
+                        }
 						token=token.replace('_',' ');
-						if(token.endsWith(".class"))
-							token = token.substring(0,token.length()-6);//...
+						if(token.endsWith(".class")) {
+                            token = token.substring(0,token.length()-6);//...
+                        }
 					}
 
 					node = new DefaultMutableTreeNode(token); // finally, construct the node
@@ -431,15 +450,18 @@ public class ControlPanel implements PlugIn
 						String cmd = (command==null) ? token : command;
 /*						if(token.equals("Reload Plugins"))
 							IJ.write("node cmd: "+cmd);*/
-						if(treeCommands==null) treeCommands = new Hashtable();
-						if(!treeCommands.containsKey(token)) treeCommands.put(token,cmd);
+						if(treeCommands==null) {
+                            treeCommands = new Hashtable();
+                        }
+						if(!treeCommands.containsKey(token)) {
+                            treeCommands.put(token,cmd);
+                        }
 					}
 					// add this node to the top node, then make it top node and continue iteration
 					topNode.add(node);
 					topNode=node;
 				}
-				continue;
-			}
+            }
 			else
 			{
 				// this node may have been visited before, so we avoid duplicate nodes
@@ -450,7 +472,7 @@ public class ControlPanel implements PlugIn
 				while(nodes.hasMoreElements())
 				{
 					node = (DefaultMutableTreeNode)nodes.nextElement();
-					if(((String)node.getUserObject()).equals(token))
+					if(node.getUserObject().equals(token))
 					{
 						hasTokenAsNode = true;
 						topNode = node;
@@ -459,14 +481,17 @@ public class ControlPanel implements PlugIn
 				}
 				if(!hasTokenAsNode)
 				{
-					if(token.indexOf("ControlPanel")==-1)
+					if(!token.contains("ControlPanel"))
 					{
 						if(tokens==0) // we're at leaf level
 						{
-							if(label!=null) token = label;
+							if(label!=null) {
+                                token = label;
+                            }
 							token=token.replace('_',' ');
-							if(token.endsWith(".class"))
-								token=token.substring(0,token.length()-6); // ...
+							if(token.endsWith(".class")) {
+                                token=token.substring(0,token.length()-6); // ...
+                            }
 						}
 						node = new DefaultMutableTreeNode(token);
 						topNode.add(node);
@@ -487,15 +512,13 @@ public class ControlPanel implements PlugIn
 	TreePanel newPanel(DefaultMutableTreeNode node)
 	{
 		boolean main = node.getUserObject().equals(root.getUserObject());
-		TreePanel panel = new TreePanel(node, this, main);
-		return panel;
+        return new TreePanel(node, this, main);
 	}
 
 	TreePanel newPanel(DefaultMutableTreeNode node, Point location)
 	{
 		boolean main = node.getUserObject().equals(root.getUserObject());
-		TreePanel panel = new TreePanel(node, this, main, location);
-		return panel;
+        return new TreePanel(node, this, main, location);
 	}
 	/**Constructs a TreePanel rooted at the path.
 	 *
@@ -544,7 +567,9 @@ public class ControlPanel implements PlugIn
 			return (TreePanel)panels.get(pStr2Key(pathString));
 		}
 		//else return newPanel(node);
-		else return null;
+		else {
+            return null;
+        }
 	}
 
 	String getPluginsPath(){
@@ -621,12 +646,13 @@ public class ControlPanel implements PlugIn
 						{
 							visiblePanels.addElement(key);
 						}
-						if(val.equals("expand"))
-							expandedNodes.addElement(key);
+						if("expand".equals(val)) {
+                            expandedNodes.addElement(key);
+                        }
 					}
 				}
 			}
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 	}
 
 	void saveProperties()
@@ -638,7 +664,9 @@ public class ControlPanel implements PlugIn
 			{
 				String s = (String)e.nextElement();
 				TreePanel p = (TreePanel)panels.get(s);
-				if(p!=null) recordGeometry(p);
+				if(p!=null) {
+                    recordGeometry(p);
+                }
 			}
 			for(Enumeration e=expandedNodes.elements(); e.hasMoreElements();)
 			{
@@ -646,10 +674,12 @@ public class ControlPanel implements PlugIn
 			}
 			try
 			{
-				if(pcpPropsFile.exists() && !pcpPropsFile.canWrite()) return;
+				if(pcpPropsFile.exists() && !pcpPropsFile.canWrite()) {
+                    return;
+                }
 				pcpProperties.store(new FileOutputStream(pcpPropsFile),"Plugins Control Panel properties");
 			}
-			catch (Exception e) {}
+			catch (Exception ignored) {}
 		}
 		propertiesChanged=false;
 	}
@@ -712,13 +742,11 @@ public class ControlPanel implements PlugIn
 		String[] visPanls = new String[visiblePanels.size()];
 		visiblePanels.toArray(visPanls);
 		Arrays.sort(visPanls);
-		for(int i=0; i<visPanls.length; i++)
-		{
-			if(!panels.containsKey(visPanls[i]))
-			{
-				TreePanel p = newPanel(visPanls[i]);
-			}
-		}
+        for (String visPanl : visPanls) {
+            if (!panels.containsKey(visPanl)) {
+                TreePanel p = newPanel(visPanl);
+            }
+        }
 		//IJ.write("restoring done");
 	}
 
@@ -836,16 +864,20 @@ public class ControlPanel implements PlugIn
 	String pStr2Key(String pathString)
 	{
 		String keyword = pathString;
-		if(keyword.startsWith("["))
-			keyword = keyword.substring(keyword.indexOf("[")+1,keyword.length());
-		if(keyword.endsWith("]"))
-			keyword = keyword.substring(0,keyword.lastIndexOf("]"));
+		if(keyword.startsWith("[")) {
+            keyword = keyword.substring(keyword.indexOf("[")+1,keyword.length());
+        }
+		if(keyword.endsWith("]")) {
+            keyword = keyword.substring(0,keyword.lastIndexOf("]"));
+        }
 		StringTokenizer st = new StringTokenizer(keyword,",");
 		String result = "";
 		while(st.hasMoreTokens())
 		{
 			String token  = st.nextToken();
-			if(token.startsWith(" ")) token = token.substring(1,token.length()); // remove leading space
+			if(token.startsWith(" ")) {
+                token = token.substring(1,token.length()); // remove leading space
+            }
 			result+=token+".";
 		}
 		result = result.substring(0,result.length()-1);//remove trailing dot
@@ -876,7 +908,9 @@ public class ControlPanel implements PlugIn
 	public int[] s2ints(String s) {
 		StringTokenizer st = new StringTokenizer(s, ", \t");
 		int nInts = st.countTokens();
-            if (nInts==0) return null;
+            if (nInts==0) {
+                return null;
+            }
 		int[] ints = new int[nInts];
 		for(int i=0; i<nInts; i++) {
 			try {ints[i] = Integer.parseInt(st.nextToken());}
@@ -1014,9 +1048,11 @@ class TreePanel implements
 		pFrame.getContentPane().add(ptView, BorderLayout.CENTER);
 		addListeners();
 		pFrame.pack();
-		if(defaultLocation!=null)
-			pFrame.setLocation((int)defaultLocation.getX(),(int)defaultLocation.getY());
-		else pcp.restoreGeometry(this);
+		if(defaultLocation!=null) {
+            pFrame.setLocation((int)defaultLocation.getX(),(int)defaultLocation.getY());
+        } else {
+            pcp.restoreGeometry(this);
+        }
 		//restoreExpandedNodes();
 		GUI.center(pFrame);
 		setVisible();
@@ -1059,7 +1095,8 @@ class TreePanel implements
 		pFrame.addWindowListener(this);
 		pFrame.addComponentListener(new ComponentAdapter()
 		{
-			public void componentMoved(ComponentEvent e)
+			@Override
+            public void componentMoved(ComponentEvent e)
 			{
 				Rectangle r = e.getComponent().getBounds();
 				defaultLocation = new Point(r.x,r.y);
@@ -1068,15 +1105,21 @@ class TreePanel implements
 		});
 		pTree.addMouseListener(new MouseAdapter()
 		{
-			public void mouseClicked(MouseEvent e)
+			@Override
+            public void mouseClicked(MouseEvent e)
 			{
 				isDragging = false;
-				if(pcp.requiresDoubleClick() && e.getClickCount()!=2) return;
+				if(pcp.requiresDoubleClick() && e.getClickCount()!=2) {
+                    return;
+                }
 				int selRow=pTree.getRowForLocation(e.getX(),e.getY());
-				if (selRow!=-1) toAction();
+				if (selRow!=-1) {
+                    toAction();
+                }
 			}
 
-			public void mouseReleased(MouseEvent e)
+			@Override
+            public void mouseReleased(MouseEvent e)
 			{
 				if(isDragging)
 				{
@@ -1089,12 +1132,15 @@ class TreePanel implements
 		});
 		pTree.addMouseMotionListener(new MouseMotionAdapter()
 		{
-			public void mouseDragged(MouseEvent e)
+			@Override
+            public void mouseDragged(MouseEvent e)
 			{
 				int selRow = pTree.getRowForLocation(e.getX(), e.getY());
 				if(selRow!=-1)
 				{
-					if(((DefaultMutableTreeNode)pTree.getLastSelectedPathComponent()).isLeaf()) return;
+					if(((DefaultMutableTreeNode)pTree.getLastSelectedPathComponent()).isLeaf()) {
+                        return;
+                    }
 					pFrame.setCursor(new Cursor(Cursor.MOVE_CURSOR));
 					isDragging = true;
 				}
@@ -1139,7 +1185,9 @@ class TreePanel implements
 
 	void setAutoSaveProps(boolean autoSave)
 	{
-		if(isTheMainPanel()) pMenu_saveOnClose.setSelected(autoSave);
+		if(isTheMainPanel()) {
+            pMenu_saveOnClose.setSelected(autoSave);
+        }
 	}
 
 	boolean getAutoSaveProps() {return pMenu_saveOnClose.isSelected();}
@@ -1147,8 +1195,9 @@ class TreePanel implements
 	void restoreExpandedNodes()
 	{
 		//IJ.write("restore exp nodes");
-		if (pTree==null || root==null)
-			return;
+		if (pTree==null || root==null) {
+            return;
+        }
 		pTree.removeTreeExpansionListener(this);
 		TreeNode[] rootPath = root.getPath();
 		for(Enumeration e = root.breadthFirstEnumeration(); e.hasMoreElements();)
@@ -1177,7 +1226,7 @@ class TreePanel implements
 						try
 						{
 							pTree.expandPath(newPath);
-						}catch(Throwable t){}
+						}catch(Throwable ignored){}
 					}
 				}
 				else if((pcp.hasExpandedStateProperty(npS) || pTree.isExpanded(newPath)) && pcp.hasPanelShowingProperty(npS))
@@ -1196,7 +1245,9 @@ class TreePanel implements
 
 	public void processEvent(ActionEvent e)
 	{
-		if (listener != null) listener.actionPerformed(e);
+		if (listener != null) {
+            listener.actionPerformed(e);
+        }
 	}
 
 	public void addActionListener(ActionListener al)
@@ -1209,42 +1260,50 @@ class TreePanel implements
 			listener=AWTEventMulticaster.remove(listener, al);
 	}
 
-	public void actionPerformed(ActionEvent e)
+	@Override
+    public void actionPerformed(ActionEvent e)
 	{
 			String cmd=e.getActionCommand();
 			//IJ.write(cmd);
-			if(cmd==null) return;
-			if (cmd.equals("Help"))
+			if(cmd==null) {
+                return;
+            }
+			if ("Help".equals(cmd))
 			{
 				showHelp();
 				return;
 			}
-			if(cmd.equals("Show Parent"))
+			if("Show Parent".equals(cmd))
 			{
 				DefaultMutableTreeNode parent = (DefaultMutableTreeNode)root.getParent();
 				if(parent!=null)
 				{
 					//IJ.write("show parent");
 					TreePanel panel = pcp.getPanelForNode(parent);
-					if(panel==null) panel = pcp.newPanel(parent);
-					if(panel!=null) panel.setVisible();
+					if(panel==null) {
+                        panel = pcp.newPanel(parent);
+                    }
+					if(panel!=null) {
+                        panel.setVisible();
+                    }
 				}
 				return;
 			}
-			if(cmd.equals("Reload Plugins From Panel")) // cmd fired by clicking on tree leaf
+			if("Reload Plugins From Panel".equals(cmd)) // cmd fired by clicking on tree leaf
 			{
 				pcp.closeAll(false);
 				IJ.doCommand("Reload Plugins");
 			}
 			else
 			{
-				if(cmd.equals("Reload Plugins")) // cmd fired from ImageJ menu; don't propagate it further
+				if("Reload Plugins".equals(cmd)) // cmd fired from ImageJ menu; don't propagate it further
 				{
 					pcp.closeAll(false);
 				}
-				else IJ.doCommand(cmd);
-				return;
-			}
+				else {
+                    IJ.doCommand(cmd);
+                }
+            }
 	}
 
 	// we implement window listener directly so that we can catch ImageJ's window events
@@ -1253,25 +1312,34 @@ class TreePanel implements
 	 * main panel, all other visible panels are also closed and properties
 	 * are saved
 	 */
-	public void windowClosing(WindowEvent e)
+	@Override
+    public void windowClosing(WindowEvent e)
 	{
-		if(isMainPanel)
-			pcp.saveProperties();
+		if(isMainPanel) {
+            pcp.saveProperties();
+        }
 		pcp.unsetPanelShowingProperty(getRootPath().toString());
 		pcp.verifyQuit();
 	}
 
-	public void windowActivated(WindowEvent e){}
-	public void windowClosed(WindowEvent e)
+	@Override
+    public void windowActivated(WindowEvent e){}
+	@Override
+    public void windowClosed(WindowEvent e)
 	{
 	}
-	public void windowDeactivated(WindowEvent e) {}
-	public void windowDeiconified(WindowEvent e) {}
-	public void windowIconified(WindowEvent e) {}
-	public void windowOpened(WindowEvent e) {}
+	@Override
+    public void windowDeactivated(WindowEvent e) {}
+	@Override
+    public void windowDeiconified(WindowEvent e) {}
+	@Override
+    public void windowIconified(WindowEvent e) {}
+	@Override
+    public void windowOpened(WindowEvent e) {}
 
 
-	public void treeCollapsed (TreeExpansionEvent ev)
+	@Override
+    public void treeCollapsed (TreeExpansionEvent ev)
 	{
 		String evPathString = ev.getPath().toString();
     evPathString = evPathString.substring(evPathString.indexOf("[")+1,evPathString.lastIndexOf("]"));
@@ -1283,7 +1351,8 @@ class TreePanel implements
 		pcp.unsetExpandedStateProperty(path);
 	}
 
-	public void treeExpanded(TreeExpansionEvent ev)
+	@Override
+    public void treeExpanded(TreeExpansionEvent ev)
 	{
 		TreePath evPath = ev.getPath();
 		//DefaultMutableTreeNode node = (DefaultMutableTreeNode)evPath.getLastPathComponent();
@@ -1298,16 +1367,20 @@ class TreePanel implements
 		{
 			Hashtable panels = pcp.getPanels();
 			TreePanel p = (TreePanel)panels.get(path);
-			if(p!=null) p.close();
+			if(p!=null) {
+                p.close();
+            }
 		}
 		//IJ.write("expansion");
 		pcp.setExpandedStateProperty(path);
 	}
 
 	//stub for future development
-	public void treeWillExpand(TreeExpansionEvent ev) {}
+	@Override
+    public void treeWillExpand(TreeExpansionEvent ev) {}
 	//stub for future development
-	public void treeWillCollapse(TreeExpansionEvent ev) {}
+	@Override
+    public void treeWillCollapse(TreeExpansionEvent ev) {}
 
 	void recordGeometry() {pcp.recordGeometry(this);}
 
@@ -1334,9 +1407,12 @@ class TreePanel implements
 	{
 		isDragging = false;
 		pFrame.setCursor(Cursor.getDefaultCursor());
-		if(node==null)
-			node = (DefaultMutableTreeNode)pTree.getLastSelectedPathComponent();
-		if(node.isLeaf()) return;
+		if(node==null) {
+            node = (DefaultMutableTreeNode)pTree.getLastSelectedPathComponent();
+        }
+		if(node.isLeaf()) {
+            return;
+        }
 		TreeNode[] nPath = node.getPath();
 		TreeNode[] rPath = root.getPath();
 		DefaultMutableTreeNode[] tPath = new DefaultMutableTreeNode[nPath.length-rPath.length+1];
@@ -1351,10 +1427,11 @@ class TreePanel implements
 		TreePanel p = pcp.getPanelForNode(node);
 		if(p==null)
 		{
-			if(pnt!=null)
-				p = pcp.newPanel(node, pnt);
-			else
-				p = pcp.newPanel(node);
+			if(pnt!=null) {
+                p = pcp.newPanel(node, pnt);
+            } else {
+                p = pcp.newPanel(node);
+            }
 			pTree.collapsePath(localPath);
 		}
 		else
@@ -1373,7 +1450,9 @@ class TreePanel implements
 	{
 			DefaultMutableTreeNode nde=(DefaultMutableTreeNode)pTree.getLastSelectedPathComponent();
 			// if the node has children then do nothing (return)
-			if (nde.getChildCount()>0) return;
+			if (nde.getChildCount()>0) {
+                return;
+            }
 			String aCmd=nde.toString();
 			String cmd= aCmd;
 			if(pcp.treeCommands.containsKey(aCmd))
@@ -1389,7 +1468,9 @@ class TreePanel implements
 		if (pFrame!=null && !pFrame.isVisible())
 		{
 			restoreExpandedNodes();
-			if(defaultLocation!=null) pFrame.setLocation(defaultLocation);
+			if(defaultLocation!=null) {
+                pFrame.setLocation(defaultLocation);
+            }
 			pFrame.setVisible(true);
 			// close expanded path to this panel in its parent panel (if visible and if the path is expanded)
 			DefaultMutableTreeNode parent = (DefaultMutableTreeNode)root.getParent();
@@ -1413,12 +1494,16 @@ class TreePanel implements
 				}
 			}
 		}
-		if (pcp!=null) pcp.setPanelShowingProperty(getRootPath().toString());
+		if (pcp!=null) {
+            pcp.setPanelShowingProperty(getRootPath().toString());
+        }
 	}
 
 	void setLocation(Point p)
 	{
-		if(p!=null) defaultLocation = p;
+		if(p!=null) {
+            defaultLocation = p;
+        }
 	}
 
 	void close()

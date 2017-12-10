@@ -17,10 +17,10 @@ public class Line3D {
 	 * Creates a new lines3D object. No parameters are set.
 	 *
 	 */
-	public Line3D() {};
-	
-	
-	/**
+	public Line3D() {}
+
+
+    /**
 	 * Creates a new lines3D object with start point, end point and color of the line
 	 * 
 	 * @param x1 - x coordinate of start point

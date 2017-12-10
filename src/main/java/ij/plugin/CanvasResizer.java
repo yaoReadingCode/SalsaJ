@@ -1,10 +1,7 @@
 package ij.plugin;
 import ij.*;
-import ij.plugin.filter.*;
 import ij.process.*;
 import ij.gui.*;
-import java.awt.*;
-import java.util.ResourceBundle.*;
 
 /**
  *  This plugin implements the Image/Adjust/Canvas Size command. It changes the
@@ -23,7 +20,8 @@ public class CanvasResizer implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	int wOld;
 	int hOld;
 	int wNew;

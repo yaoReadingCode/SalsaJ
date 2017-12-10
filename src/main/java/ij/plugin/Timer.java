@@ -1,5 +1,4 @@
 package ij.plugin;
-import java.awt.*;
 import ij.*;
 
 /**ImageJ plugin for measuring the speed of various Java operations.*/
@@ -9,7 +8,8 @@ public class Timer implements PlugIn {
 	int numLoops;
 
 
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		int j=0, k;
 		int[] a = new int[10];
 		long endTime;
@@ -52,7 +52,7 @@ public class Timer implements PlugIn {
 
 		// i = o.getJClass()
 		startTime = System.currentTimeMillis();
-		for (int i=0; i<numLoops; i++) {k = o.getJClass();}
+		for (int i=0; i<numLoops; i++) {k = Timer2.getJClass();}
 		showTime("i=o.getJ() (static)");
 
 		// i=o.j

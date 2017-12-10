@@ -1,13 +1,12 @@
 package ij.plugin.filter;
 import ij.*;
 import ij.process.*;
-import ij.gui.*;
-import java.awt.*;
 
 /**Binary Fill (Process/Binary/Fill) by Gabriel Landini, G.Landini at bham.ac.uk. */
 public class BinaryFiller implements PlugInFilter {
 	protected boolean backgroundIsZero;
 
+	@Override
 	public int setup(String arg, ImagePlus imp) {
 		if (imp==null)
 			{IJ.noImage(); return DONE;}
@@ -17,11 +16,13 @@ public class BinaryFiller implements PlugInFilter {
 			return DONE;
 		}
 		backgroundIsZero = Prefs.blackBackground;
-		if (imp.isInvertedLut()) 
-			backgroundIsZero = !backgroundIsZero;			
+		if (imp.isInvertedLut()) {
+            backgroundIsZero = !backgroundIsZero;
+        }
 		return IJ.setupDialog(imp, DOES_8G);
 	}
 
+	@Override
 	public void run(ImageProcessor ip) {
 		int xe = ip.getWidth();
 		int ye = ip.getHeight();
@@ -30,28 +31,34 @@ public class BinaryFiller implements PlugInFilter {
 		int [][] pixel = new int [xe][ye];
 
 		//original converted to white particles
-		if (!backgroundIsZero)
-			ip.invert();
+		if (!backgroundIsZero) {
+            ip.invert();
+        }
 			
 		//get original
 		for(y=0;y<ye;y++) {
-			for(x=0;x<xe;x++)
-				pixel[x][y]=ip.getPixel(x,y);
+			for(x=0;x<xe;x++) {
+                pixel[x][y]=ip.getPixel(x,y);
+            }
 		}
 
 		//label background borders
 		for (y=0; y<ye; y++){
-			if(ip.getPixel(0,y)==0)
-				ip.putPixel(0,y,127);
-			if(ip.getPixel(xe-1,y)==0)
-				ip.putPixel(xe-1,y,127);
+			if(ip.getPixel(0,y)==0) {
+                ip.putPixel(0,y,127);
+            }
+			if(ip.getPixel(xe-1,y)==0) {
+                ip.putPixel(xe-1,y,127);
+            }
 		}
 
 		for (x=0; x<xe; x++){
-			if(ip.getPixel(x,0)==0)
-				ip.putPixel(x,0,127);
-			if(ip.getPixel(x,ye-1)==0)
-				ip.putPixel(x,ye-1,127);
+			if(ip.getPixel(x,0)==0) {
+                ip.putPixel(x,0,127);
+            }
+			if(ip.getPixel(x,ye-1)==0) {
+                ip.putPixel(x,ye-1,127);
+            }
 		}
 
 		//flood background from borders
@@ -83,16 +90,18 @@ public class BinaryFiller implements PlugInFilter {
 
 		for(y=0;y<ye;y++) {
 			for(x=0;x<xe;x++){
-				if(ip.getPixel(x,y)==0)
-					ip.putPixel(x,y,255);
-				else
-					ip.putPixel(x,y,pixel[x][y]);
+				if(ip.getPixel(x,y)==0) {
+                    ip.putPixel(x,y,255);
+                } else {
+                    ip.putPixel(x,y,pixel[x][y]);
+                }
 			}
 		}
 
 		//return to original state
-		if (!backgroundIsZero)
-			ip.invert();
+		if (!backgroundIsZero) {
+            ip.invert();
+        }
 	}
 
 }

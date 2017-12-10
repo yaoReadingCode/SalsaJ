@@ -5,7 +5,6 @@ import ij.process.*;
 import ij.gui.*;
 import java.awt.*;
 import java.awt.image.*;
-import java.math.*;
 import java.util.*;
 import ij.measure.*;
 
@@ -49,7 +48,8 @@ public class SurfacePlotter implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		img = WindowManager.getCurrentImage();
 		if (img == null) {
 			IJ.noImage();
@@ -226,8 +226,7 @@ public class SurfacePlotter implements PlugIn {
 			p1x = xstart;
 			p1y = ystart + 255;
 			p2x = xstart + xinc * height;
-			;
-			p2y = p1y + yinc * height;
+            p2y = p1y + yinc * height;
 			p3x = p2x + width - 1;
 			p3y = p2y - yinc2 * width;
 		}
@@ -344,7 +343,7 @@ public class SurfacePlotter implements PlugIn {
 
 		//z-axis & label
 		s = cal.getValueUnit();
-		if (s.equals("Gray Value")) {
+		if ("Gray Value".equals(s)) {
 			s = "";
 		}
 		w = ip2.getFontMetrics().stringWidth(s);
@@ -451,8 +450,7 @@ public class SurfacePlotter implements PlugIn {
 	int yloc = (y1 + y2) / 2 - ipText.getHeight() / 2 + offsetYDirection * labelSide * (int) (15 * Math.sin(theta));
 		b.copyBits(ipText, xloc, yloc, Blitter.COPY_TRANSPARENT);
 
-		return;
-	}
+    }
 
 
 	/**

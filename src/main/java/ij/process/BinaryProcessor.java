@@ -21,10 +21,13 @@ public class BinaryProcessor extends ByteProcessor {
 	void process(int type, int count) {
 		int p1, p2, p3, p4, p5, p6, p7, p8, p9;
 		int inc = roiHeight/25;
-		if (inc<1) inc = 1;
+		if (inc<1) {
+            inc = 1;
+        }
 		int bgColor = 255;
-		if (parent.isInvertedLut())
-			bgColor = 0;
+		if (parent.isInvertedLut()) {
+            bgColor = 0;
+        }
 
 		byte[] pixels2 = (byte[])parent.getPixelsCopy();
 		int offset, v=0, sum;
@@ -51,16 +54,18 @@ public class BinaryProcessor extends ByteProcessor {
 						v = p5;
 						if (v!=bgColor) {
 							if (!(p1==bgColor || p2==bgColor || p3==bgColor || p4==bgColor
-								|| p6==bgColor || p7==bgColor || p8==bgColor || p9==bgColor))
-									v = bgColor;
+								|| p6==bgColor || p7==bgColor || p8==bgColor || p9==bgColor)) {
+                                v = bgColor;
+                            }
 						}
 						break;
 				}
 				
 				pixels[offset++] = (byte)v;
 			}
-			if (y%inc==0)
-				parent.showProgress((double)(y-roiY)/roiHeight);
+			if (y%inc==0) {
+                parent.showProgress((double)(y-roiY)/roiHeight);
+            }
 		}
 		parent.hideProgress();
 	}
@@ -75,6 +80,7 @@ public class BinaryProcessor extends ByteProcessor {
 		representation of the 256 neighborhoods indexed by the table is available
 		at "http://rsb.info.nih.gov/ij/images/skeletonize-table.gif".
 	*/
+	@Override
 	public void  skeletonize() {
 		int[] table  =
 				//0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1
@@ -111,10 +117,13 @@ public class BinaryProcessor extends ByteProcessor {
 	int thin(int pass, int[] table) {
 		int p1, p2, p3, p4, p5, p6, p7, p8, p9;
 		int inc = roiHeight/25;
-		if (inc<1) inc = 1;
+		if (inc<1) {
+            inc = 1;
+        }
 		int bgColor = 255;
-		if (parent.isInvertedLut())
-			bgColor = 0;
+		if (parent.isInvertedLut()) {
+            bgColor = 0;
+        }
 			
 		byte[] pixels2 = (byte[])getPixelsCopy();
 		int v, index, code;
@@ -136,14 +145,30 @@ public class BinaryProcessor extends ByteProcessor {
 					p8 = pixels2[offset+rowOffset]&0xff;
 					p9 = pixels2[offset+rowOffset+1]&0xff;
 					index = 0;
-					if (p1!=bgColor) index |= 1;
-					if (p2!=bgColor) index |= 2;
-					if (p3!=bgColor) index |= 4;
-					if (p6!=bgColor) index |= 8;
-					if (p9!=bgColor) index |= 16;
-					if (p8!=bgColor) index |= 32;
-					if (p7!=bgColor) index |= 64;
-					if (p4!=bgColor) index |= 128;
+					if (p1!=bgColor) {
+                        index |= 1;
+                    }
+					if (p2!=bgColor) {
+                        index |= 2;
+                    }
+					if (p3!=bgColor) {
+                        index |= 4;
+                    }
+					if (p6!=bgColor) {
+                        index |= 8;
+                    }
+					if (p9!=bgColor) {
+                        index |= 16;
+                    }
+					if (p8!=bgColor) {
+                        index |= 32;
+                    }
+					if (p7!=bgColor) {
+                        index |= 64;
+                    }
+					if (p4!=bgColor) {
+                        index |= 128;
+                    }
 					code = table[index];
 					if ((pass&1)==1) { //odd pass
 						if (code==2 || code==3) {
@@ -159,13 +184,15 @@ public class BinaryProcessor extends ByteProcessor {
 				}
 				pixels[offset++] = (byte)v;
 			}
-			if (y%inc==0)
-				showProgress((double)(y-roiY)/roiHeight);
+			if (y%inc==0) {
+                showProgress((double)(y-roiY)/roiHeight);
+            }
 		}
 		hideProgress();
 		return pixelsRemoved;
 	}
 	
+	@Override
 	public void outline() {
 		process(OUTLINE, 0);
 	}

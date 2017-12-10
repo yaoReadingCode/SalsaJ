@@ -1,6 +1,6 @@
 package ij.process;
 import ij.*;
-import ij.gui.*;
+
 import java.awt.Rectangle;
 
 
@@ -63,8 +63,9 @@ public class PolygonFiller {
 			iplus1 = i==n-1?0:i+1;
 			y1 = y[i];	y2 = y[iplus1];
 			x1 = x[i];	x2 = x[iplus1];
-			if (y1==y2)
-				continue; //ignore horizontal lines
+			if (y1==y2) {
+                continue; //ignore horizontal lines
+            }
 			if (y1>y2) { // swap ends
 				int tmp = y1;
 				y1=y2; y2=tmp;
@@ -78,8 +79,9 @@ public class PolygonFiller {
 			eslope[edges] = slope;
 			edges++;   
 		}
-		for (int i=0; i<edges; i++)
-			sedge[i] = i;
+		for (int i=0; i<edges; i++) {
+            sedge[i] = i;
+        }
 		activeEdges = 0;
 		//quickSort(sedge);
 	}
@@ -92,10 +94,7 @@ public class PolygonFiller {
 		while (index<edges && ey1[edges]>ey1[sedge[index]]) {
 			index++;
 		}
-		for (int i=edges-1; i>=index; i--) {
-			sedge[i+1] = sedge[i];
-			//IJ.log((i+1)+"="+i);
-		}
+		System.arraycopy(sedge, index, sedge, index + 1, edges - index);
 		sedge[index] = edges;
 	}
 
@@ -118,14 +117,23 @@ public class PolygonFiller {
 			offset = y*width;
 			for (int i=0; i<activeEdges; i+=2) {
 				x1 = (int)(ex[aedge[i]]+0.5);
-				if (x1<0) x1=0;
-				if (x1>width) x1 = width;
+				if (x1<0) {
+                    x1=0;
+                }
+				if (x1>width) {
+                    x1 = width;
+                }
 				x2 = (int)(ex[aedge[i+1]]+0.5); 
-				if (x2<0) x2=0; 
-				if (x2>width) x2 = width;
+				if (x2<0) {
+                    x2=0;
+                }
+				if (x2>width) {
+                    x2 = width;
+                }
 				//IJ.log(y+" "+x1+"  "+x2);
-				for (int x=x1; x<x2; x++)
-					pixels[offset+x] = -1; // 255 (white)
+				for (int x=x1; x<x2; x++) {
+                    pixels[offset+x] = -1; // 255 (white)
+                }
 			}			
 			updateXCoordinates();
 		}
@@ -141,11 +149,14 @@ public class PolygonFiller {
 			index = aedge[i];
 			x2 = ex[index] + eslope[index];
 			ex[index] = x2;
-			if (x2<x1) sorted = false;
+			if (x2<x1) {
+                sorted = false;
+            }
 			x1 = x2;
 		}
-		if (!sorted) 
-			sortActiveEdges();
+		if (!sorted) {
+            sortActiveEdges();
+        }
 	}
 
 	/** Sorts the active edges list by x coordinate using a selection sort. */
@@ -153,8 +164,11 @@ public class PolygonFiller {
 		int min, tmp;
 		for (int i=0; i<activeEdges; i++) {
 			min = i;
-			for (int j=i; j<activeEdges; j++)
-				if (ex[aedge[j]] <ex[aedge[min]]) min = j;
+			for (int j=i; j<activeEdges; j++) {
+                if (ex[aedge[j]] <ex[aedge[min]]) {
+                    min = j;
+                }
+            }
 			tmp=aedge[min];
 			aedge[min] = aedge[i]; 
 			aedge[i]=tmp;
@@ -167,11 +181,11 @@ public class PolygonFiller {
 		while (i<activeEdges) {
 			int index = aedge[i];
 			if (y<ey1[index] || y>=ey2[index]) {
-				for (int j=i; j<activeEdges-1; j++)
-					aedge[j] = aedge[j+1];
+				System.arraycopy(aedge, i + 1, aedge, i, activeEdges - 1 - i);
 				activeEdges--; 
-			} else
-				i++;		 
+			} else {
+                i++;
+            }
 		}
 	}
 
@@ -181,10 +195,10 @@ public class PolygonFiller {
 			int edge =sedge[i];
 			if (y==ey1[edge]) {
 				int index = 0;
-				while (index<activeEdges && ex[edge]>ex[aedge[index]])
-					index++;
-				for (int j=activeEdges-1; j>=index; j--) 
-					aedge[j+1] = aedge[j];
+				while (index<activeEdges && ex[edge]>ex[aedge[index]]) {
+                    index++;
+                }
+				System.arraycopy(aedge, index, aedge, index + 1, activeEdges - index);
 				aedge[index] = edge;
 				activeEdges++;
 			}

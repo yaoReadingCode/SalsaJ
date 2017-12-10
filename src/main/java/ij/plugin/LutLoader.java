@@ -27,7 +27,8 @@ public class LutLoader extends ImagePlus implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	FileInfo fi = new FileInfo();
 		fi.reds = new byte[256];
 		fi.greens = new byte[256];
@@ -35,34 +36,34 @@ public class LutLoader extends ImagePlus implements PlugIn {
 		fi.lutSize = 256;
 	int nColors = 0;
 
-		if (arg.equals("invert")) {
+		if ("invert".equals(arg)) {
 			invertLut();
 			return;
-		} else if (arg.equals("fire")) {
+		} else if ("fire".equals(arg)) {
 			nColors = fire(fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("grays")) {
+		} else if ("grays".equals(arg)) {
 			nColors = grays(fi.reds, fi.greens, fi.blues);
-                } else if (arg.equals("igrays")) {
+                } else if ("igrays".equals(arg)) {
 			nColors = igrays(fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("ice")) {
+		} else if ("ice".equals(arg)) {
 			nColors = ice(fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("spectrum")) {
+		} else if ("spectrum".equals(arg)) {
 			nColors = spectrum(fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("3-3-2 RGB")) {
+		} else if ("3-3-2 RGB".equals(arg)) {
 			nColors = rgb332(fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("red")) {
+		} else if ("red".equals(arg)) {
 			nColors = primaryColor(4, fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("green")) {
+		} else if ("green".equals(arg)) {
 			nColors = primaryColor(2, fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("blue")) {
+		} else if ("blue".equals(arg)) {
 			nColors = primaryColor(1, fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("cyan")) {
+		} else if ("cyan".equals(arg)) {
 			nColors = primaryColor(3, fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("magenta")) {
+		} else if ("magenta".equals(arg)) {
 			nColors = primaryColor(5, fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("yellow")) {
+		} else if ("yellow".equals(arg)) {
 			nColors = primaryColor(6, fi.reds, fi.greens, fi.blues);
-		} else if (arg.equals("redgreen")) {
+		} else if ("redgreen".equals(arg)) {
 			nColors = redGreen(fi.reds, fi.greens, fi.blues);
 		}
 		if (nColors > 0) {
@@ -82,7 +83,7 @@ public class LutLoader extends ImagePlus implements PlugIn {
 			return;
 		}
 		if (openLut(fi)) {
-			showLut(fi, arg.equals(""));
+			showLut(fi, "".equals(arg));
 		}
 		IJ.showStatus("");
 	}
@@ -339,7 +340,7 @@ public class LutLoader extends ImagePlus implements PlugIn {
 	 */
 	boolean openLut(FileInfo fi) {
 	//IJ.showStatus("Opening: " + fi.directory + fi.fileName);
-	boolean isURL = fi.url != null && !fi.url.equals("");
+	boolean isURL = fi.url != null && !"".equals(fi.url);
 	int length = 0;
 		if (!isURL) {
 		File f = new File(fi.directory + fi.fileName);

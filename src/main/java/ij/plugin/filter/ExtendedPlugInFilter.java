@@ -1,6 +1,5 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.process.*;
 
 /** ImageJ plugins that process an image may implement this interface.
  *  In addition to the features of PlugInFilter, it is better suited
@@ -50,7 +49,7 @@ public interface ExtendedPlugInFilter extends PlugInFilter {
      * of the flags specified in interfaces <code>PlugInFilter</code> and
      * <code>ExtendedPlugInFilter</code>.
      */
-    public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr);
+    int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr);
 
     /**
      * This method is called by ImageJ to inform the plugin-filter
@@ -61,13 +60,13 @@ public interface ExtendedPlugInFilter extends PlugInFilter {
      * processed for preview before), and again, 3 times that number
      * for RGB images processed with <code>CONVERT_TO_FLOAT</code>.
      */
-    public void setNPasses(int nPasses);
+    void setNPasses(int nPasses);
 
     /** Set this flag if the last preview image may be kept as a result.
         For stacks, this flag can lead to out-of-sequence processing of the
         slices, irrespective of the <code>PARALLELIZE_STACKS<code> flag.
      */
-    public final int KEEP_PREVIEW = 0x1000000;
+    int KEEP_PREVIEW = 0x1000000;
 
 	
 }

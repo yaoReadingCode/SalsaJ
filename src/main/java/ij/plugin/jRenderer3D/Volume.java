@@ -118,10 +118,12 @@ class Volume {
 		
 		if (firstTime) {
 			// 1.06
-			if (zAspect == 1) 
-				zAspect = (float) (cal.pixelDepth / cal.pixelWidth);
-			if (zAspect == 0)
-				zAspect = 1;
+			if (zAspect == 1) {
+                zAspect = (float) (cal.pixelDepth / cal.pixelWidth);
+            }
+			if (zAspect == 0) {
+                zAspect = 1;
+            }
 			
 			lut = new Lut();
 			lut.readLut(imp);
@@ -132,10 +134,7 @@ class Volume {
 		}
 		
 		boolean changed;
-		if (oldMin == min && oldMax == max) 
-			changed = false;
-		else
-			changed = true;
+		changed = !(oldMin == min) || !(oldMax == max);
 		oldMin = min;
 		oldMax = max;
 		
@@ -163,8 +162,12 @@ class Volume {
 						int val = 0xff & pixels[pos++];
 						val = (int)((val-min)*scale);
 						
-						if (val<0f) val = 0;
-						if (val>255) val = 255;
+						if (val<0f) {
+                            val = 0;
+                        }
+						if (val>255) {
+                            val = 255;
+                        }
 						
 						data3D[z][y][x] = (byte)(0xff & val); 
 					}
@@ -184,11 +187,15 @@ class Volume {
 					
 					for (int x = 0; x <widthX; x++) {
 						
-						int val = (int) ((int)(0xFFFF & pixels[pos++])*b + a - min);
-						if (val<0f) val = 0;
+						int val = (int) ((0xFFFF & pixels[pos++]) *b + a - min);
+						if (val<0f) {
+                            val = 0;
+                        }
 						val = (int)(val*scale);
 						
-						if (val>255) val = 255;
+						if (val>255) {
+                            val = 255;
+                        }
 						data3D[z][y][x] = (byte)(val);  
 					}
 				}
@@ -208,10 +215,14 @@ class Volume {
 				for (int y = 0; y < heightY; y++) {
 					for (int x = 0; x <widthX; x++) {
 						float value = (float) (pixels[pos++] - min);
-						if (value<0f) value = 0f;
+						if (value<0f) {
+                            value = 0f;
+                        }
 						int ivalue = (int)(value*scale);
 						
-						if (ivalue>255) ivalue = 255;
+						if (ivalue>255) {
+                            ivalue = 255;
+                        }
 						data3D[z][y][x] = (byte)(ivalue);  
 					}
 				}
@@ -259,18 +270,16 @@ class Volume {
 					int val = 0xff & datax[x];
 					
 					if (val >= threshold) {
-						
-						double z_ = z1;
-						
-						if (z_ > cutDist) {
+
+						if (z1 > cutDist) {
 							int x_ = (int)(x1);
 							int y_ = (int)(y1);
 							
 							if (x_ >= 0 && y_ >= 0 && x_ < bufferWidth && y_ < bufferHeight) { 
 								int pos = y_*bufferWidth + x_;  
 								
-								if (z_ < zbufferPixels[pos]) {
-									zbufferPixels[pos] = z_;
+								if (z1 < zbufferPixels[pos]) {
+									zbufferPixels[pos] = z1;
 									bufferPixels[pos] = val+1;  
 								}
 							}
@@ -284,10 +293,12 @@ class Volume {
 		}
 		for (int i = bufferPixels.length-1; i >= 0; i--)  {
 			int val = bufferPixels[i];
-			if (val > 255)
-				val = 255;
-			if (val > 0)
-				bufferPixels[i] = lut.colors[val];
+			if (val > 255) {
+                val = 255;
+            }
+			if (val > 0) {
+                bufferPixels[i] = lut.colors[val];
+            }
 		}
 	}
 	
@@ -345,11 +356,19 @@ class Volume {
 			tr.xyzPos(volumeLimits[i]);
 			
 			int xi = (int) tr.X;
-			if (xi < xMin) xMin = xi;
-			if (xi > xMax) xMax = xi;
+			if (xi < xMin) {
+                xMin = xi;
+            }
+			if (xi > xMax) {
+                xMax = xi;
+            }
 			int yi = (int) tr.Y;
-			if (yi < yMin) yMin = yi;
-			if (yi > yMax) yMax = yi;
+			if (yi < yMin) {
+                yMin = yi;
+            }
+			if (yi > yMax) {
+                yMax = yi;
+            }
 		}
 		
 		xMin = (xMin < 0)   ?   0 : xMin;
@@ -402,11 +421,19 @@ class Volume {
 			tr.xyzPos(volumeLimits[i]);
 			
 			int xi = (int) tr.X;
-			if (xi < xMin) xMin = xi;
-			if (xi > xMax) xMax = xi;
+			if (xi < xMin) {
+                xMin = xi;
+            }
+			if (xi > xMax) {
+                xMax = xi;
+            }
 			int yi = (int) tr.Y;
-			if (yi < yMin) yMin = yi;
-			if (yi > yMax) yMax = yi;
+			if (yi < yMin) {
+                yMin = yi;
+            }
+			if (yi > yMax) {
+                yMax = yi;
+            }
 		}
 		
 		xMin = (xMin < 0)   ?   0 : xMin;
@@ -448,22 +475,43 @@ class Volume {
 		p[0] = x;
 		p[1] = y;
 		
-		if (Misc.inside(p, cornerT[0], cornerT[1], cornerT[4])) return true;
-		if (Misc.inside(p, cornerT[0], cornerT[1], cornerT[5])) return true;
-		if (Misc.inside(p, cornerT[2], cornerT[3], cornerT[6])) return true;
-		if (Misc.inside(p, cornerT[2], cornerT[3], cornerT[7])) return true;
+		if (Misc.inside(p, cornerT[0], cornerT[1], cornerT[4])) {
+            return true;
+        }
+		if (Misc.inside(p, cornerT[0], cornerT[1], cornerT[5])) {
+            return true;
+        }
+		if (Misc.inside(p, cornerT[2], cornerT[3], cornerT[6])) {
+            return true;
+        }
+		if (Misc.inside(p, cornerT[2], cornerT[3], cornerT[7])) {
+            return true;
+        }
 		
-		if (Misc.inside(p, cornerT[1], cornerT[3], cornerT[5])) return true;
-		if (Misc.inside(p, cornerT[1], cornerT[3], cornerT[7])) return true;
-		if (Misc.inside(p, cornerT[0], cornerT[2], cornerT[4])) return true;
-		if (Misc.inside(p, cornerT[0], cornerT[2], cornerT[6])) return true;
+		if (Misc.inside(p, cornerT[1], cornerT[3], cornerT[5])) {
+            return true;
+        }
+		if (Misc.inside(p, cornerT[1], cornerT[3], cornerT[7])) {
+            return true;
+        }
+		if (Misc.inside(p, cornerT[0], cornerT[2], cornerT[4])) {
+            return true;
+        }
+		if (Misc.inside(p, cornerT[0], cornerT[2], cornerT[6])) {
+            return true;
+        }
 		
-		if (Misc.inside(p, cornerT[1], cornerT[2], cornerT[4])) return true;
-		if (Misc.inside(p, cornerT[1], cornerT[2], cornerT[7])) return true;
-		if (Misc.inside(p, cornerT[0], cornerT[3], cornerT[5])) return true;
-		if (Misc.inside(p, cornerT[0], cornerT[3], cornerT[6])) return true;
-		
-		return false;
+		if (Misc.inside(p, cornerT[1], cornerT[2], cornerT[4])) {
+            return true;
+        }
+		if (Misc.inside(p, cornerT[1], cornerT[2], cornerT[7])) {
+            return true;
+        }
+		if (Misc.inside(p, cornerT[0], cornerT[3], cornerT[5])) {
+            return true;
+        }
+		return Misc.inside(p, cornerT[0], cornerT[3], cornerT[6]);
+
 	}
 	
 	public synchronized void volumeProjection_trilinear_front(){
@@ -483,14 +531,26 @@ class Volume {
 			tr.xyzPos(volumeLimits[i]);
 			
 			int xi = (int) tr.X;
-			if (xi < xMin) xMin = xi;
-			if (xi > xMax) xMax = xi;
+			if (xi < xMin) {
+                xMin = xi;
+            }
+			if (xi > xMax) {
+                xMax = xi;
+            }
 			int yi = (int) tr.Y;
-			if (yi < yMin) yMin = yi;
-			if (yi > yMax) yMax = yi;
+			if (yi < yMin) {
+                yMin = yi;
+            }
+			if (yi > yMax) {
+                yMax = yi;
+            }
 			int zi = (int) tr.Z;
-			if (zi < zMin) zMin = zi;
-			if (zi > zMax) zMax = zi;
+			if (zi < zMin) {
+                zMin = zi;
+            }
+			if (zi > zMax) {
+                zMax = zi;
+            }
 		}
 		
 		xMin = (xMin < 0)   ?   0 : xMin;
@@ -501,14 +561,15 @@ class Volume {
 		int[] v1 = new int[3];
 		int[] v2 = new int[3];
 		
-		if (cutDist > zMin)
-			zMin = cutDist;
+		if (cutDist > zMin) {
+            zMin = cutDist;
+        }
 		
 		int nd = zMax - zMin;
 		
 		if (nd > 0) {
 			
-			float scaleLum = (renderDepth > 1) ? (renderDepth*255/((renderDepth-1)*255f)) : 2;;
+			float scaleLum = (renderDepth > 1) ? (renderDepth*255/((renderDepth-1)*255f)) : 2;
 			v1[2] = zMin; 
 			v2[2] = zMax; 
 			
@@ -577,14 +638,16 @@ class Volume {
 	
 								
 								int f = 255 - 10*Math.abs(val - threshold);
-								if (f < 0)
-									f = 0;
+								if (f < 0) {
+                                    f = 0;
+                                }
 								if (f > 10) {
 									alpha +=f;
 									V += f*255;
 								
-								if (++k >= renderDepth)
-									break;
+								if (++k >= renderDepth) {
+                                    break;
+                                }
 								}
 								
 //								int f = 255 - 10*Math.abs(val - threshold);
@@ -619,12 +682,14 @@ class Volume {
 							zd1 += dz;
 						}
 						int val = (int) (scaleLum * V / alpha);
-						if (val > 255)
-							val = 255;
+						if (val > 255) {
+                            val = 255;
+                        }
 						
 						int val2 = (int) (scaleLum * V2 / alpha2);
-						if (val2 > 255)
-							val2 = 255;
+						if (val2 > 255) {
+                            val2 = 255;
+                        }
 						
 						
 //						int v_ = (int) ((z * 10) + 128);
@@ -659,14 +724,26 @@ class Volume {
 			tr.xyzPos(volumeLimits[i]);
 			
 			int xi = (int) tr.X;
-			if (xi < xMin) xMin = xi;
-			if (xi > xMax) xMax = xi;
+			if (xi < xMin) {
+                xMin = xi;
+            }
+			if (xi > xMax) {
+                xMax = xi;
+            }
 			int yi = (int) tr.Y;
-			if (yi < yMin) yMin = yi;
-			if (yi > yMax) yMax = yi;
+			if (yi < yMin) {
+                yMin = yi;
+            }
+			if (yi > yMax) {
+                yMax = yi;
+            }
 			int zi = (int) tr.Z;
-			if (zi < zMin) zMin = zi;
-			if (zi > zMax) zMax = zi;
+			if (zi < zMin) {
+                zMin = zi;
+            }
+			if (zi > zMax) {
+                zMax = zi;
+            }
 		}
 		
 		xMin = (xMin < 0)   ?   0 : xMin;
@@ -682,8 +759,9 @@ class Volume {
 		int[] v1 = new int[3];
 		int[] v2 = new int[3];
 		
-		if (cutDist < zMin)
-			cutDist = zMin;
+		if (cutDist < zMin) {
+            cutDist = zMin;
+        }
 		
 		int nd = zMax - cutDist;
 		
@@ -740,8 +818,9 @@ class Volume {
 								if (val >= threshold) {
 									vals[k++] = val;
 									
-								if (k > renderDepth)
-									break;
+								if (k > renderDepth) {
+                                    break;
+                                }
 								}
 							}
 							
@@ -752,8 +831,9 @@ class Volume {
 						for (int i = k-1; i>= 0; i--) {
 							int a = (vals[i] - threshold) + 50;
 							
-							if (a > 255)
-								a = 255;
+							if (a > 255) {
+                                a = 255;
+                            }
 							
 							V = (a*vals[i] + V*(255-a))/255;
 						}
@@ -761,7 +841,9 @@ class Volume {
 						//int val = V; 
 						// TODO changed
 						int val = V+1;
-						if (val > 255) val = 255;
+						if (val > 255) {
+                            val = 255;
+                        }
 						bufferPixels[pos] = lut.colors[val];
 					    zbufferPixels[pos] = (int) tr.z;
 						
@@ -796,14 +878,14 @@ class Volume {
 		double dz = z - tz;
 		int tz1 = (tz < depthZm1) ? tz+1 : tz;
 		
-		int  v000 = (int) (0xff & data3D[tz ][ty ][tx ]);
-		int  v001 = (int) (0xff & data3D[tz1][ty ][tx ]); 
-		int  v010 = (int) (0xff & data3D[tz ][ty1][tx ]); 
-		int  v011 = (int) (0xff & data3D[tz1][ty1][tx ]); 
-		int  v100 = (int) (0xff & data3D[tz ][ty ][tx1]); 
-		int  v101 = (int) (0xff & data3D[tz1][ty ][tx1]); 
-		int  v110 = (int) (0xff & data3D[tz ][ty1][tx1]); 
-		int  v111 = (int) (0xff & data3D[tz1][ty1][tx1]); 
+		int  v000 = 0xff & data3D[tz ][ty ][tx ];
+		int  v001 = 0xff & data3D[tz1][ty ][tx ];
+		int  v010 = 0xff & data3D[tz ][ty1][tx ];
+		int  v011 = 0xff & data3D[tz1][ty1][tx ];
+		int  v100 = 0xff & data3D[tz ][ty ][tx1];
+		int  v101 = 0xff & data3D[tz1][ty ][tx1];
+		int  v110 = 0xff & data3D[tz ][ty1][tx1];
+		int  v111 = 0xff & data3D[tz1][ty1][tx1];
 		
 		return (int) (
 				(v100 - v000)*dx + 
@@ -834,17 +916,24 @@ class Volume {
 	}
 
 	protected void draw() {
-		
-		if (drawMode == JRenderer3D.VOLUME_DOTS)
-			volumeDots();
-		else if (drawMode == JRenderer3D.VOLUME_SLICE_NEAREST_NEIGHBOR)
-			volumeSliceNearestNeighbor();
-		else if (drawMode == JRenderer3D.VOLUME_SLICE_TRILINEAR)
-			volumeSliceTrilinear();
-		else if (drawMode == JRenderer3D.VOLUME_DOTS )
-			volumeDots();
-		else if (drawMode == JRenderer3D.VOLUME_PROJECTION_TRILINEAR_FRONT)
-			volumeProjection_trilinear_front();		
+
+		switch (drawMode) {
+			case JRenderer3D.VOLUME_DOTS:
+				volumeDots();
+				break;
+			case JRenderer3D.VOLUME_SLICE_NEAREST_NEIGHBOR:
+				volumeSliceNearestNeighbor();
+				break;
+			case JRenderer3D.VOLUME_SLICE_TRILINEAR:
+				volumeSliceTrilinear();
+				break;
+			case JRenderer3D.VOLUME_DOTS:
+				volumeDots();
+				break;
+			case JRenderer3D.VOLUME_PROJECTION_TRILINEAR_FRONT:
+				volumeProjection_trilinear_front();
+				break;
+		}
 	}
 
 	protected void setVolumeThreshold(int volume_threshold) {
@@ -856,8 +945,9 @@ class Volume {
 	}
 
 	protected void setVolumeLut(int volume_lutNr) {
-		if (lut != null)
-			lut.setLut(volume_lutNr);
+		if (lut != null) {
+            lut.setLut(volume_lutNr);
+        }
 	}
 
 	protected void setVolumeDotsSubsampling(int volume_dotsDeltaX, int volume_dotsDeltaY, int volume_dotsDeltaZ) {

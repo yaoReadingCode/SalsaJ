@@ -17,30 +17,35 @@ import skyview.geometry.Transformer;
 public class ArcProjecter extends Projecter {
 
     /** Get a name for the component */
-    public String getName() {
+    @Override
+	public String getName() {
 	return "ArcProjecter";
     }
     
     /** Get a description for the component */
-    public String getDescription() {
+    @Override
+	public String getDescription() {
 	return "Zenithal Equidistant (ARC) projecter";
     }
     
     /** Get this inverse of the transformation */
-    public Deprojecter inverse() {
+    @Override
+	public Deprojecter inverse() {
 	return new ArcProjecter.ArcDeprojecter();
     }
 
     /** Is this an inverse of some other transformation? */
-    public boolean isInverse(Transformer t) {
-	return t.getName().equals("ArcDeprojecter");
+    @Override
+	public boolean isInverse(Transformer t) {
+	return "ArcDeprojecter".equals(t.getName());
     }
     
     /** Project a point from the sphere to the plane.
      *  @param sphere a double[3] unit vector
      *  @param plane  a double[2] preallocated vector.
      */
-    public final void transform(double[] sphere, double[] plane) {
+    @Override
+	public final void transform(double[] sphere, double[] plane) {
 	
 	if (Double.isNaN(sphere[2])) {
 	    plane[0] = Double.NaN;
@@ -69,23 +74,27 @@ public class ArcProjecter extends Projecter {
     public class ArcDeprojecter extends Deprojecter {
 	
 	/** Get the name of the component */
+	@Override
 	public String getName() {
 	    return "ArcDeprojecter";
 	}
 	
 	/** Get the description of the compontent */
+	@Override
 	public String getDescription() {
 	    return "Zenithal equal area (ARC) deprojecter";
 	}
 	
 	/** Get the inverse transformation */
+	@Override
 	public Projecter inverse() {
 	    return ArcProjecter.this;
 	}
 	 
         /** Is this an inverse of some other transformation? */
-        public boolean isInverse(Transformer t) {
-	    return t.getName().equals("ArcProjecter");
+        @Override
+		public boolean isInverse(Transformer t) {
+	    return "ArcProjecter".equals(t.getName());
         }
 	
 	
@@ -93,7 +102,8 @@ public class ArcProjecter extends Projecter {
          *  @param plane a double[2] vector in the tangent plane.
          *  @param spehre a preallocated double[3] vector.
          */
-        public final void transform(double[] plane, double[] sphere) {
+        @Override
+		public final void transform(double[] plane, double[] sphere) {
 	
 	    double r = Math.sqrt(plane[0]*plane[0] + plane[1]*plane[1]);
 	

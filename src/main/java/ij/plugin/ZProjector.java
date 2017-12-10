@@ -5,8 +5,6 @@ import ij.gui.GenericDialog;
 import ij.process.*;
 import ij.plugin.filter.*;
 import java.lang.*;
-import java.awt.*;
-import java.awt.event.*;
 
 /**
  *  This plugin performs a z-projection of the input stack. Type of output image
@@ -166,7 +164,8 @@ public class ZProjector implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		imp = WindowManager.getCurrentImage();
 		if (imp == null) {
 			IJ.noImage();
@@ -219,7 +218,7 @@ public class ZProjector implements PlugIn {
 			doProjection();
 		}
 
-		if (arg.equals("")) {
+		if ("".equals(arg)) {
 		long tstop = System.currentTimeMillis();
 
 			projImage.setCalibration(imp.getCalibration());
@@ -228,8 +227,7 @@ public class ZProjector implements PlugIn {
 
 		imp.unlock();
 		IJ.register(ZProjector.class);
-		return;
-	}
+    }
 
 
 	/**
@@ -321,7 +319,7 @@ public class ZProjector implements PlugIn {
 	ImageStack stack = imp.getStack();
 	RayFunction rayFunc = getRayFunction(method, fp);
 
-		if (IJ.debugMode == true) {
+		if (IJ.debugMode) {
 			IJ.log("\nProjecting stack from: " + startSlice
 					 + " to: " + stopSlice);
 		}
@@ -352,17 +350,21 @@ public class ZProjector implements PlugIn {
 		}
 
 		// Finish up projection.
-		if (method == SUM_METHOD) {
-			fp.resetMinAndMax();
-			projImage = new ImagePlus(makeTitle(), fp);
-		} else if (method == SD_METHOD) {
-			rayFunc.postProcess();
-			fp.resetMinAndMax();
-			projImage = new ImagePlus(makeTitle(), fp);
-		} else {
-			rayFunc.postProcess();
-			projImage = makeOutputImage(imp, fp, ptype);
-		}
+        switch (method) {
+            case SUM_METHOD:
+                fp.resetMinAndMax();
+                projImage = new ImagePlus(makeTitle(), fp);
+                break;
+            case SD_METHOD:
+                rayFunc.postProcess();
+                fp.resetMinAndMax();
+                projImage = new ImagePlus(makeTitle(), fp);
+                break;
+            default:
+                rayFunc.postProcess();
+                projImage = makeOutputImage(imp, fp, ptype);
+                break;
+        }
 
 		if (projImage == null) {
 			IJ.error("ZProjection - error computing projection.");
@@ -728,7 +730,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(byte[] pixels) {
+		@Override
+        public void projectSlice(byte[] pixels) {
 			for (int i = 0; i < len; i++) {
 				fpixels[i] += (pixels[i] & 0xff);
 			}
@@ -740,7 +743,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(short[] pixels) {
+		@Override
+        public void projectSlice(short[] pixels) {
 			for (int i = 0; i < len; i++) {
 				fpixels[i] += pixels[i] & 0xffff;
 			}
@@ -752,7 +756,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(float[] pixels) {
+		@Override
+        public void projectSlice(float[] pixels) {
 			for (int i = 0; i < len; i++) {
 				fpixels[i] += pixels[i];
 			}
@@ -762,7 +767,8 @@ public class ZProjector implements PlugIn {
 		/**
 		 *  Description of the Method
 		 */
-		public void postProcess() {
+		@Override
+        public void postProcess() {
 		float fnum = num;
 
 			for (int i = 0; i < len; i++) {
@@ -803,7 +809,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(byte[] pixels) {
+		@Override
+        public void projectSlice(byte[] pixels) {
 			for (int i = 0; i < len; i++) {
 				if ((pixels[i] & 0xff) > fpixels[i]) {
 					fpixels[i] = (pixels[i] & 0xff);
@@ -817,7 +824,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(short[] pixels) {
+		@Override
+        public void projectSlice(short[] pixels) {
 			for (int i = 0; i < len; i++) {
 				if ((pixels[i] & 0xffff) > fpixels[i]) {
 					fpixels[i] = pixels[i] & 0xffff;
@@ -831,7 +839,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(float[] pixels) {
+		@Override
+        public void projectSlice(float[] pixels) {
 			for (int i = 0; i < len; i++) {
 				if (pixels[i] > fpixels[i]) {
 					fpixels[i] = pixels[i];
@@ -872,7 +881,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(byte[] pixels) {
+		@Override
+        public void projectSlice(byte[] pixels) {
 			for (int i = 0; i < len; i++) {
 				if ((pixels[i] & 0xff) < fpixels[i]) {
 					fpixels[i] = (pixels[i] & 0xff);
@@ -886,7 +896,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(short[] pixels) {
+		@Override
+        public void projectSlice(short[] pixels) {
 			for (int i = 0; i < len; i++) {
 				if ((pixels[i] & 0xffff) < fpixels[i]) {
 					fpixels[i] = pixels[i] & 0xffff;
@@ -900,7 +911,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(float[] pixels) {
+		@Override
+        public void projectSlice(float[] pixels) {
 			for (int i = 0; i < len; i++) {
 				if (pixels[i] < fpixels[i]) {
 					fpixels[i] = pixels[i];
@@ -943,7 +955,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(byte[] pixels) {
+		@Override
+        public void projectSlice(byte[] pixels) {
 		int v;
 
 			for (int i = 0; i < len; i++) {
@@ -959,7 +972,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(short[] pixels) {
+		@Override
+        public void projectSlice(short[] pixels) {
 		double v;
 
 			for (int i = 0; i < len; i++) {
@@ -975,7 +989,8 @@ public class ZProjector implements PlugIn {
 		 *
 		 *@param  pixels  Description of the Parameter
 		 */
-		public void projectSlice(float[] pixels) {
+		@Override
+        public void projectSlice(float[] pixels) {
 		double v;
 
 			for (int i = 0; i < len; i++) {
@@ -989,7 +1004,8 @@ public class ZProjector implements PlugIn {
 		/**
 		 *  Description of the Method
 		 */
-		public void postProcess() {
+		@Override
+        public void postProcess() {
 		double stdDev;
 		double n = num;
 

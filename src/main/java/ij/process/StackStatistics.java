@@ -1,6 +1,5 @@
 package ij.process;
 import ij.*;
-import ij.gui.*;
 import ij.measure.*;
 import ij.plugin.filter.Analyzer;
 import java.awt.*;
@@ -80,8 +79,12 @@ public class StackStatistics extends ImageStatistics {
 					if (mask==null || mask[mi++]!=0) {
 						v = ip.getPixelValue(x,y);
 						if (v>=minThreshold && v<=maxThreshold) {
-							if (v<roiMin) roiMin = v;
-							if (v>roiMax) roiMax = v;
+							if (v<roiMin) {
+                                roiMin = v;
+                            }
+							if (v>roiMax) {
+                                roiMax = v;
+                            }
 						}
 					}
 					i++;
@@ -91,8 +94,12 @@ public class StackStatistics extends ImageStatistics {
 		min = roiMin;
 		max = roiMax;
 		if (fixedRange) {
-			if (min<histMin) min = histMin;
-			if (max>histMax) max = histMax;
+			if (min<histMin) {
+                min = histMin;
+            }
+			if (max>histMax) {
+                max = histMax;
+            }
 		} else {
 			histMin = min; 
 			histMax =  max;
@@ -118,8 +125,9 @@ public class StackStatistics extends ImageStatistics {
 							sum += v;
 							sum2 += v*v;
 							index = (int)(scale*(v-histMin));
-							if (index>=nBins)
-								index = nBins-1;
+							if (index>=nBins) {
+                                index = nBins-1;
+                            }
 							histogram[index]++;
 						}
                     }

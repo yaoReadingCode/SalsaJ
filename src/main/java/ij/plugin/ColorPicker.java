@@ -1,7 +1,6 @@
 package ij.plugin;
 import ij.*;
 //import ij.plugin.*;
-import ij.plugin.frame.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
@@ -23,7 +22,8 @@ public class ColorPicker extends ImagePlus implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	ImagePlus imp = WindowManager.getImage(id);
 		if (imp != null && imp.getWindow() != null) {
 			imp.getWindow().toFront();
@@ -49,7 +49,8 @@ public class ColorPicker extends ImagePlus implements PlugIn {
 	/**
 	 *  Overrides ImagePlus.show(). *
 	 */
-	public void show() {
+	@Override
+    public void show() {
 		if (img == null && ip != null) {
 			img = ip.createImage();
 		}
@@ -118,26 +119,24 @@ class ColorGenerator extends ColorProcessor {
 	float hue;
 	float saturation = 1f;
 	float brightness = 1f;
-	double w = colorWidth;
-	double h = colorHeight;
 
-		for (x = 2; x < 10; x++) {
+        for (x = 2; x < 10; x++) {
 			for (y = 0; y < 32; y++) {
-				hue = (float) (y / (2 * h) - .15);
+				hue = (float) (y / (2 * (double) colorHeight) - .15);
 				if (x < 6) {
 					saturation = 1f;
-					brightness = (float) (x * 4 / w);
+					brightness = (float) (x * 4 / (double) colorWidth);
 				} else {
-					saturation = 1f - ((float) ((5 - x) * -4 / w));
+					saturation = 1f - ((float) ((5 - x) * -4 / (double) colorWidth));
 					brightness = 1f;
 				}
 				c = Color.getHSBColor(hue, saturation, brightness);
-				setRoi(x * (int) (w / 2), y * (int) (h / 2), (int) w / 2, (int) h / 2);
+				setRoi(x * (int) ((double) colorWidth / 2), y * (int) ((double) colorHeight / 2), (int) (double) colorWidth / 2, (int) (double) colorHeight / 2);
 				setColor(c);
 				fill();
 			}
 		}
-		drawSpectrum(h);
+		drawSpectrum((double) colorHeight);
 		resetRoi();
 	}
 
@@ -201,7 +200,7 @@ class ColorGenerator extends ColorProcessor {
 			float hue = (float) (y / (2 * h) - .15);
 
 				c = Color.getHSBColor(hue, 1f, 1f);
-				setRoi(x * (int) (w / 2), y * (int) (h / 2), (int) w / 2, (int) h / 2);
+				setRoi(x * w / 2, y * (int) (h / 2), w / 2, (int) h / 2);
 				setColor(c);
 				fill();
 			}
@@ -307,7 +306,8 @@ class ColorCanvas extends ImageCanvas {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void mousePressed(MouseEvent e) {
+	@Override
+    public void mousePressed(MouseEvent e) {
 	//super.mousePressed(e);
 	ImageProcessor ip = imp.getProcessor();
 

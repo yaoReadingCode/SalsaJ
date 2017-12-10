@@ -108,7 +108,9 @@ public class FileOpener {
 						case FileInfo.GRAY24_UNSIGNED:
 						case FileInfo.GRAY64_FLOAT:
 							pixels = readPixels(fi);
-							if (pixels == null)return null;
+							if (pixels == null) {
+                                return null;
+                            }
 							ip = new FloatProcessor(width, height, (float[]) pixels, cm);
 							imp = new ImagePlus(fi.fileName, ip);
 							break;
@@ -258,7 +260,7 @@ public class FileOpener {
 	ImageProcessor ip;
 	String path = fi.directory + fi.fileName;
 
-		if (fi.fileFormat == fi.GIF_OR_JPG) {
+		if (fi.fileFormat == FileInfo.GIF_OR_JPG) {
 			// restore gif or jpg
 			img = Toolkit.getDefaultToolkit().createImage(path);
 			imp.setImage(img);
@@ -268,7 +270,7 @@ public class FileOpener {
 			return;
 		}
 
-		if (fi.fileFormat == fi.DICOM) {
+		if (fi.fileFormat == FileInfo.DICOM) {
 		// restore DICOM
 		ImagePlus imp2 = (ImagePlus) IJ.runPlugIn("ij.plugin.DICOM", path);
 			if (imp2 != null) {
@@ -277,7 +279,7 @@ public class FileOpener {
 			return;
 		}
 
-		if (fi.fileFormat == fi.BMP) {
+		if (fi.fileFormat == FileInfo.BMP) {
 		// restore BMP
 		ImagePlus imp2 = (ImagePlus) IJ.runPlugIn("ij.plugin.BMP_Reader", path);
 			if (imp2 != null) {
@@ -286,7 +288,7 @@ public class FileOpener {
 			return;
 		}
 
-		if (fi.fileFormat == fi.PGM) {
+		if (fi.fileFormat == FileInfo.PGM) {
 		// restore PGM
 		ImagePlus imp2 = (ImagePlus) IJ.runPlugIn("ij.plugin.PGM_Reader", path);
 			if (imp2 != null) {
@@ -295,7 +297,7 @@ public class FileOpener {
 			return;
 		}
 
-		if (fi.fileFormat == fi.ZIP_ARCHIVE) {
+		if (fi.fileFormat == FileInfo.ZIP_ARCHIVE) {
 		// restore ".zip" file
 		ImagePlus imp2 = (new Opener()).openZip(path);
 			if (imp2 != null) {
@@ -305,7 +307,7 @@ public class FileOpener {
 		}
 
 		// restore PNG or another image opened using ImageIO
-		if (fi.fileFormat == fi.IMAGEIO) {
+		if (fi.fileFormat == FileInfo.IMAGEIO) {
 		ImagePlus imp2 = (new Opener()).openUsingImageIO(path);
 			if (imp2 != null) {
 				imp.setProcessor(null, imp2.getProcessor());
@@ -318,7 +320,7 @@ public class FileOpener {
 		}
 
 	ColorModel cm;
-		if (fi.url == null || fi.url.equals("")) {
+		if (fi.url == null || "".equals(fi.url)) {
 			//EU_HOU Bundle
 			IJ.showStatus("Loading: " + path);
 		} else {
@@ -389,7 +391,7 @@ public class FileOpener {
 		int f = fi.calibrationFunction;
 			if ((f >= Calibration.STRAIGHT_LINE && f <= Calibration.RODBARD2 && fi.coefficients != null)
 					 || f == Calibration.UNCALIBRATED_OD) {
-			boolean zeroClip = props != null && props.getProperty("zeroclip", "false").equals("true");
+			boolean zeroClip = props != null && "true".equals(props.getProperty("zeroclip", "false"));
 				cal.setFunction(f, fi.coefficients, fi.valueUnit, zeroClip);
 			}
 		}
@@ -478,7 +480,7 @@ public class FileOpener {
 	InputStream is = null;
 		if (fi.inputStream != null) {
 			is = fi.inputStream;
-		} else if (fi.url != null && !fi.url.equals("")) {
+		} else if (fi.url != null && !"".equals(fi.url)) {
 			is = new URL(fi.url + fi.fileName).openStream();
 		} else {
 			if (fi.directory.length() > 0 && !fi.directory.endsWith(Prefs.separator)) {
@@ -605,7 +607,7 @@ public class FileOpener {
 		}
 		if (IJ.debugMode) {
 			//EU_HOU Bundle
-			IJ.log("Image Description: " + new String(fi.description).replace('\n', ' '));
+			IJ.log("Image Description: " + fi.description.replace('\n', ' '));
 		}
 		if (!fi.description.startsWith("ImageJ")) {
 			return null;
@@ -630,18 +632,16 @@ public class FileOpener {
 			if (n == null) {
 				break;
 			}
-			c[i] = n.doubleValue();
+			c[i] = n;
 			count++;
 		}
 		if (count >= 2) {
 			fi.coefficients = new double[count];
-			for (int i = 0; i < count; i++) {
-				fi.coefficients[i] = c[i];
-			}
+            System.arraycopy(c, 0, fi.coefficients, 0, count);
 		}
 		fi.valueUnit = props.getProperty("vunit");
 		n = getNumber(props, "images");
-		if (n != null && n.doubleValue() > 1.0) {
+		if (n != null && n > 1.0) {
 			fi.nImages = (int) n.doubleValue();
 		}
 		if (fi.nImages > 1) {
@@ -666,7 +666,7 @@ public class FileOpener {
 		if (s != null) {
 			try {
 				return Double.valueOf(s);
-			} catch (NumberFormatException e) {}
+			} catch (NumberFormatException ignored) {}
 		}
 		return null;
 	}
@@ -681,7 +681,7 @@ public class FileOpener {
 	 */
 	private double getDouble(Properties props, String key) {
 	Double n = getNumber(props, key);
-		return n != null ? n.doubleValue() : 0.0;
+		return n != null ? n : 0.0;
 	}
 
 
@@ -694,7 +694,7 @@ public class FileOpener {
 	 */
 	private boolean getBoolean(Properties props, String key) {
 	String s = props.getProperty(key);
-		return s != null && s.equals("true") ? true : false;
+		return s != null && s.equals("true");
 	}
 
 }

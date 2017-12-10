@@ -20,7 +20,8 @@ public class RGBStackMerge implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		imp = WindowManager.getCurrentImage();
 		mergeStacks();
 	}
@@ -143,9 +144,9 @@ public class RGBStackMerge implements PlugIn {
 	byte[] redPixels;
 	byte[] greenPixels;
 	byte[] bluePixels;
-	boolean invertedRed = red != null ? red.getProcessor(1).isInvertedLut() : false;
-	boolean invertedGreen = green != null ? green.getProcessor(1).isInvertedLut() : false;
-	boolean invertedBlue = blue != null ? blue.getProcessor(1).isInvertedLut() : false;
+	boolean invertedRed = red != null && red.getProcessor(1).isInvertedLut();
+	boolean invertedGreen = green != null && green.getProcessor(1).isInvertedLut();
+	boolean invertedBlue = blue != null && blue.getProcessor(1).isInvertedLut();
 		try {
 			for (int i = 1; i <= d; i++) {
 				cp = new ColorProcessor(w, h);

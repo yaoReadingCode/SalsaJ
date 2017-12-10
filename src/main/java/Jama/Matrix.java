@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.io.StreamTokenizer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.FieldPosition;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -204,9 +203,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 				throw new IllegalArgumentException
 						("All rows must have the same length.");
 			}
-			for (int j = 0; j < n; j++) {
-				C[i][j] = A[i][j];
-			}
+			System.arraycopy(A[i], 0, C[i], 0, n);
 		}
 		return X;
 	}
@@ -222,9 +219,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		Matrix X = new Matrix(m, n);
 		double[][] C = X.getArray();
 		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				C[i][j] = A[i][j];
-			}
+			System.arraycopy(A[i], 0, C[i], 0, n);
 		}
 		return X;
 	}
@@ -236,7 +231,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 * @return    Description of the Return Value
 	 */
 
-	public Object clone() {
+	@Override
+    public Object clone() {
 		return this.copy();
 	}
 
@@ -261,9 +257,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	public double[][] getArrayCopy() {
 		double[][] C = new double[m][n];
 		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				C[i][j] = A[i][j];
-			}
+			System.arraycopy(A[i], 0, C[i], 0, n);
 		}
 		return C;
 	}
@@ -295,9 +289,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	public double[] getRowPackedCopy() {
 		double[] vals = new double[m * n];
 		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				vals[i * n + j] = A[i][j];
-			}
+			System.arraycopy(A[i], 0, vals, i * n + 0, n);
 		}
 		return vals;
 	}
@@ -353,9 +345,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		double[][] B = X.getArray();
 		try {
 			for (int i = i0; i <= i1; i++) {
-				for (int j = j0; j <= j1; j++) {
-					B[i - i0][j - j0] = A[i][j];
-				}
+				System.arraycopy(A[i], j0, B[i - i0], j0 - j0, j1 + 1 - j0);
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new ArrayIndexOutOfBoundsException("Submatrix indices");
@@ -427,9 +417,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		double[][] B = X.getArray();
 		try {
 			for (int i = 0; i < r.length; i++) {
-				for (int j = j0; j <= j1; j++) {
-					B[i][j - j0] = A[r[i]][j];
-				}
+				System.arraycopy(A[r[i]], j0, B[i], j0 - j0, j1 + 1 - j0);
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new ArrayIndexOutOfBoundsException("Submatrix indices");
@@ -1197,7 +1185,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
 		// Ignore initial empty lines
 		while (tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
-			;
 		}
 		if (tokenizer.ttype == StreamTokenizer.TT_EOF) {
 			throw new java.io.IOException("Unexpected EOF on matrix read.");
@@ -1212,7 +1199,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		double row[] = new double[n];
 		for (int j = 0; j < n; j++) {
 			// extract the elements of the 1st row.
-			row[j] = ((Double) v.elementAt(j)).doubleValue();
+			row[j] = (Double) v.elementAt(j);
 		}
 		v.removeAllElements();
 		v.addElement(row);
@@ -1226,7 +1213,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 					throw new java.io.IOException
 							("Row " + v.size() + " is too long.");
 				}
-				row[j++] = Double.valueOf(tokenizer.sval).doubleValue();
+				row[j++] = Double.valueOf(tokenizer.sval);
 			} while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
 			if (j < n) {
 				throw new java.io.IOException

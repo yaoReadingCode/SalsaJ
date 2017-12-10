@@ -1,6 +1,5 @@
 package ij.plugin;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.awt.image.*;
 import java.io.*;
@@ -26,25 +25,26 @@ public class Clipboard implements PlugIn, Transferable {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		if (IJ.altKeyDown()) {
-			if (arg.equals("copy")) {
+			if ("copy".equals(arg)) {
 				arg = "scopy";
-			} else if (arg.equals("paste")) {
+			} else if ("paste".equals(arg)) {
 				arg = "spaste";
 			}
 		}
-		if (arg.equals("copy")) {
+		if ("copy".equals(arg)) {
 			copy(false);
-		} else if (arg.equals("paste")) {
+		} else if ("paste".equals(arg)) {
 			paste();
-		} else if (arg.equals("cut")) {
+		} else if ("cut".equals(arg)) {
 			copy(true);
-		} else if (arg.equals("scopy")) {
+		} else if ("scopy".equals(arg)) {
 			copyToSystem();
-		} else if (arg.equals("showsys")) {
+		} else if ("showsys".equals(arg)) {
 			showSystemClipboard();
-		} else if (arg.equals("show")) {
+		} else if ("show".equals(arg)) {
 			showInternalClipboard();
 		}
 	}
@@ -113,7 +113,7 @@ public class Clipboard implements PlugIn, Transferable {
 		}
 		try {
 			clipboard.setContents(this, null);
-		} catch (Throwable t) {}
+		} catch (Throwable ignored) {}
 	}
 
 
@@ -172,7 +172,8 @@ public class Clipboard implements PlugIn, Transferable {
 	 *
 	 *@return    The transferDataFlavors value
 	 */
-	public DataFlavor[] getTransferDataFlavors() {
+	@Override
+    public DataFlavor[] getTransferDataFlavors() {
 		return new DataFlavor[]{DataFlavor.imageFlavor};
 	}
 
@@ -183,7 +184,8 @@ public class Clipboard implements PlugIn, Transferable {
 	 *@param  flavor  Description of the Parameter
 	 *@return         The dataFlavorSupported value
 	 */
-	public boolean isDataFlavorSupported(DataFlavor flavor) {
+	@Override
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
 		return DataFlavor.imageFlavor.equals(flavor);
 	}
 
@@ -195,7 +197,8 @@ public class Clipboard implements PlugIn, Transferable {
 	 *@return                                 The transferData value
 	 *@exception  UnsupportedFlavorException  Description of the Exception
 	 */
-	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+	@Override
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
 		if (!isDataFlavorSupported(flavor)) {
 			throw new UnsupportedFlavorException(flavor);
 		}
@@ -287,7 +290,7 @@ public class Clipboard implements PlugIn, Transferable {
 				return null;
 			}
 			img = getImageFromPictStream((InputStream) is);
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 		return img;
 	}
 
@@ -349,36 +352,36 @@ public class Clipboard implements PlugIn, Transferable {
 		Class c = Class.forName("quicktime.QTSession");
 		Method m = c.getMethod("isInitialized", null);
 		Boolean b = (Boolean) m.invoke(null, null);
-			if (b.booleanValue() == false) {
+			if (!b.booleanValue()) {
 				m = c.getMethod("open", null);
 				m.invoke(null, null);
 			}
 			c = Class.forName("quicktime.util.QTHandle");
-		Constructor con = c.getConstructor(new Class[]{imgBytes.getClass()});
+		Constructor con = c.getConstructor(imgBytes.getClass());
 		Object handle = con.newInstance(new Object[]{imgBytes});
-		String s = new String("PICT");
+		String s = "PICT";
 			c = Class.forName("quicktime.util.QTUtils");
-			m = c.getMethod("toOSType", new Class[]{s.getClass()});
+			m = c.getMethod("toOSType", s.getClass());
 		Integer type = (Integer) m.invoke(null, new Object[]{s});
 			c = Class.forName("quicktime.std.image.GraphicsImporter");
-			con = c.getConstructor(new Class[]{type.TYPE});
-		Object importer = con.newInstance(new Object[]{type});
+			con = c.getConstructor(Integer.TYPE);
+		Object importer = con.newInstance(type);
 			m = c.getMethod("setDataHandle",
-					new Class[]{Class.forName("quicktime.util." + "QTHandleRef")});
-			m.invoke(importer, new Object[]{handle});
+                    Class.forName("quicktime.util." + "QTHandleRef"));
+			m.invoke(importer, handle);
 			m = c.getMethod("getNaturalBounds", null);
 		Object rect = m.invoke(importer, null);
 			c = Class.forName("quicktime.app.view.GraphicsImporterDrawer");
-			con = c.getConstructor(new Class[]{importer.getClass()});
-		Object iDrawer = con.newInstance(new Object[]{importer});
+			con = c.getConstructor(importer.getClass());
+		Object iDrawer = con.newInstance(importer);
 			m = rect.getClass().getMethod("getWidth", null);
 		Integer width = (Integer) m.invoke(rect, null);
 			m = rect.getClass().getMethod("getHeight", null);
 		Integer height = (Integer) m.invoke(rect, null);
-		Dimension d = new Dimension(width.intValue(), height.intValue());
+		Dimension d = new Dimension(width, height);
 			c = Class.forName("quicktime.app.view.QTImageProducer");
-			con = c.getConstructor(new Class[]{iDrawer.getClass(), d.getClass()});
-		Object producer = con.newInstance(new Object[]{iDrawer, d});
+			con = c.getConstructor(iDrawer.getClass(), d.getClass());
+		Object producer = con.newInstance(iDrawer, d);
 			if (producer instanceof ImageProducer) {
 				return (Toolkit.getDefaultToolkit().createImage((ImageProducer) producer));
 			}
@@ -401,7 +404,7 @@ public class Clipboard implements PlugIn, Transferable {
 		try {
 		Class c = Class.forName("quicktime.QTSession");
 			isInstalled = true;
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 		return isInstalled;
 	}
 

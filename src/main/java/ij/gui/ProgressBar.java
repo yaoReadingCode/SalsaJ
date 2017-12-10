@@ -2,7 +2,6 @@ package ij.gui;
 import ij.macro.Interpreter;
 
 import java.awt.*;
-import java.awt.image.*;
 
 /** This is the progress bar that is displayed in the lower 
 	right hand corner of the ImageJ window. Use one of the static 
@@ -56,7 +55,9 @@ public class ProgressBar extends Canvas {
      * batch mode.
      */
     public void show(double percent, boolean showInBatchMode) {
-        if (!showInBatchMode && Interpreter.isBatchMode()) return;
+        if (!showInBatchMode && Interpreter.isBatchMode()) {
+            return;
+        }
         if (percent>=1.0) {     //clear the progress bar
 			percent = 0.0;
 			showBar = false;
@@ -64,7 +65,9 @@ public class ProgressBar extends Canvas {
             return;
         }
         long time = System.currentTimeMillis();
-        if (time - lastTime < 90 && percent != 1.0) return;
+        if (time - lastTime < 90 && percent != 1.0) {
+            return;
+        }
         lastTime = time;
         showBar = true;
 		this.percent = percent;
@@ -79,11 +82,13 @@ public class ProgressBar extends Canvas {
         show((currentIndex+1.0)/(double)finalIndex, true);
     }
 
+	@Override
 	public void update(Graphics g) {
 		paint(g);
 	}
 
-    public void paint(Graphics g) {
+    @Override
+	public void paint(Graphics g) {
     	if (showBar) {
 			fill3DRect(g, x-1, y-1, width+1, height+1);
 			drawBar(g);
@@ -94,8 +99,9 @@ public class ProgressBar extends Canvas {
     }
 
     void drawBar(Graphics g) {
-    	if (percent<0.0)
-    		percent = 0.0;
+    	if (percent<0.0) {
+            percent = 0.0;
+        }
     	int barEnd = (int)(width*percent);
 //		if (negativeProgress) {
 //			g.setColor(fillColor);
@@ -106,7 +112,8 @@ public class ProgressBar extends Canvas {
 //		}
     }
     
-    public Dimension getPreferredSize() {
+    @Override
+	public Dimension getPreferredSize() {
         return new Dimension(canvasWidth, canvasHeight);
     }
 

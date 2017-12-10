@@ -38,7 +38,7 @@ public class CoordinateFormatter {
         int    deg,  min,  sec,  frac;
 	double fdeg, fmin, fsec, ffrac;
 
-	StringBuffer str = new StringBuffer();
+	StringBuilder str = new StringBuilder();
 	
 	if (value < 0) {
 	    value = Math.abs(value);
@@ -63,7 +63,7 @@ public class CoordinateFormatter {
 	        frac = 0;
 	    }
 	    
-	    str.append(numb(deg)+"."+frac);
+	    str.append(numb(deg)).append(".").append(frac);
 	    
 	} else if (precision == 4) {
 		
@@ -73,7 +73,7 @@ public class CoordinateFormatter {
 	        deg += 1;
                 min = 0;
             }
-            str.append(numb(deg)+sexaSep[0]+numb(min));
+            str.append(numb(deg)).append(sexaSep[0]).append(numb(min));
 		
 	} else if (precision == 5) {
 	  
@@ -92,7 +92,7 @@ public class CoordinateFormatter {
 	        min = 0;
 	    }
 		
-	    str.append(numb(deg) + sexaSep[0] + numb(min) + "." + frac);
+	    str.append(numb(deg)).append(sexaSep[0]).append(numb(min)).append(".").append(frac);
 		
 	} else if (precision == 6) {
 	  
@@ -109,7 +109,7 @@ public class CoordinateFormatter {
 	        min = 0; 
 	    } 
 	  
-	    str.append(numb(deg) + sexaSep[0] + numb(min) + sexaSep[1] + numb(sec));
+	    str.append(numb(deg)).append(sexaSep[0]).append(numb(min)).append(sexaSep[1]).append(numb(sec));
 		
 	} else {  
 	    int i;
@@ -143,7 +143,7 @@ public class CoordinateFormatter {
 	    }
 		
 	    // need to format this properly
-	    str.append(numb(deg)+sexaSep[0]+numb(min)+sexaSep[1]+numb(sec)+"."+frac);
+	    str.append(numb(deg)).append(sexaSep[0]).append(numb(min)).append(sexaSep[1]).append(numb(sec)).append(".").append(frac);
         }
         return str.toString();
     }

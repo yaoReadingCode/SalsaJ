@@ -4,7 +4,6 @@ package ij.process;
 import java.util.*;
 import java.awt.*;
 import java.awt.image.*;
-import ij.gui.*;
 
 /**
  *  This is an 32-bit floating-point image and methods that operate on that
@@ -168,7 +167,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  max  The new minAndMax value
 	 *@see         ij.plugin.frame.ContrastAdjuster
 	 */
-	public void setMinAndMax(double min, double max) {
+	@Override
+    public void setMinAndMax(double min, double max) {
 		if (min == 0.0 && max == 0.0) {
 			resetMinAndMax();
 			return;
@@ -185,7 +185,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *  display. This ensures that this FloatProcessor is set up to correctly
 	 *  display the image.
 	 */
-	public void resetMinAndMax() {
+	@Override
+    public void resetMinAndMax() {
 		fixedScale = false;
 		findMinAndMax();
 		resetThreshold();
@@ -197,7 +198,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    The min value
 	 */
-	public double getMin() {
+	@Override
+    public double getMin() {
 		return min;
 	}
 
@@ -207,7 +209,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    The max value
 	 */
-	public double getMax() {
+	@Override
+    public double getMax() {
 		return max;
 	}
 
@@ -217,7 +220,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public Image createImage() {
+	@Override
+    public Image createImage() {
 	boolean firstTime = pixels8 == null;
 
 		if (firstTime || !lutAnimation) {
@@ -269,7 +273,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  height  Description of the Parameter
 	 *@return         Description of the Return Value
 	 */
-	public ImageProcessor createProcessor(int width, int height) {
+	@Override
+    public ImageProcessor createProcessor(int width, int height) {
 	ImageProcessor ip2 = new FloatProcessor(width, height, new float[width * height], getColorModel());
 
 		ip2.setMinAndMax(getMin(), getMax());
@@ -280,7 +285,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void snapshot() {
+	@Override
+    public void snapshot() {
 		snapshotWidth = width;
 		snapshotHeight = height;
 		snapshotMin = min;
@@ -295,7 +301,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void reset() {
+	@Override
+    public void reset() {
 		if (snapshotPixels == null) {
 			return;
 		}
@@ -310,7 +317,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  mask  Description of the Parameter
 	 */
-	public void reset(ImageProcessor mask) {
+	@Override
+    public void reset(ImageProcessor mask) {
 		if (mask == null || snapshotPixels == null) {
 			return;
 		}
@@ -338,7 +346,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  pixels  The new snapshotPixels value
 	 */
-	public void setSnapshotPixels(Object pixels) {
+	@Override
+    public void setSnapshotPixels(Object pixels) {
 		snapshotPixels = (float[]) pixels;
 		snapshotWidth = width;
 		snapshotHeight = height;
@@ -350,7 +359,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    The snapshotPixels value
 	 */
-	public Object getSnapshotPixels() {
+	@Override
+    public Object getSnapshotPixels() {
 		return snapshotPixels;
 	}
 
@@ -362,7 +372,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    The pixel value
 	 */
-	public int getPixel(int x, int y) {
+	@Override
+    public int getPixel(int x, int y) {
 		if (x >= 0 && x < width && y >= 0 && y < height) {
 			return Float.floatToIntBits(pixels[y * width + x]);
 		} else {
@@ -378,7 +389,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    Description of the Return Value
 	 */
-	public final int get(int x, int y) {
+	@Override
+    public final int get(int x, int y) {
 		return Float.floatToIntBits(pixels[y * width + x]);
 	}
 
@@ -390,7 +402,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y      Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public final void set(int x, int y, int value) {
+	@Override
+    public final void set(int x, int y, int value) {
 		pixels[y * width + x] = Float.intBitsToFloat(value);
 	}
 
@@ -401,7 +414,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  index  Description of the Parameter
 	 *@return        Description of the Return Value
 	 */
-	public final int get(int index) {
+	@Override
+    public final int get(int index) {
 		return Float.floatToIntBits(pixels[index]);
 	}
 
@@ -412,7 +426,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  index  Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public final void set(int index, int value) {
+	@Override
+    public final void set(int index, int value) {
 		pixels[index] = Float.intBitsToFloat(value);
 	}
 
@@ -424,7 +439,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    Description of the Return Value
 	 */
-	public final float getf(int x, int y) {
+	@Override
+    public final float getf(int x, int y) {
 		return pixels[y * width + x];
 	}
 
@@ -436,7 +452,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y      Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public final void setf(int x, int y, float value) {
+	@Override
+    public final void setf(int x, int y, float value) {
 		pixels[y * width + x] = value;
 	}
 
@@ -447,7 +464,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  index  Description of the Parameter
 	 *@return        Description of the Return Value
 	 */
-	public final float getf(int index) {
+	@Override
+    public final float getf(int index) {
 		return pixels[index];
 	}
 
@@ -458,7 +476,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  index  Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public final void setf(int index, float value) {
+	@Override
+    public final void setf(int index, float value) {
 		pixels[index] = value;
 	}
 
@@ -472,7 +491,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  iArray  Description of the Parameter
 	 *@return         The pixel value
 	 */
-	public int[] getPixel(int x, int y, int[] iArray) {
+	@Override
+    public int[] getPixel(int x, int y, int[] iArray) {
 		if (iArray == null) {
 			iArray = new int[1];
 		}
@@ -488,7 +508,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y       Description of the Parameter
 	 *@param  iArray  Description of the Parameter
 	 */
-	public void putPixel(int x, int y, int[] iArray) {
+	@Override
+    public void putPixel(int x, int y, int[] iArray) {
 		putPixelValue(x, y, iArray[0]);
 	}
 
@@ -501,7 +522,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    The interpolatedPixel value
 	 */
-	public double getInterpolatedPixel(double x, double y) {
+	@Override
+    public double getInterpolatedPixel(double x, double y) {
 		if (x < 0.0) {
 			x = 0.0;
 		}
@@ -526,7 +548,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y      Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public void putPixel(int x, int y, int value) {
+	@Override
+    public void putPixel(int x, int y, int value) {
 		if (x >= 0 && x < width && y >= 0 && y < height) {
 			pixels[y * width + x] = Float.intBitsToFloat(value);
 		}
@@ -540,7 +563,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y      Description of the Parameter
 	 *@param  value  Description of the Parameter
 	 */
-	public void putPixelValue(int x, int y, double value) {
+	@Override
+    public void putPixelValue(int x, int y, double value) {
 		if (x >= 0 && x < width && y >= 0 && y < height) {
 			pixels[y * width + x] = (float) value;
 		}
@@ -554,7 +578,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  y  Description of the Parameter
 	 *@return    The pixelValue value
 	 */
-	public float getPixelValue(int x, int y) {
+	@Override
+    public float getPixelValue(int x, int y) {
 		if (x >= 0 && x < width && y >= 0 && y < height) {
 			return pixels[y * width + x];
 		} else {
@@ -569,7 +594,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  x  Description of the Parameter
 	 *@param  y  Description of the Parameter
 	 */
-	public void drawPixel(int x, int y) {
+	@Override
+    public void drawPixel(int x, int y) {
 		if (x >= clipXMin && x <= clipXMax && y >= clipYMin && y <= clipYMax) {
 			putPixel(x, y, Float.floatToIntBits(fillColor));
 		}
@@ -581,8 +607,9 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    The pixels value
 	 */
-	public Object getPixels() {
-		return (Object) pixels;
+	@Override
+    public Object getPixels() {
+		return pixels;
 	}
 
 
@@ -594,7 +621,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@see       ImageProcessor#snapshot
 	 *@see       ImageProcessor#setSnapshotCopyMode
 	 */
-	public Object getPixelsCopy() {
+	@Override
+    public Object getPixelsCopy() {
 		if (snapshotCopyMode && snapshotPixels != null) {
 			snapshotCopyMode = false;
 			return snapshotPixels;
@@ -612,7 +640,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  pixels  The new pixels value
 	 */
-	public void setPixels(Object pixels) {
+	@Override
+    public void setPixels(Object pixels) {
 		this.pixels = (float[]) pixels;
 		resetPixels(pixels);
 		if (pixels == null) {
@@ -633,7 +662,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  yloc  Description of the Parameter
 	 *@param  mode  Description of the Parameter
 	 */
-	public void copyBits(ImageProcessor ip, int xloc, int yloc, int mode) {
+	@Override
+    public void copyBits(ImageProcessor ip, int xloc, int yloc, int mode) {
 		//if (!(ip instanceof FloatProcessor))
 		//	throw new IllegalArgumentException("32-bit (real) image required");
 		new FloatBlitter(this).copyBits(ip, xloc, yloc, mode);
@@ -645,7 +675,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  lut  Description of the Parameter
 	 */
-	public void applyTable(int[] lut) { }
+	@Override
+    public void applyTable(int[] lut) { }
 
 
 	/**
@@ -707,7 +738,7 @@ public class FloatProcessor extends ImageProcessor {
 									}
 									break;
 								case ABS:
-									v2 = (float) Math.abs(v1);
+									v2 = Math.abs(v1);
 									break;
 								case MINIMUM:
 									if (v1 < value) {
@@ -738,7 +769,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void invert() {
+	@Override
+    public void invert() {
 		process(INVERT, 0.0);
 	}
 
@@ -748,7 +780,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  Description of the Parameter
 	 */
-	public void add(int value) {
+	@Override
+    public void add(int value) {
 		process(ADD, value);
 	}
 
@@ -758,7 +791,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  Description of the Parameter
 	 */
-	public void add(double value) {
+	@Override
+    public void add(double value) {
 		process(ADD, value);
 	}
 
@@ -768,7 +802,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  Description of the Parameter
 	 */
-	public void multiply(double value) {
+	@Override
+    public void multiply(double value) {
 		process(MULT, value);
 	}
 
@@ -778,7 +813,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  Description of the Parameter
 	 */
-	public void and(int value) { }
+	@Override
+    public void and(int value) { }
 
 
 	/**
@@ -786,7 +822,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  Description of the Parameter
 	 */
-	public void or(int value) { }
+	@Override
+    public void or(int value) { }
 
 
 	/**
@@ -794,7 +831,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  Description of the Parameter
 	 */
-	public void xor(int value) { }
+	@Override
+    public void xor(int value) { }
 
 
 	/**
@@ -802,7 +840,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  Description of the Parameter
 	 */
-	public void gamma(double value) {
+	@Override
+    public void gamma(double value) {
 		process(GAMMA, value);
 	}
 
@@ -810,7 +849,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void log() {
+	@Override
+    public void log() {
 		process(LOG, 0.0);
 	}
 
@@ -818,7 +858,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void exp() {
+	@Override
+    public void exp() {
 		process(EXP, 0.0);
 	}
 
@@ -826,7 +867,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void sqr() {
+	@Override
+    public void sqr() {
 		process(SQR, 0.0);
 	}
 
@@ -834,7 +876,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void sqrt() {
+	@Override
+    public void sqrt() {
 		process(SQRT, 0.0);
 	}
 
@@ -842,7 +885,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void abs() {
+	@Override
+    public void abs() {
 		process(ABS, 0.0);
 	}
 
@@ -852,7 +896,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  Description of the Parameter
 	 */
-	public void min(double value) {
+	@Override
+    public void min(double value) {
 		process(MINIMUM, value);
 	}
 
@@ -862,7 +907,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  Description of the Parameter
 	 */
-	public void max(double value) {
+	@Override
+    public void max(double value) {
 		process(MAXIMUM, value);
 	}
 
@@ -871,7 +917,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Fills the current rectangular ROI.
 	 */
-	public void fill() {
+	@Override
+    public void fill() {
 		process(FILL, 0.0);
 	}
 
@@ -882,7 +929,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  mask  Description of the Parameter
 	 */
-	public void fill(ImageProcessor mask) {
+	@Override
+    public void fill(ImageProcessor mask) {
 		if (mask == null) {
 			fill();
 			return;
@@ -916,7 +964,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  kernel  Description of the Parameter
 	 */
-	public void convolve3x3(int[] kernel) {
+	@Override
+    public void convolve3x3(int[] kernel) {
 	float p1;
 	float p2;
 	float p3;
@@ -940,9 +989,9 @@ public class FloatProcessor extends ImageProcessor {
 
 	float scale = 0f;
 
-		for (int i = 0; i < kernel.length; i++) {
-			scale += kernel[i];
-		}
+        for (int aKernel : kernel) {
+            scale += aKernel;
+        }
 		if (scale == 0) {
 			scale = 1f;
 		}
@@ -998,7 +1047,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  type  Description of the Parameter
 	 */
-	public void filter(int type) {
+	@Override
+    public void filter(int type) {
 	float p1;
 	float p2;
 	float p3;
@@ -1072,7 +1122,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  angle  Description of the Parameter
 	 *@see           ImageProcessor#setInterpolate
 	 */
-	public void rotate(double angle) {
+	@Override
+    public void rotate(double angle) {
 	float[] pixels2 = (float[]) getPixelsCopy();
 	double centerX = roiX + (roiWidth - 1) / 2.0;
 	double centerY = roiY + (roiHeight - 1) / 2.0;
@@ -1152,7 +1203,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  ty  Description of the Parameter
 	 *@see        ImageProcessor#setInterpolate
 	 */
-	public void translate(double tx, double ty) {
+	@Override
+    public void translate(double tx, double ty) {
 	//System.out.println("Float");
 	float[] pixels2 = (float[]) getPixelsCopy();
 	int xMax = roiX + this.roiWidth - 1;
@@ -1221,7 +1273,8 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Description of the Method
 	 */
-	public void flipVertical() {
+	@Override
+    public void flipVertical() {
 	int index1;
 	int index2;
 	float tmp;
@@ -1243,7 +1296,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  range  Description of the Parameter
 	 */
-	public void noise(double range) {
+	@Override
+    public void noise(double range) {
 	Random rnd = new Random();
 
 		for (int y = roiY; y < (roiY + roiHeight); y++) {
@@ -1265,7 +1319,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public ImageProcessor crop() {
+	@Override
+    public ImageProcessor crop() {
 	ImageProcessor ip2 = createProcessor(roiWidth, roiHeight);
 	float[] pixels2 = (float[]) ip2.getPixels();
 
@@ -1286,7 +1341,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public synchronized ImageProcessor duplicate() {
+	@Override
+    public synchronized ImageProcessor duplicate() {
 	ImageProcessor ip2 = createProcessor(width, height);
 	float[] pixels2 = (float[]) ip2.getPixels();
 
@@ -1302,7 +1358,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  yScale  Description of the Parameter
 	 *@see            ImageProcessor#setInterpolate
 	 */
-	public void scale(double xScale, double yScale) {
+	@Override
+    public void scale(double xScale, double yScale) {
 	double xCenter = roiX + roiWidth / 2.0;
 	double yCenter = roiY + roiHeight / 2.0;
 	int xmin;
@@ -1363,7 +1420,7 @@ public class FloatProcessor extends ImageProcessor {
 				xs = (x - xCenter) / xScale + xCenter;
 				xsi = (int) xs;
 				if (checkCoordinates && ((xsi < xmin) || (xsi > xmax) || (ysi < ymin) || (ysi > ymax))) {
-					pixels[index1++] = (float) min;
+					pixels[index1++] = min;
 				} else {
 					if (interpolate) {
 						if (xs < 0.0) {
@@ -1395,7 +1452,7 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  pixels  Description of the Parameter
 	 *@return         The interpolatedPixel value
 	 */
-	private final double getInterpolatedPixel(double x, double y, float[] pixels) {
+	private double getInterpolatedPixel(double x, double y, float[] pixels) {
 	int xbase = (int) x;
 	int ybase = (int) y;
 	double xFraction = x - xbase;
@@ -1420,7 +1477,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  dstHeight  Description of the Parameter
 	 *@return            Description of the Return Value
 	 */
-	public ImageProcessor resize(int dstWidth, int dstHeight) {
+	@Override
+    public ImageProcessor resize(int dstWidth, int dstHeight) {
 	double srcCenterX = roiX + roiWidth / 2.0;
 	double srcCenterY = roiY + roiHeight / 2.0;
 	double dstCenterX = dstWidth / 2.0;
@@ -1483,7 +1541,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  color  The new color value
 	 */
-	public void setColor(Color color) {
+	@Override
+    public void setColor(Color color) {
 	int bestIndex = getBestIndex(color);
 
 		if (bestIndex > 0 && getMin() == 0.0 && getMax() == 0.0) {
@@ -1502,7 +1561,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  The new value value
 	 */
-	public void setValue(double value) {
+	@Override
+    public void setValue(double value) {
 		fillColor = (float) value;
 	}
 
@@ -1512,7 +1572,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  value  The new backgroundValue value
 	 */
-	public void setBackgroundValue(double value) {
+	@Override
+    public void setBackgroundValue(double value) {
 	}
 
 
@@ -1523,7 +1584,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  maxThreshold  The new threshold value
 	 *@param  lutUpdate     The new threshold value
 	 */
-	public void setThreshold(double minThreshold, double maxThreshold, int lutUpdate) {
+	@Override
+    public void setThreshold(double minThreshold, double maxThreshold, int lutUpdate) {
 		if (minThreshold == NO_THRESHOLD) {
 			resetThreshold();
 			return;
@@ -1548,7 +1610,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *@param  kernelWidth   Description of the Parameter
 	 *@param  kernelHeight  Description of the Parameter
 	 */
-	public void convolve(float[] kernel, int kernelWidth, int kernelHeight) {
+	@Override
+    public void convolve(float[] kernel, int kernelWidth, int kernelHeight) {
 		snapshot();
 		new ij.plugin.filter.Convolver().convolve(this, kernel, kernelWidth, kernelHeight);
 	}
@@ -1559,19 +1622,22 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@param  level  Description of the Parameter
 	 */
-	public void threshold(int level) { }
+	@Override
+    public void threshold(int level) { }
 
 
 	/**
 	 *  Not implemented.
 	 */
-	public void autoThreshold() { }
+	@Override
+    public void autoThreshold() { }
 
 
 	/**
 	 *  Not implemented.
 	 */
-	public void medianFilter() { }
+	@Override
+    public void medianFilter() { }
 
 
 	/**
@@ -1579,7 +1645,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    The histogram value
 	 */
-	public int[] getHistogram() {
+	@Override
+    public int[] getHistogram() {
 		return null;
 	}
 
@@ -1587,13 +1654,15 @@ public class FloatProcessor extends ImageProcessor {
 	/**
 	 *  Not implemented.
 	 */
-	public void erode() { }
+	@Override
+    public void erode() { }
 
 
 	/**
 	 *  Not implemented.
 	 */
-	public void dilate() { }
+	@Override
+    public void dilate() { }
 
 
 	/**
@@ -1605,7 +1674,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *      ImageProcessor types).
 	 *@return                This FloatProcessor
 	 */
-	public FloatProcessor toFloat(int channelNumber, FloatProcessor fp) {
+	@Override
+    public FloatProcessor toFloat(int channelNumber, FloatProcessor fp) {
 		return this;
 	}
 
@@ -1618,7 +1688,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *      ColorProcessor.toFloat)
 	 *@param  fp             The FloatProcessor where the image data are read from.
 	 */
-	public void setPixels(int channelNumber, FloatProcessor fp) {
+	@Override
+    public void setPixels(int channelNumber, FloatProcessor fp) {
 		if (fp.getPixels() != getPixels()) {
 			setPixels(fp.getPixels());
 		}
@@ -1631,7 +1702,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public double minValue() {
+	@Override
+    public double minValue() {
 		return Float.MIN_VALUE;
 	}
 
@@ -1641,7 +1713,8 @@ public class FloatProcessor extends ImageProcessor {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public double maxValue() {
+	@Override
+    public double maxValue() {
 		return Float.MAX_VALUE;
 	}
 

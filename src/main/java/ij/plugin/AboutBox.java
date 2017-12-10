@@ -5,7 +5,6 @@ import ij.*;
 import ij.process.*;
 import ij.gui.*;
 import java.awt.*;
-import ij.io.*;
 import java.net.URL;
 import java.awt.image.*;
 
@@ -25,6 +24,7 @@ public class AboutBox implements PlugIn {
      *
      *@param  arg  Description of the Parameter
      */
+    @Override
     public void run(String arg) {
         int lines = 6;
         String[] text = new String[lines];
@@ -46,7 +46,7 @@ public class AboutBox implements PlugIn {
             Image img = null;
             try {
                 img = ij.createImage((ImageProducer) url.getContent());
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             if (img != null) {
                 ImagePlus imp = new ImagePlus("", img);

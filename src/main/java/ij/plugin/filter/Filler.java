@@ -29,7 +29,8 @@ public class Filler implements PlugInFilter, Measurements {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.arg = arg;
 		this.imp = imp;
 		if (imp != null) {
@@ -38,21 +39,21 @@ public class Filler implements PlugInFilter, Measurements {
 		isTextRoi = roi != null && (roi instanceof TextRoi);
 		IJ.register(Filler.class);
 	int baseCapabilities = DOES_ALL + ROI_REQUIRED;
-		if (arg.equals("clear")) {
+		if ("clear".equals(arg)) {
 			if (isTextRoi || isLineSelection()) {
 				return baseCapabilities;
 			} else {
 				return IJ.setupDialog(imp, baseCapabilities + SUPPORTS_MASKING);
 			}
-		} else if (arg.equals("draw")) {
+		} else if ("draw".equals(arg)) {
 			return baseCapabilities;
-		} else if (arg.equals("label")) {
+		} else if ("label".equals(arg)) {
 			if (Analyzer.firstParticle < Analyzer.lastParticle) {
 				return baseCapabilities - ROI_REQUIRED;
 			} else {
 				return baseCapabilities;
 			}
-		} else if (arg.equals("outside")) {
+		} else if ("outside".equals(arg)) {
 			return IJ.setupDialog(imp, baseCapabilities);
 		} else {
 			return IJ.setupDialog(imp, baseCapabilities + SUPPORTS_MASKING);
@@ -65,18 +66,19 @@ public class Filler implements PlugInFilter, Measurements {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
-		if (arg.equals("clear")) {
+	@Override
+    public void run(ImageProcessor ip) {
+		if ("clear".equals(arg)) {
 			clear(ip);
-		} else if (isTextRoi && (arg.equals("draw") || arg.equals("fill"))) {
+		} else if (isTextRoi && ("draw".equals(arg) || "fill".equals(arg))) {
 			draw(ip);
-		} else if (arg.equals("fill")) {
+		} else if ("fill".equals(arg)) {
 			fill(ip);
-		} else if (arg.equals("draw")) {
+		} else if ("draw".equals(arg)) {
 			draw(ip);
-		} else if (arg.equals("label")) {
+		} else if ("label".equals(arg)) {
 			label(ip);
-		} else if (arg.equals("outside")) {
+		} else if ("outside".equals(arg)) {
 			clearOutside(ip);
 		}
 	}

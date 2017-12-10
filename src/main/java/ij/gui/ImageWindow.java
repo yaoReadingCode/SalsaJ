@@ -2,14 +2,10 @@
 package ij.gui;
 
 import java.awt.*;
-import java.awt.image.*;
-import java.util.Properties;
 import java.awt.event.*;
 import ij.*;
-import ij.process.*;
 import ij.io.*;
 import ij.measure.*;
-import ij.plugin.frame.Recorder;
 import ij.macro.Interpreter;
 /*
  *  EU_HOU CHANGES
@@ -174,7 +170,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 */
 		System.out.println("ImageWindow(ImagePlus imp, ImageCanvas ic, boolean pub)");
 		publicImage = pub;
-		if (Prefs.blackCanvas && getClass().getName().equals("ij.gui.ImageWindow")) {
+		if (Prefs.blackCanvas && "ij.gui.ImageWindow".equals(getClass().getName())) {
 			setForeground(Color.white);
 			setBackground(Color.black);
 		} else {
@@ -250,7 +246,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 				if (img != null) {
 					try {
 						setIconImage(img);
-					} catch (Exception e) {}
+					} catch (Exception ignored) {}
 				}
 			}
 			if (centerOnScreen) {
@@ -377,7 +373,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@return    The insets value
 	 */
-	public Insets getInsets() {
+	@Override
+    public Insets getInsets() {
 	Insets insets = super.getInsets();
 	double mag = ic.getMagnification();
 	int extraWidth = (int) ((MIN_WIDTH - imp.getWidth() * mag) / 2.0);
@@ -492,7 +489,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void paint(Graphics g) {
+	@Override
+    public void paint(Graphics g) {
 		//if (IJ.debugMode) IJ.log("wPaint: " + imp.getTitle());
 		drawInfo(g);
 
@@ -718,7 +716,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void focusGained(FocusEvent e) {
+	@Override
+    public void focusGained(FocusEvent e) {
 		//IJ.log("focusGained: "+imp.getTitle());
 		if (!Interpreter.isBatchMode() && ij != null && !ij.quitting()) {
 			WindowManager.setCurrentWindow(this);
@@ -731,7 +730,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowActivated(WindowEvent e) {
+	@Override
+    public void windowActivated(WindowEvent e) {
 	//IJ.log("windowActivated: "+imp.getTitle());
 	ImageJ ij = IJ.getInstance();
 	boolean quitting = ij != null && ij.quitting();
@@ -752,7 +752,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowClosing(WindowEvent e) {
+	@Override
+    public void windowClosing(WindowEvent e) {
 		//IJ.log("windowClosing: "+imp.getTitle()+" "+closed);
 		if (closed) {
 			return;
@@ -773,7 +774,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowStateChanged(WindowEvent e) {
+	@Override
+    public void windowStateChanged(WindowEvent e) {
 	int oldState = e.getOldState();
 	int newState = e.getNewState();
 		//IJ.log("WSC: "+getBounds()+" "+oldState+" "+newState);
@@ -790,7 +792,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowClosed(WindowEvent e) { }
+	@Override
+    public void windowClosed(WindowEvent e) { }
 
 
 	/**
@@ -798,7 +801,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowDeactivated(WindowEvent e) { }
+	@Override
+    public void windowDeactivated(WindowEvent e) { }
 
 
 	/**
@@ -806,7 +810,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void focusLost(FocusEvent e) { }
+	@Override
+    public void focusLost(FocusEvent e) { }
 
 
 	/**
@@ -814,7 +819,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowDeiconified(WindowEvent e) { }
+	@Override
+    public void windowDeiconified(WindowEvent e) { }
 
 
 	/**
@@ -822,7 +828,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowIconified(WindowEvent e) { }
+	@Override
+    public void windowIconified(WindowEvent e) { }
 
 
 	/**
@@ -830,7 +837,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void windowOpened(WindowEvent e) { }
+	@Override
+    public void windowOpened(WindowEvent e) { }
 
 
 	/**
@@ -838,7 +846,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@param  event  Description of the Parameter
 	 */
-	public void mouseWheelMoved(MouseWheelEvent event) {
+	@Override
+    public void mouseWheelMoved(MouseWheelEvent event) {
 	int rotation = event.getWheelRotation();
 	int width = imp.getWidth();
 	int height = imp.getHeight();
@@ -923,7 +932,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public String toString() {
+	@Override
+    public String toString() {
 		return imp.getTitle();
 	}
 

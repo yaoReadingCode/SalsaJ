@@ -37,44 +37,54 @@ public final class RandomAccessStream extends InputStream {
     }
 
     public int getFilePointer() throws IOException {
-    	if (ras!=null)
-    		return (int)ras.getFilePointer();
-    	else
-        	return (int)pointer;
+    	if (ras!=null) {
+            return (int)ras.getFilePointer();
+        } else {
+            return (int)pointer;
+        }
     }
 
     public long getLongFilePointer() throws IOException {
-    	if (ras!=null)
-    		return ras.getFilePointer();
-    	else
-        	return pointer;
+    	if (ras!=null) {
+            return ras.getFilePointer();
+        } else {
+            return pointer;
+        }
     }
 
+    @Override
     public int read() throws IOException {
-    	if (ras!=null)
-    		return ras.read();
+    	if (ras!=null) {
+            return ras.read();
+        }
         long l = pointer + 1L;
         long l1 = readUntil(l);
         if(l1 >= l) {
             byte abyte0[] = (byte[])data.elementAt((int)(pointer>>BLOCK_SHIFT));
             return abyte0[(int)(pointer++ & BLOCK_MASK)] & 0xff;
-        } else
+        } else {
             return -1;
+        }
     }
 
+    @Override
     public int read(byte[] bytes, int off, int len) throws IOException {
-        if(bytes == null)
+        if(bytes == null) {
             throw new NullPointerException();
-     	if (ras!=null)
-    		return ras.read(bytes, off, len);
-        if(off<0 || len<0 || off+len>bytes.length)
+        }
+     	if (ras!=null) {
+            return ras.read(bytes, off, len);
+        }
+        if(off<0 || len<0 || off+len>bytes.length) {
             throw new IndexOutOfBoundsException();
-        if(len == 0)
+        }
+        if(len == 0) {
             return 0;
+        }
         long l = readUntil(pointer+len);
-        if (l<=pointer)
+        if (l<=pointer) {
             return -1;
-        else {
+        } else {
             byte abyte1[] = (byte[])data.elementAt((int)(pointer >> BLOCK_SHIFT));
             int k = Math.min(len, BLOCK_SIZE - (int)(pointer & BLOCK_MASK));
             System.arraycopy(abyte1, (int)(pointer & BLOCK_MASK), bytes, off, k);
@@ -91,16 +101,20 @@ public final class RandomAccessStream extends InputStream {
    		int read = 0;
         do {
             int l = read(bytes, read, len - read);
-            if(l < 0) break;
+            if(l < 0) {
+                break;
+            }
             read += l;
         } while (read<len);
     }
 
     private long readUntil(long l) throws IOException {
-        if(l<length)
+        if(l<length) {
             return l;
-        if(foundEOS)
+        }
+        if(foundEOS) {
             return length;
+        }
         int i = (int)(l >> BLOCK_SHIFT);
         int j = length >> BLOCK_SHIFT;
         for(int k = j; k <= i; k++) {
@@ -127,19 +141,21 @@ public final class RandomAccessStream extends InputStream {
     public void seek(long loc) throws IOException {
     	if (ras!=null)
     		{ras.seek(loc); return;}
-        if(loc < 0)
-			pointer = 0L;
-        else
+        if(loc < 0) {
+            pointer = 0L;
+        } else {
             pointer = loc;
+        }
     }
 
     public void seek(int loc) throws IOException {
     	if (ras!=null)
-    		{ras.seek(loc&0xffffffff); return;}
-        if(loc < 0)
-			pointer = 0L;
-        else
+    		{ras.seek(loc); return;}
+        if(loc < 0) {
+            pointer = 0L;
+        } else {
             pointer = loc;
+        }
     }
 
     public final int readInt() throws IOException {
@@ -147,10 +163,11 @@ public final class RandomAccessStream extends InputStream {
         int j = read();
         int k = read();
         int l = read();
-        if((i | j | k | l) < 0)
+        if((i | j | k | l) < 0) {
             throw new EOFException();
-        else
+        } else {
             return (i << 24) + (j << 16) + (k << 8) + l;
+        }
     }
 
     public final long readLong() throws IOException {
@@ -164,21 +181,23 @@ public final class RandomAccessStream extends InputStream {
     public final short readShort() throws IOException {
         int i = read();
         int j = read();
-        if((i | j) < 0)
+        if((i | j) < 0) {
             throw new EOFException();
-        else
+        } else {
             return (short)((i << 8) + j);
+        }
     }
 
     public final float readFloat() throws IOException {
         return Float.intBitsToFloat(readInt());
     }
     
+    @Override
     public void close() throws IOException {
 		//if (ij.IJ.debugMode) ij.IJ.log("close: "+(data!=null?""+data.size():""));
- 		if (ras!=null)
- 			ras.close();
- 		else {
+ 		if (ras!=null) {
+            ras.close();
+        } else {
  			data.removeAllElements();
     		src.close();
     	}

@@ -3,7 +3,7 @@ import ij.*;
 import ij.gui.GenericDialog;
 import ij.gui.DialogListener;
 import ij.process.*;
-import ij.measure.Calibration;
+
 import java.awt.*;
 
 /** This plug-in filter uses convolution with a Gaussian function for smoothing.
@@ -52,24 +52,27 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
      * @return Code describing supported formats etc.
      * (see ij.plugin.filter.PlugInFilter & ExtendedPlugInFilter)
      */
+    @Override
     public int setup(String arg, ImagePlus imp) {
         this.imp = imp;
         if (imp!=null && imp.getRoi()!=null) {
             Rectangle roiRect = imp.getRoi().getBoundingRect();
-            if (roiRect.y > 0 || roiRect.y+roiRect.height < imp.getDimensions()[1])
+            if (roiRect.y > 0 || roiRect.y+roiRect.height < imp.getDimensions()[1]) {
                 flags |= SNAPSHOT;                  // snapshot for pixels above and/or below roi rectangle
+            }
         }
         return flags;
     }
     
     /** Ask the user for the parameters
      */
+    @Override
     public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
         String options = Macro.getOptions();
         boolean oldMacro = false;
 		nChannels = imp.getProcessor().getNChannels();
         if  (options!=null) {
-            if (options.indexOf("radius=") >= 0) {  // ensure compatibility with old macros
+            if (options.contains("radius=")) {  // ensure compatibility with old macros
                 oldMacro = true;                    // specifying "radius=", not "sigma=
                 Macro.setOptions(options.replaceAll("radius=", "sigma="));
             }
@@ -77,27 +80,35 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
         GenericDialog gd = new GenericDialog(command);
         sigma = Math.abs(sigma);
         gd.addNumericField("Sigma (Radius)", sigma, 2);
-        if (imp.getCalibration()!=null && !imp.getCalibration().getUnits().equals("pixels")) {
+        if (imp.getCalibration()!=null && !"pixels".equals(imp.getCalibration().getUnits())) {
             hasScale = true;
             gd.addCheckbox("Scaled Units ("+imp.getCalibration().getUnits()+")", sigmaScaled);
-        } else
+        } else {
             sigmaScaled = false;
+        }
         gd.addPreviewCheckbox(pfr);
         gd.addDialogListener(this);
         gd.showDialog();                    // input by the user (or macro) happens here
-        if (gd.wasCanceled()) return DONE;
-        if (oldMacro) sigma /= 2.5;         // for old macros, "radius" was 2.5 sigma
+        if (gd.wasCanceled()) {
+            return DONE;
+        }
+        if (oldMacro) {
+            sigma /= 2.5;         // for old macros, "radius" was 2.5 sigma
+        }
         IJ.register(this.getClass());       // protect static class variables (parameters) from garbage collection
         return IJ.setupDialog(imp, flags);  // ask whether to process all slices of stack (if a stack)
     }
 
     /** Listener to modifications of the input fields of the dialog */
+    @Override
     public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
         sigma = gd.getNextNumber();
-        if (sigma < 0 || gd.invalidNumber())
+        if (sigma < 0 || gd.invalidNumber()) {
             return false;
-        if (hasScale)
+        }
+        if (hasScale) {
             sigmaScaled = gd.getNextBoolean();
+        }
         return true;
     }
 
@@ -107,6 +118,7 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
      *  Otherwise, the caller should set nPasses to the number of 1-dimensional
      *  filter operations required.
      */
+    @Override
     public void setNPasses(int nPasses) {
         this.nPasses = 2 * nChannels * nPasses;
         pass = 0;
@@ -116,6 +128,7 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
      * @param ip The image subject to filtering. It must have a valid snapshot if
      * the height of the roi is less than the full image height.
      */
+    @Override
     public void run(ImageProcessor ip) {
         double sigmaX = sigmaScaled ? sigma/imp.getCalibration().pixelWidth : sigma;
         double sigmaY = sigmaScaled ? sigma/imp.getCalibration().pixelHeight : sigma;
@@ -130,8 +143,9 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
      *  than the previous ImageJ code */
     public boolean blur(ImageProcessor ip, double radius) {
         Rectangle roi = ip.getRoi();
-        if (roi.height!=ip.getHeight() && ip.getMask()==null)
+        if (roi.height!=ip.getHeight() && ip.getMask()==null) {
             ip.snapshot();              // a snapshot is needed for out-of-Rectangle pixels
+        }
         blurGaussian(ip, 0.4*radius, 0.4*radius, 0.01);
         return true;
     }
@@ -145,19 +159,24 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
      *                 accuracy needs slightly more computing time.
      */
     public void blurGaussian(ImageProcessor ip, double sigmaX, double sigmaY, double accuracy) {
-    	if (nPasses<=1)
-    		nPasses = ip.getNChannels() * (sigmaX>0 && sigmaY>0 ? 2 : 1);
+    	if (nPasses<=1) {
+            nPasses = ip.getNChannels() * (sigmaX>0 && sigmaY>0 ? 2 : 1);
+        }
         FloatProcessor fp = null;
         for (int i=0; i<ip.getNChannels(); i++) {
             fp = ip.toFloat(i, fp);
-            if (Thread.currentThread().isInterrupted()) return; // interruption for new parameters during preview?
+            if (Thread.currentThread().isInterrupted()) {
+                return; // interruption for new parameters during preview?
+            }
             blurFloat(fp, sigmaX, sigmaY, accuracy);
-            if (Thread.currentThread().isInterrupted()) return;
+            if (Thread.currentThread().isInterrupted()) {
+                return;
+            }
             ip.setPixels(i, fp);
         }
-        if (ip.getRoi().height!=ip.getHeight() && sigmaX>0 && sigmaY>0)
+        if (ip.getRoi().height!=ip.getHeight() && sigmaX>0 && sigmaY>0) {
             resetOutOfRoi(ip, (int)Math.ceil(5*sigmaY)); // reset out-of-Rectangle pixels above and below roi
-        return;
+        }
     }
 
     /** Gaussian Filtering of a FloatProcessor. This method does NOT include
@@ -171,12 +190,15 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
      *                  accuracy needs slightly more computing time.
      */
     public void blurFloat(FloatProcessor ip, double sigmaX, double sigmaY, double accuracy) {
-        if (sigmaX > 0)
+        if (sigmaX > 0) {
             blur1Direction(ip, sigmaX, accuracy, true, (int)Math.ceil(5*sigmaY));
-        if (Thread.currentThread().isInterrupted()) return; // interruption for new parameters during preview?
-        if (sigmaY > 0)
+        }
+        if (Thread.currentThread().isInterrupted()) {
+            return; // interruption for new parameters during preview?
+        }
+        if (sigmaY > 0) {
             blur1Direction(ip, sigmaY, accuracy, false, 0);
-        return;
+        }
     }
 
     /** Blur an image in one direction (x or y) by a Gaussian.
@@ -199,19 +221,27 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
         int pointInc = xDirection ? 1 : width;      //increment of the pixels array index to the next point in a line
         int lineInc = xDirection ? width : 1;       //increment of the pixels array index to the next line
         int lineFrom = (xDirection ? roi.y : roi.x) - extraLines;  //the first line to process
-        if (lineFrom < 0) lineFrom = 0;
+        if (lineFrom < 0) {
+            lineFrom = 0;
+        }
         int lineTo = (xDirection ? roi.y+roi.height : roi.x+roi.width) + extraLines; //the last line+1 to process
-        if (lineTo > (xDirection ? height:width)) lineTo = (xDirection ? height:width);
+        if (lineTo > (xDirection ? height:width)) {
+            lineTo = (xDirection ? height:width);
+        }
         int writeFrom = xDirection? roi.x : roi.y;  //first point of a line that needs to be written
         int writeTo = xDirection ? roi.x+roi.width : roi.y+roi.height;
         int inc = Math.max((lineTo-lineFrom)/(100/(nPasses>0?nPasses:1)+1),20);
         pass++;
-        if (pass>nPasses) pass =1;
+        if (pass>nPasses) {
+            pass =1;
+        }
         Thread thread = Thread.currentThread();     // needed to check for interrupted state
         if (sigma > 2*MIN_DOWNSCALED_SIGMA + 0.5) {
              /* large radius (sigma): scale down, then convolve, then scale up */
             int reduceBy = (int)Math.floor(sigma/MIN_DOWNSCALED_SIGMA); //downscale by this factor
-            if (reduceBy > length) reduceBy = length;
+            if (reduceBy > length) {
+                reduceBy = length;
+            }
             /* Downscale gives std devation sigma = 1/sqrt(3); upscale gives sigma = 1/2. (in downscaled pixels) */
             /* All sigma^2 values add to full sigma^2  */
             double sigmaGauss = Math.sqrt(sigma*sigma/(reduceBy*reduceBy) - 1./3. - 1./4.);
@@ -231,7 +261,9 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
             for (int line=lineFrom; line<lineTo; line++, pixel0+=lineInc) {
                 if (line%inc==0) {
                     showProgress((double)(line-lineFrom)/(lineTo-lineFrom));
-                    if (thread.isInterrupted()) return; // interruption for new parameters during preview?
+                    if (thread.isInterrupted()) {
+                        return; // interruption for new parameters during preview?
+                    }
                 }
                 downscaleLine(pixels, cache1, downscaleKernel, reduceBy, pixel0, unscaled0, length, pointInc, newLength);
                 convolveLine(cache1, cache2, gaussKernel, 0, newLength, 1, newLength-1, 0, 1);
@@ -248,15 +280,17 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
             for (int line=lineFrom; line<lineTo; line++, pixel0+=lineInc) {
                 if (line%inc==0) {
                     showProgress((double)(line-lineFrom)/(lineTo-lineFrom));
-                    if (thread.isInterrupted()) return; // interruption for new parameters during preview?
+                    if (thread.isInterrupted()) {
+                        return; // interruption for new parameters during preview?
+                    }
                 }
                 int p = pixel0 + readFrom*pointInc;
-                for (int i=readFrom; i<readTo; i++ ,p+=pointInc)
+                for (int i=readFrom; i<readTo; i++ ,p+=pointInc) {
                     cache[i] = pixels[p];
+                }
                 convolveLine(cache, pixels, gaussKernel, readFrom, readTo, writeFrom, writeTo, pixel0, pointInc);
             }
         }
-        return;
     }
 
     /** Scale a line (row or column of a FloatProcessor or part thereof)
@@ -389,11 +423,17 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
         for (; i<firstPart; i++,p+=pointInc) {  //while the sum would include pixels < 0
             float result = input[i]*kern0;
             result += kernSum[i]*first;
-            if (i+kRadius>length) result += kernSum[length-i-1]*last;
+            if (i+kRadius>length) {
+                result += kernSum[length-i-1]*last;
+            }
             for (int k=1; k<kRadius; k++) {
                 float v = 0;
-                if (i-k >= 0) v += input[i-k];
-                if (i+k<length) v+= input[i+k];
+                if (i-k >= 0) {
+                    v += input[i-k];
+                }
+                if (i+k<length) {
+                    v+= input[i+k];
+                }
                 result += kern[k] * v;
             }
             pixels[p] = result;
@@ -401,18 +441,27 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
         int iEndInside = length-kRadius<writeTo ? length-kRadius : writeTo;
         for (;i<iEndInside;i++,p+=pointInc) {   //while only pixels within the line are be addressed (the easy case)
             float result = input[i]*kern0;
-            for (int k=1; k<kRadius; k++)
+            for (int k=1; k<kRadius; k++) {
                 result += kern[k] * (input[i-k] + input[i+k]);
+            }
             pixels[p] = result;
         }
         for (; i<writeTo; i++,p+=pointInc) {    //while the sum would include pixels >= length 
             float result = input[i]*kern0;
-            if (i<kRadius) result += kernSum[i]*first;
-            if (i+kRadius>=length) result += kernSum[length-i-1]*last;
+            if (i<kRadius) {
+                result += kernSum[i]*first;
+            }
+            if (i+kRadius>=length) {
+                result += kernSum[length-i-1]*last;
+            }
             for (int k=1; k<kRadius; k++) {
                 float v = 0;
-                if (i-k >= 0) v += input[i-k];
-                if (i+k<length) v+= input[i+k];
+                if (i-k >= 0) {
+                    v += input[i-k];
+                }
+                if (i+k<length) {
+                    v+= input[i+k];
+                }
                 result += kern[k] * v;
             }
             pixels[p] = result;
@@ -446,32 +495,42 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
      */
     public float[][] makeGaussianKernel(double sigma, double accuracy, int maxRadius) {
         int kRadius = (int)Math.ceil(sigma*Math.sqrt(-2*Math.log(accuracy)))+1;
-        if (maxRadius < 50) maxRadius = 50;         // too small maxRadius would result in inaccurate sum.
-        if (kRadius > maxRadius) kRadius = maxRadius;
+        if (maxRadius < 50) {
+            maxRadius = 50;         // too small maxRadius would result in inaccurate sum.
+        }
+        if (kRadius > maxRadius) {
+            kRadius = maxRadius;
+        }
         float[][] kernel = new float[2][kRadius];
         for (int i=0; i<kRadius; i++)               // Gaussian function
+        {
             kernel[0][i] = (float)(Math.exp(-0.5*i*i/sigma/sigma));
+        }
         if (kRadius < maxRadius && kRadius > 3) {   // edge correction
             double sqrtSlope = Double.MAX_VALUE;
             int r = kRadius;
             while (r > kRadius/2) {
                 r--;
                 double a = Math.sqrt(kernel[0][r])/(kRadius-r);
-                if (a < sqrtSlope)
+                if (a < sqrtSlope) {
                     sqrtSlope = a;
-                else
+                } else {
                     break;
+                }
             }
-            for (int r1 = r+2; r1 < kRadius; r1++)
+            for (int r1 = r+2; r1 < kRadius; r1++) {
                 kernel[0][r1] = (float)((kRadius-r1)*(kRadius-r1)*sqrtSlope*sqrtSlope);
+            }
         }
         double sum;                                 // sum over all kernel elements for normalization
         if (kRadius < maxRadius) {
             sum = kernel[0][0];
-            for (int i=1; i<kRadius; i++)
+            for (int i=1; i<kRadius; i++) {
                 sum += 2*kernel[0][i];
-        } else
+            }
+        } else {
             sum = sigma * Math.sqrt(2*Math.PI);
+        }
         
         double rsum = 0.5 + 0.5*kernel[0][0]/sum;
         for (int i=0; i<kRadius; i++) {
@@ -498,13 +557,19 @@ public class GaussianBlur implements ExtendedPlugInFilter, DialogListener {
         Object pixels = ip.getPixels();
         Object snapshot = ip.getSnapshotPixels();
         int y0 = roi.y-radius;              // the first line that should be reset
-        if (y0<0) y0 = 0;
-        for (int y=y0,p=width*y+roi.x; y<roi.y; y++,p+=width)
+        if (y0<0) {
+            y0 = 0;
+        }
+        for (int y=y0,p=width*y+roi.x; y<roi.y; y++,p+=width) {
             System.arraycopy(snapshot, p, pixels, p, roi.width);
+        }
         int yEnd = roi.y+roi.height+radius; // the last line + 1 that should be reset
-        if (yEnd > height) yEnd = height;
-        for (int y=roi.y+roi.height,p=width*y+roi.x; y<yEnd; y++,p+=width)
+        if (yEnd > height) {
+            yEnd = height;
+        }
+        for (int y=roi.y+roi.height,p=width*y+roi.x; y<yEnd; y++,p+=width) {
             System.arraycopy(snapshot, p, pixels, p, roi.width);
+        }
     }
     
     void showProgress(double percent) {

@@ -1,6 +1,4 @@
 package ij.macro;
-import ij.IJ;
-import java.util.ArrayList;
 
 public class ExtensionDescriptor {
   public String name;
@@ -15,9 +13,7 @@ public class ExtensionDescriptor {
   
   public static ExtensionDescriptor newDescriptor(String theName, MacroExtension theHandler, int[] types) {
     int[] argTypes = new int[types.length];
-    for (int i=0; i < types.length; ++i) {
-      argTypes[i] = types[i];
-    }
+      System.arraycopy(types, 0, argTypes, 0, types.length);
     
     return new ExtensionDescriptor(theName, argTypes, theHandler);
   }
@@ -45,7 +41,7 @@ public class ExtensionDescriptor {
   public static ExtensionDescriptor newDescriptor(String theName, MacroExtension theHandler, Integer[] types) {
     int[] argTypes = new int[types.length];
     for (int i=0; i < types.length; ++i) {
-      argTypes[i] = types[i].intValue();
+      argTypes[i] = types[i];
     }
     
     return new ExtensionDescriptor(theName, argTypes, theHandler);
@@ -70,24 +66,35 @@ public class ExtensionDescriptor {
       
       int rawType = getRawType(argTypes[i]);
       
-      if (args.length < i)
-        return optional ? true : false;
+      if (args.length < i) {
+          return optional ? true : false;
+      }
       
       switch(rawType) {
       case MacroExtension.ARG_STRING:
         if (output) {
-          if (! (args[i] instanceof String[])) return false;
+          if (! (args[i] instanceof String[])) {
+              return false;
+          }
         } else {
-          if (! (args[i] instanceof String)) return false;
+          if (! (args[i] instanceof String)) {
+              return false;
+          }
         }
       case MacroExtension.ARG_NUMBER:
         if (output) {
-          if (! (args[i] instanceof Double[])) return false;
+          if (! (args[i] instanceof Double[])) {
+              return false;
+          }
         } else {
-          if (!(args[i] instanceof Double)) return false;
+          if (!(args[i] instanceof Double)) {
+              return false;
+          }
         }
       case MacroExtension.ARG_ARRAY:
-        if (!(args[i] instanceof Object[])) return false;
+        if (!(args[i] instanceof Object[])) {
+            return false;
+        }
       }
     }
     
@@ -129,7 +136,7 @@ public class ExtensionDescriptor {
         oArray[i] = array[i].getString();
         break;
       case Variable.VALUE:
-        oArray[i] = new Double( array[i].getValue() );
+        oArray[i] = array[i].getValue();
         break;
       case Variable.ARRAY:
         oArray[i] = convertArray(array[i].getArray());
@@ -176,8 +183,9 @@ public class ExtensionDescriptor {
       interp.getToken();
     } while (interp.token == ',');
     
-    if (interp.token!=')')
-      interp.error("')' expected");
+    if (interp.token!=')') {
+        interp.error("')' expected");
+    }
 
     if (i < argTypes.length && !isOptionalArg(argTypes[i])) {
       interp.error("too few arguments, expected "+argTypes.length+" but found "+i);
@@ -191,8 +199,9 @@ public class ExtensionDescriptor {
     int type = getRawType(rawType);
     boolean output = isOutputArg(rawType);
 
-    if (var == null)
-      return null;
+    if (var == null) {
+        return null;
+    }
 
     switch (type) {
     case MacroExtension.ARG_STRING:
@@ -211,9 +220,9 @@ public class ExtensionDescriptor {
         return null;
       }
       if (output) {
-        return new Double[] { new Double(var.getValue()) };
+        return new Double[] {var.getValue()};
       } else {
-        return new Double( var.getValue() );
+        return var.getValue();
       }
     case MacroExtension.ARG_ARRAY:
       if (var.getType() != Variable.ARRAY) {
@@ -233,7 +242,7 @@ public class ExtensionDescriptor {
       variable.setString(str[0]);
     } else if (object instanceof Double[]) {
       Double[] dbl = (Double[]) object;
-      variable.setValue(dbl[0].doubleValue());
+      variable.setValue(dbl[0]);
     } else if (object instanceof Object[]) {
       Object[] arr = (Object[]) object;
       Variable[] vArr = new Variable[arr.length];
@@ -259,11 +268,10 @@ public class ExtensionDescriptor {
     if (next != ')') {
       vArgs = parseArgumentList(func);
     }
-    
-    for (int i=0; i < vArgs.length; ++i) {
-      Variable v = vArgs[i];
-      System.err.println("variable is "+(v!= null?v.toString():"(null)"));
-    }
+
+      for (Variable v : vArgs) {
+          System.err.println("variable is " + (v != null ? v.toString() : "(null)"));
+      }
     
     Object[] args = new Object[ argTypes.length ];
     // check variable types...
@@ -281,7 +289,9 @@ public class ExtensionDescriptor {
     
     String retVal = handler.handleExtension(name, args);
     for (int i=0; i < argTypes.length; ++i) {
-      if (i >= vArgs.length) break;
+      if (i >= vArgs.length) {
+          break;
+      }
       if (ExtensionDescriptor.isOutputArg(argTypes[i])) {
         ExtensionDescriptor.convertOutputType(vArgs[i], args[i]);
       }

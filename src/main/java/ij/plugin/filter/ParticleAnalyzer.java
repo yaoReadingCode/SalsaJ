@@ -8,7 +8,6 @@ import ij.process.*;
 import ij.measure.*;
 import ij.text.*;
 import ij.plugin.filter.Analyzer;
-import ij.plugin.frame.Recorder;
 import ij.plugin.frame.RoiManager;
 import ij.util.Tools;
 
@@ -195,8 +194,8 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 		}
 		this.minSize = minSize;
 		this.maxSize = maxSize;
-		this.minCircularity = minCirc;
-		this.maxCircularity = maxCirc;
+		minCircularity = minCirc;
+		maxCircularity = maxCirc;
 		slice = 1;
 	}
 
@@ -231,7 +230,8 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.arg = arg;
 		this.imp = imp;
 		IJ.register(ParticleAnalyzer.class);
@@ -260,7 +260,8 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		if (canceled) {
 			return;
 		}
@@ -303,7 +304,7 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 		}
 		options = staticOptions;
 	String unit = cal.getUnit();
-		if (unit.equals("inch")) {
+		if ("inch".equals(unit)) {
 			unit = "pixel";
 			unitSquared = 1.0;
 		}
@@ -318,19 +319,19 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 			places = 2;
 		}
 	String minStr = IJ.d2s(cmin, places);
-		if (minStr.indexOf("-") != -1) {
+		if (minStr.contains("-")) {
 			for (int i = places; i <= 6; i++) {
 				minStr = IJ.d2s(cmin, i);
-				if (minStr.indexOf("-") == -1) {
+				if (!minStr.contains("-")) {
 					break;
 				}
 			}
 		}
 	String maxStr = IJ.d2s(cmax, places);
-		if (maxStr.indexOf("-") != -1) {
+		if (maxStr.contains("-")) {
 			for (int i = places; i <= 6; i++) {
 				maxStr = IJ.d2s(cmax, i);
-				if (maxStr.indexOf("-") == -1) {
+				if (!maxStr.contains("-")) {
 					break;
 				}
 			}
@@ -673,7 +674,7 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 	String label = imp.getTitle();
 		if (slices > 1) {
 			label = imp.getStack().getShortSliceLabel(slice);
-			label = label != null && !label.equals("") ? label : "" + slice;
+			label = label != null && !"".equals(label) ? label : "" + slice;
 		}
 	String aLine;
 		if (areas != null) {
@@ -810,23 +811,27 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 		} else {
 			level1 = t1;
 			level2 = t2;
-			if (imageType == BYTE) {
-				if (level1 > 0) {
-					fillColor = 0;
-				} else if (level2 < 255) {
-					fillColor = 255;
-				}
-			} else if (imageType == SHORT) {
-				if (level1 > 0) {
-					fillColor = 0;
-				} else if (level2 < 65535) {
-					fillColor = 65535;
-				}
-			} else if (imageType == FLOAT) {
-				fillColor = -Float.MAX_VALUE;
-			} else {
-				return false;
-			}
+            switch (imageType) {
+                case BYTE:
+                    if (level1 > 0) {
+                        fillColor = 0;
+                    } else if (level2 < 255) {
+                        fillColor = 255;
+                    }
+                    break;
+                case SHORT:
+                    if (level1 > 0) {
+                        fillColor = 0;
+                    } else if (level2 < 65535) {
+                        fillColor = 65535;
+                    }
+                    break;
+                case FLOAT:
+                    fillColor = -Float.MAX_VALUE;
+                    break;
+                default:
+                    return false;
+            }
 		}
 		imageType2 = imageType;
 		if (redirectIP != null) {

@@ -5,9 +5,9 @@ import ij.gui.*;
 import ij.plugin.frame.Recorder;
 import java.awt.*;
 import java.awt.image.*;
-import ij.util.*;
+
 import ij.measure.*;
-import java.util.Vector;
+
 import java.awt.event.*;
 
 public class LUT_Editor implements PlugIn, ActionListener{
@@ -15,6 +15,7 @@ public class LUT_Editor implements PlugIn, ActionListener{
     Button openButton, saveButton, resizeButton, invertButton;
     ColorPanel colorPanel;
 
+    @Override
     public void run(String args) {
      	ImagePlus imp = WindowManager.getCurrentImage();
     	if (imp==null) {
@@ -55,26 +56,28 @@ public class LUT_Editor implements PlugIn, ActionListener{
 		Recorder.record = recording;
         if (gd.wasCanceled()){
             colorPanel.cancelLUT();
-            return;
-        } else
-        	colorPanel.applyLUT();
+        } else {
+            colorPanel.applyLUT();
+        }
     }
 
     void save() {
     	try {IJ.run("LUT...");} // File>Save As>Lut...
-    	catch(RuntimeException e) {}
+    	catch(RuntimeException ignored) {}
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source==openButton)
+        if (source==openButton) {
             colorPanel.open();
-        else if (source==saveButton)
+        } else if (source==saveButton) {
             save();
-        else if (source==resizeButton)
+        } else if (source==resizeButton) {
             colorPanel.resize();
-        else if (source==invertButton)
+        } else if (source==invertButton) {
             colorPanel.invert();
+        }
     }
 }
 
@@ -117,23 +120,25 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
         cm.getBlues(blues);
         addMouseListener(this);
         addMouseMotionListener(this);
-        for(int index  = 0; index < mapSize; index++)
+        for(int index  = 0; index < mapSize; index++) {
             c[index] = new Color(reds[index]&255, greens[index]&255, blues[index]&255);
+        }
     }
     
+    @Override
     public Dimension getPreferredSize()  {
         return new Dimension(columns*entryWidth, rows*entryHeight);
     }
     
+    @Override
     public Dimension getMinimumSize() {
         return new Dimension(columns*entryWidth, rows*entryHeight);
     }
     
     int getMouseZone(int x, int y){
-        int horizontal = (int)x/entryWidth;
-        int vertical = (int)y/entryHeight;
-        int index = (columns*vertical + horizontal);
-        return index;
+        int horizontal = x /entryWidth;
+        int vertical = y /entryHeight;
+        return (columns*vertical + horizontal);
     }
     
     public void colorRamp() {
@@ -146,31 +151,37 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
         int start = (byte)c[initialC].getRed()&255;
         int end = (byte)c[finalC].getRed()&255;
         float rstep = (end-start)/difference;
-        for(int index =  initialC;  index <= finalC; index++)
+        for(int index =  initialC;  index <= finalC; index++) {
             reds[index] = (byte)(start+ (index-initialC)*rstep);
+        }
         
         start = (byte)c[initialC].getGreen()&255;
         end = (byte)c[finalC].getGreen()&255;
         float gstep = (end-start)/difference;
-            for(int index = initialC; index <= finalC; index++)
+            for(int index = initialC; index <= finalC; index++) {
                 greens[index] = (byte)(start + (index-initialC)*gstep);
+            }
         
         start = (byte)c[initialC].getBlue()&255;
         end = (byte)c[finalC].getBlue()&255;
         float bstep = (end-start)/difference;
-        for(int index = initialC; index <= finalC; index++)
+        for(int index = initialC; index <= finalC; index++) {
             blues[index] = (byte)(start + (index-initialC)*bstep);
-        for (int index = initialC; index <= finalC; index++)
+        }
+        for (int index = initialC; index <= finalC; index++) {
             c[index] = new Color(reds[index]&255, greens[index]&255, blues[index]&255);
+        }
         repaint();
     }
 
+    @Override
     public void mousePressed(MouseEvent e){
         x = (e.getX());
         y = (e.getY());
         initialC = getMouseZone(x,y);
     }
 
+    @Override
     public void mouseReleased(MouseEvent e){
         x = (e.getX());
         y = (e.getY());
@@ -179,12 +190,15 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
     		initialC = finalC = -1;
     		return;
         }
-        if(initialC>=mapSize)
+        if(initialC>=mapSize) {
             initialC = mapSize-1;
-        if(finalC>=mapSize)
+        }
+        if(finalC>=mapSize) {
             finalC = mapSize-1;
-        if(finalC<0)
+        }
+        if(finalC<0) {
             finalC = 0;
+        }
         if (initialC == finalC) {
             b = c[finalC];
             ColorChooser cc = new ColorChooser("Color at Entry " + (finalC) , c[finalC] ,  false);
@@ -216,10 +230,14 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
     applyLUT();
     }
 
+    @Override
     public void mouseClicked(MouseEvent e){}
+    @Override
     public void mouseEntered(MouseEvent e){}
+    @Override
     public void mouseExited(MouseEvent e){}
 
+    @Override
     public void mouseDragged(MouseEvent e){
         x = (e.getX());
         y = (e.getY());
@@ -227,6 +245,7 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
         repaint();
     }
 
+    @Override
     public void mouseMoved(MouseEvent e) {
         x = (e.getX());
         y = (e.getY());
@@ -236,26 +255,29 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
            int green = greens[entry]&255;
            int blue = blues[entry]&255;
            IJ.showStatus("index=" + entry + ", color=" + red + "," + green + "," + blue);
-        } else
-           IJ.showStatus("");
+        } else {
+            IJ.showStatus("");
+        }
     }
 
     void open() {
     	try {IJ.run("LUT... ");} // File>Import>Lut...
-    	catch(RuntimeException e) {}
+    	catch(RuntimeException ignored) {}
         updateLut = true;
         repaint();
    }
 
     void updateLut() {
         IndexColorModel cm = (IndexColorModel)imp.getChannelProcessor().getColorModel();
-        if (mapSize == 0)
-             return;
+        if (mapSize == 0) {
+            return;
+        }
         cm.getReds(reds);
         cm.getGreens(greens);
         cm.getBlues(blues);
-        for(int i=0; i<mapSize; i++)
+        for(int i=0; i<mapSize; i++) {
             c[i] = new Color(reds[i]&255, greens[i]&255, blues[i]&255);
+        }
    }
 
     void invert() {
@@ -268,8 +290,9 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
 			blues2[i] = (byte)(blues[mapSize-i-1]&255);
 		}
         reds=reds2; greens=greens2; blues=blues2;
-        for(int i=0; i<mapSize; i++)
+        for(int i=0; i<mapSize; i++) {
             c[i] = new Color(reds[i]&255, greens[i]&255, blues[i]&255);
+        }
         applyLUT();
         repaint();
     }
@@ -284,26 +307,32 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
             return;
         }
         int newSize = (int)sgd.getNextNumber();
-        if (newSize<2) newSize = 2;
-        if (newSize>256) newSize =256;
+        if (newSize<2) {
+            newSize = 2;
+        }
+        if (newSize>256) {
+            newSize =256;
+        }
         scaleMethod = sgd.getNextChoice();
         scale(reds, greens, blues, newSize);
         mapSize = newSize;
-        for(int i=0; i<mapSize; i++)
+        for(int i=0; i<mapSize; i++) {
             c[i] = new Color(reds[i]&255, greens[i]&255, blues[i]&255);
+        }
         applyLUT();
         repaint();
     }
 
     void scale(byte[] reds, byte[] greens, byte[] blues, int newSize) {
-        if (newSize==mapSize)
+        if (newSize==mapSize) {
             return;
-        else if (newSize<mapSize || scaleMethod.equals(choices[0]))
+        } else if (newSize<mapSize || scaleMethod.equals(choices[0])) {
             scaleUsingReplication(reds, greens, blues, newSize);
-        else if (scaleMethod.equals(choices[1]))
+        } else if (scaleMethod.equals(choices[1])) {
             scaleUsingInterpolation(reds, greens, blues, newSize);
-        else
-             scaleUsingSplineFitting(reds, greens, blues, newSize);
+        } else {
+            scaleUsingSplineFitting(reds, greens, blues, newSize);
+        }
     }
 
     void scaleUsingReplication(byte[] reds, byte[] greens, byte[] blues, int newSize) {
@@ -338,7 +367,9 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
         for (int i=0; i<newSize; i++) {
             i1 = (int)(i*scale);
             i2 = i1+1;
-            if (i2==mapSize) i2 = mapSize-1;
+            if (i2==mapSize) {
+                i2 = mapSize-1;
+            }
             fraction = i*scale - i1;
             //IJ.log(i+" "+i1+" "+i2+" "+fraction+" "+mapSize+" "+newSize);
             reds[i] = (byte)((1.0-fraction)*r[i1] + fraction*r[i2]);
@@ -367,17 +398,36 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
         SplineFitter sfBlues = new SplineFitter(xValues, blues2, mapSize);
         for(int i = 0; i < newSize; i++) {
              double v = Math.round(sfReds.evalSpline(xValues, reds2, mapSize, i));
-             if (v<0.0) v=0.0; if (v>255.0) v=255.0; reds[i] = (byte)v;
+             if (v<0.0) {
+                 v=0.0;
+             }
+            if (v>255.0) {
+                v=255.0;
+            }
+            reds[i] = (byte)v;
              v = Math.round(sfGreens.evalSpline(xValues, greens2, mapSize, i));
-             if (v<0.0) v=0.0; if (v>255.0) v=255.0; greens[i] = (byte)v;
+             if (v<0.0) {
+                 v=0.0;
+             }
+            if (v>255.0) {
+                v=255.0;
+            }
+            greens[i] = (byte)v;
              v = Math.round(sfBlues.evalSpline(xValues, blues2, mapSize, i));
-             if (v<0.0) v=0.0; if (v>255.0) v=255.0; blues[i] = (byte)v;
+             if (v<0.0) {
+                 v=0.0;
+             }
+            if (v>255.0) {
+                v=255.0;
+            }
+            blues[i] = (byte)v;
         }
      }
 
     public void cancelLUT() {
-        if (mapSize == 0)
-             return;
+        if (mapSize == 0) {
+            return;
+        }
         origin.getReds(reds);
         origin.getGreens(greens);
         origin.getBlues(blues);
@@ -401,15 +451,18 @@ class ColorPanel extends Panel implements MouseListener, MouseMotionListener{
         ColorModel cm = new IndexColorModel(8, 256, reds2, greens2, blues2);
         ImageProcessor ip = imp.getChannelProcessor();
         ip.setColorModel(cm);
-        if (imp.getStackSize()>1 && !(imp instanceof CompositeImage))
+        if (imp.getStackSize()>1 && !(imp instanceof CompositeImage)) {
             imp.getStack().setColorModel(cm);
+        }
         imp.updateAndDraw();
     }
 
+    @Override
     public void update(Graphics g) {
         paint(g);
     }
 
+    @Override
     public void paint(Graphics g) {
         if (updateLut) {
             updateLut();

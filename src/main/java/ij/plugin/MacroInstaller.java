@@ -5,10 +5,7 @@ import java.awt.event.*;
 import ij.*;
 import ij.gui.*;
 import ij.macro.*;
-import ij.text.*;
-import ij.util.Tools;
 import ij.io.*;
-import ij.macro.MacroConstants;
 import ij.plugin.frame.Recorder;
 import java.util.*;
 
@@ -57,14 +54,15 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 	 *
 	 *@param  path  Description of the Parameter
 	 */
-	public void run(String path) {
-		if (path == null || path.equals("")) {
+	@Override
+    public void run(String path) {
+		if (path == null || "".equals(path)) {
 			path = showDialog();
 		}
 		if (path == null) {
 			return;
 		}
-		openingStartupMacrosInEditor = path.indexOf("StartupMacros") != -1;
+		openingStartupMacrosInEditor = path.contains("StartupMacros");
 
 	String text = open(path);
 
@@ -138,19 +136,19 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 					name = symbol.str;
 					macroStarts[count] = i + 2;
 					macroNames[count] = name;
-					if (name.indexOf('-') != -1 && (name.indexOf("Tool") != -1 || name.indexOf("tool") != -1)) {
+					if (name.indexOf('-') != -1 && (name.contains("Tool") || name.contains("tool"))) {
 						Toolbar.getInstance().addMacroTool(name, this, toolCount);
 						toolCount++;
 					} else if (name.startsWith("AutoRun")) {
 						if (autoRunCount == 0 && !openingStartupMacrosInEditor) {
 							new MacroRunner(pgm, macroStarts[count], name, null);
-							if (name.equals("AutoRunAndHide")) {
+							if ("AutoRunAndHide".equals(name)) {
 								autoRunAndHideCount++;
 							}
 						}
 						autoRunCount++;
 						count--;
-					} else if (name.equals("Popup Menu")) {
+					} else if ("Popup Menu".equals(name)) {
 						installPopupMenu(name, pgm);
 					} else if (!name.endsWith("Tool Selected")) {
 						addShortcut(name);
@@ -177,7 +175,7 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 			 */
 			tb.repaint();
 		}
-		this.instance = this;
+		instance = this;
 		if (shortcutsInUse != null && text != null) {
 			//EU_HOU Bundle
 			IJ.showMessage("Install Macros", (inUseCount == 1 ? "This keyboard shortcut is" : "These keyboard shortcuts are")
@@ -305,16 +303,16 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 			return;
 		}
 		popup.removeAll();
-		for (int i = 0; i < commands.length; i++) {
-			if (commands[i].equals("-")) {
-				popup.addSeparator();
-			} else {
-			MenuItem mi = new MenuItem(commands[i]);
+        for (String command : commands) {
+            if ("-".equals(command)) {
+                popup.addSeparator();
+            } else {
+                MenuItem mi = new MenuItem(command);
 
-				mi.addActionListener(this);
-				popup.add(mi);
-			}
-		}
+                mi.addActionListener(this);
+                popup.add(mi);
+            }
+        }
 	}
 
 
@@ -359,8 +357,7 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 		if (len > 1) {
 			shortcut = shortcut.toUpperCase(Locale.US);
 		}
-		;
-		if (len > 3 || (len > 1 && shortcut.charAt(0) != 'F' && shortcut.charAt(0) != 'N')) {
+        if (len > 3 || (len > 1 && shortcut.charAt(0) != 'F' && shortcut.charAt(0) != 'N')) {
 			return;
 		}
 	int code = Menus.convertShortcutToCode(shortcut);
@@ -376,13 +373,13 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 		if (len == 1) {
 		Hashtable macroShortcuts = Menus.getMacroShortcuts();
 
-			macroShortcuts.put(new Integer(code), commandPrefix + name);
+			macroShortcuts.put(code, commandPrefix + name);
 			nShortcuts++;
 			return;
 		}
 	Hashtable shortcuts = Menus.getShortcuts();
 
-		if (shortcuts.get(new Integer(code)) != null) {
+		if (shortcuts.get(code) != null) {
 			if (shortcutsInUse == null) {
 				shortcutsInUse = "\n \n";
 			}
@@ -390,7 +387,7 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 			inUseCount++;
 			return;
 		}
-		shortcuts.put(new Integer(code), commandPrefix + name);
+		shortcuts.put(code, commandPrefix + name);
 		nShortcuts++;
 		//IJ.log("addShortcut3: "+name+"	  "+shortcut+"	  "+code);
 	}
@@ -442,7 +439,7 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 				if (s == null) {
 					break;
 				} else {
-					sb.append(s + "\n");
+					sb.append(s).append("\n");
 				}
 			}
 			r.close();
@@ -472,7 +469,7 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 				return null;
 			}
 		InputStreamReader isr = new InputStreamReader(is);
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		char[] b = new char[8192];
 		int n;
 
@@ -480,7 +477,7 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 				sb.append(b, 0, n);
 			}
 			text = sb.toString();
-		} catch (IOException e) {}
+		} catch (IOException ignored) {}
 		return text;
 	}
 
@@ -623,7 +620,7 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 	 *@param  fileName  The new fileName value
 	 */
 	public void setFileName(String fileName) {
-		this.fileName = fileName;
+		MacroInstaller.fileName = fileName;
 		//EU_HOU Bundle
 		openingStartupMacrosInEditor = fileName.startsWith("StartupMacros");
 	}
@@ -634,14 +631,15 @@ public class MacroInstaller implements PlugIn, MacroConstants, ActionListener {
 	 *
 	 *@param  evt  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent evt) {
+	@Override
+    public void actionPerformed(ActionEvent evt) {
 	String cmd = evt.getActionCommand();
 	MenuItem item = (MenuItem) evt.getSource();
 	MenuContainer parent = item.getParent();
 
 		if (parent instanceof PopupMenu) {
 			for (int i = 0; i < nMacros; i++) {
-				if (macroNames[i].equals("Popup Menu")) {
+				if ("Popup Menu".equals(macroNames[i])) {
 					new MacroRunner(pgm, macroStarts[i], "Popup Menu", cmd);
 					return;
 				}

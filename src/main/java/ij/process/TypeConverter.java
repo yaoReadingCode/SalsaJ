@@ -1,9 +1,6 @@
 package ij.process;
 import java.awt.*;
 import java.awt.image.*;
-import ij.*;
-import ij.gui.*;
-import ij.measure.*;
 
 /** This class converts an ImageProcessor to another data type. */
 public class TypeConverter {
@@ -17,14 +14,15 @@ public class TypeConverter {
 	public TypeConverter(ImageProcessor ip, boolean doScaling) {
 		this.ip = ip;
 		this.doScaling = doScaling;
-		if (ip instanceof ByteProcessor)
-			type = BYTE;
-		else if (ip instanceof ShortProcessor)
-			type = SHORT;
-		else if (ip instanceof FloatProcessor)
-			type = FLOAT;
-		else
-			type = RGB;
+		if (ip instanceof ByteProcessor) {
+            type = BYTE;
+        } else if (ip instanceof ShortProcessor) {
+            type = SHORT;
+        } else if (ip instanceof FloatProcessor) {
+            type = FLOAT;
+        } else {
+            type = RGB;
+        }
 		width = ip.getWidth();
 		height = ip.getHeight();
 	}
@@ -56,7 +54,9 @@ public class TypeConverter {
 			int value;
 			for (int i=0; i<width*height; i++) {
 				value = pixels16[i]&0xffff;
-				if (value>255) value = 255;
+				if (value>255) {
+                    value = 255;
+                }
 				pixels8[i] = (byte)value;
 			}
 			return new ByteProcessor(width, height, pixels8, ip.getColorModel());
@@ -74,8 +74,12 @@ public class TypeConverter {
 			float value;
 			for (int i=0; i<width*height; i++) {
 				value = pixels32[i];
-				if (value<0f) value = 0f;
-				if (value>255f) value = 255f;
+				if (value<0f) {
+                    value = 0f;
+                }
+				if (value>255f) {
+                    value = 255f;
+                }
 				pixels8[i] = (byte)Math.round(value);
 			}
 			return new ByteProcessor(width, height, pixels8, ip.getColorModel());
@@ -144,18 +148,24 @@ public class TypeConverter {
 		double min = ip.getMin();
 		double max = ip.getMax();
 		double scale;
-		if ((max-min)==0.0)
-			scale = 1.0;
-		else
-			scale = 65535.0/(max-min);
+		if ((max-min)==0.0) {
+            scale = 1.0;
+        } else {
+            scale = 65535.0/(max-min);
+        }
 		double value;
 		for (int i=0,j=0; i<width*height; i++) {
-			if (doScaling)
-				value = (pixels32[i]-min)*scale;
-			else
-				value = pixels32[i];
-			if (value<0.0) value = 0.0;
-			if (value>65535.0) value = 65535.0;
+			if (doScaling) {
+                value = (pixels32[i]-min)*scale;
+            } else {
+                value = pixels32[i];
+            }
+			if (value<0.0) {
+                value = 0.0;
+            }
+			if (value>65535.0) {
+                value = 65535.0;
+            }
 			pixels16[i] = (short)value;
 		}
 	    return new ShortProcessor(width, height, pixels16, ip.getColorModel());
@@ -187,12 +197,15 @@ public class TypeConverter {
 		boolean invertedLut = ip.isInvertedLut();
 		float[] pixels32 = new float[width*height];
 		int value;
-		if (cTable!=null && cTable.length==256)
-			for (int i=0; i<width*height; i++)
-				pixels32[i] = cTable[pixels8[i]&255];
-		else
-			for (int i=0; i<width*height; i++)
-				pixels32[i] = pixels8[i]&255;
+		if (cTable!=null && cTable.length==256) {
+            for (int i = 0; i<width*height; i++) {
+                pixels32[i] = cTable[pixels8[i] & 255];
+            }
+        } else {
+            for (int i = 0; i<width*height; i++) {
+                pixels32[i] = pixels8[i] & 255;
+            }
+        }
 	    ColorModel cm = ip.getColorModel();
 	    return new FloatProcessor(width, height, pixels32, cm);
 	}
@@ -206,21 +219,24 @@ public class TypeConverter {
 		boolean invertedLut = false; //imp.isInvertedLut();
 		float[] pixels32 = new float[width*height];
 		int value;
-		if (cTable!=null && cTable.length==65536)
-			for (int i=0; i<width*height; i++)
-				pixels32[i] = cTable[pixels16[i]&0xffff];
-		else
-			for (int i=0; i<width*height; i++)
-				pixels32[i] = pixels16[i]&0xffff;
+		if (cTable!=null && cTable.length==65536) {
+            for (int i = 0; i<width*height; i++) {
+                pixels32[i] = cTable[pixels16[i] & 0xffff];
+            }
+        } else {
+            for (int i = 0; i<width*height; i++) {
+                pixels32[i] = pixels16[i] & 0xffff;
+            }
+        }
 	    ColorModel cm = ip.getColorModel();
 	    return new FloatProcessor(width, height, pixels32, cm);
 	}
 	
 	/** Converts processor to a ColorProcessor. */
 	public ImageProcessor convertToRGB() {
-		if (type==RGB)
-			return ip;
-		else {
+		if (type==RGB) {
+            return ip;
+        } else {
 			ImageProcessor ip2 = ip.convertToByte(doScaling);
 			return new ColorProcessor(ip2.createImage());
 		}

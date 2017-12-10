@@ -1,7 +1,6 @@
 package ij.gui;
 
 import java.awt.*;
-import java.awt.image.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
@@ -272,24 +271,24 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
      */
     public PlotWindow(String title, String xLabel, String yLabel, double[] xValues, double[] yValues) {
         this(title, xLabel, yLabel, Tools.toFloat(xValues), Tools.toFloat(yValues), Tools.toFloat(xValues), Tools.toFloat(yValues));
-        this.horizontal = false;
+        horizontal = false;
     }
 
     public PlotWindow(String title, String xLabel, String yLabel, float[] xValues, float[] yValues, float[] xInitValues, float[] yInitValues, final ImagePlus origin) {
         this(title, xLabel, yLabel, xValues, yValues, xInitValues, yInitValues);
         this.origin = origin;
-        this.horizontal = false;
+        horizontal = false;
     }
 
     public PlotWindow(String title, String xLabel, String yLabel, float[] xValues, float[] yValues) {
         this(title, xLabel, yLabel, xValues, yValues, xValues, yValues);
-        this.horizontal = false;
+        horizontal = false;
     }
 
     public PlotWindow(String title, String xLabel, String yLabel, float[] xValues, float[] yValues, final ImagePlus origin) {
         this(title, xLabel, yLabel, xValues, yValues);
         this.origin = origin;
-        this.horizontal = false;
+        horizontal = false;
     }
 
     public PlotWindow(String title, String xLabel, String yLabel, float[] xValues, float[] yValues, float[] yValuesBaseLine, final ImagePlus origin) {
@@ -311,7 +310,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
 
     public PlotWindow(String title, String xLabel, String yLabel, double[] xValues, double[] yValues, final ImagePlus origin) {
         this(title, xLabel, yLabel, Tools.toFloat(xValues), Tools.toFloat(yValues));
-        this.horizontal = false;
+        horizontal = false;
         this.origin = origin;
     }
 
@@ -319,8 +318,8 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
         this(title, xLabel, yLabel, xValues, yValues, origin);
         this.modifListener = true;
         this.region = (Roi) (region.clone());
-        this.horizontal = horiz;
-        this.RadioSpectra = false;
+        horizontal = horiz;
+        RadioSpectra = false;
         if (horizontal) {
             int xOrigine = ((Line) region).getX();
             for (int i = 0; i < xValues.length; i++) {
@@ -338,7 +337,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
 
     public PlotWindow(String title, String xLabel, String yLabel, float[] xValues, float[] yValues, float[] xInitValues, float[] yInitValues, boolean horiz, final ImagePlus origin, final Roi region) {
         this(title, xLabel, yLabel, xValues, yValues, false, origin, region);
-        this.horizontal = horiz;
+        horizontal = horiz;
         this.xInitValues = xInitValues;
         this.yInitValues = yInitValues;
         double[] a = Tools.getMinMax(xInitValues);
@@ -355,12 +354,9 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
         /*
          * EU_HOU CHANGES
          */
-        this.xInitValues = xInitValues;
-        this.yInitValues = yInitValues;
         /*
          * EU_HOU END
          */
-        this.flags = flags;
         if (xValues == null || yValues == null) {
             xValues = new double[1];
             yValues = new double[1];
@@ -389,8 +385,6 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
         drawPending = true;
 
         //EU_HOU
-        origin = origin;
-        region = region;
         System.out.println("this one is actually being used");
         this.origin = origin;
     }
@@ -399,7 +393,6 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
         super(imp);
         this.plot = plot;
         draw();
-        this.origin = origin;
         System.out.println("Plot Window 12");
     }
 
@@ -492,8 +485,8 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
         int yt = TOP_MARGIN + (int) (y * frameHeight);
         ip.drawString(label, xt, yt);
         labels.add(label);
-        xlabs.add(new Integer(xt));
-        ylabs.add(new Integer(yt));
+        xlabs.add(xt);
+        ylabs.add(yt);
     }
 
     /**
@@ -606,6 +599,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
      *
      * @see ij.gui.ImageWindow#mouseClicked
      */
+    @Override
     public void mouseClicked(int x, int y) {
         String xRB = "";
         String yRB = "";
@@ -638,6 +632,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
      *
      * @see ij.gui.ImageWindow#mouseMoved
      */
+    @Override
     public void mouseMoved(int x, int y) {
         // System.out.println("P");
         if (frame == null) {
@@ -671,8 +666,8 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
             Enumeration e = labels.elements();
             int i = 0;
             while (e.hasMoreElements()) {
-                int xxx = ((Integer) xlabs.elementAt(i)).intValue();
-                int yyy = ((Integer) ylabs.elementAt(i++)).intValue();
+                int xxx = (Integer) xlabs.elementAt(i);
+                int yyy = (Integer) ylabs.elementAt(i++);
                 ip.drawString((String) e.nextElement(), xxx, yyy);
             }
             if (imp != null) {
@@ -832,7 +827,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
     }
 
     void drawYLabel(String yLabel, int x, int y, int height, FontMetrics fm) {
-        if (yLabel.equals("")) {
+        if ("".equals(yLabel)) {
             return;
         }
         int w = fm.stringWidth(yLabel) + 5;
@@ -856,7 +851,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
     }
 
     void showList() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String headings;
         initDigits();
         if (errorBars != null) {
@@ -867,9 +862,9 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
             }
             for (int i = 0; i < nPoints; i++) {
                 if (saveXValues) {
-                    sb.append(IJ.d2s(xValues[i], xdigits) + "\t" + IJ.d2s(yValues[i], ydigits) + "\t" + IJ.d2s(errorBars[i], ydigits) + "\n");
+                    sb.append(IJ.d2s(xValues[i], xdigits)).append("\t").append(IJ.d2s(yValues[i], ydigits)).append("\t").append(IJ.d2s(errorBars[i], ydigits)).append("\n");
                 } else {
-                    sb.append(IJ.d2s(yValues[i], ydigits) + "\t" + IJ.d2s(errorBars[i], ydigits) + "\n");
+                    sb.append(IJ.d2s(yValues[i], ydigits)).append("\t").append(IJ.d2s(errorBars[i], ydigits)).append("\n");
                 }
             }
 
@@ -881,9 +876,9 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
             }
             for (int i = 0; i < nPoints; i++) {
                 if (saveXValues) {
-                    sb.append(IJ.d2s(xValues[i], xdigits) + "\t" + IJ.d2s(yValues[i], ydigits) + "\n");
+                    sb.append(IJ.d2s(xValues[i], xdigits)).append("\t").append(IJ.d2s(yValues[i], ydigits)).append("\n");
                 } else {
-                    sb.append(IJ.d2s(yValues[i], ydigits) + "\n");
+                    sb.append(IJ.d2s(yValues[i], ydigits)).append("\n");
                 }
             }
         }
@@ -1052,8 +1047,8 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
         }
         if (ydigits != defaultDigits) {
             realNumbers = false;
-            for (int i = 0; i < xValues.length; i++) {
-                if ((int) xValues[i] != xValues[i]) {
+            for (float xValue : xValues) {
+                if ((int) xValue != xValue) {
                     realNumbers = true;
                 }
             }
@@ -1063,9 +1058,11 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
 
     }
 
+    @Override
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         Object b = e.getSource();
         ImagePlus imp2 = WindowManager.getCurrentImage();
@@ -1138,12 +1135,13 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
         prefs.put(OPTIONS, Integer.toString(options));
     }
 
+    @Override
     public boolean close() {
         boolean b = super.close();
         if (origin != null) {
             try {
                 origin.getWindow().getCanvas().setPoint(-1, -1, null);
-            } catch (NullPointerException e) {
+            } catch (NullPointerException ignored) {
             }
         }
         return b;
@@ -1435,8 +1433,8 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
             x4 = xInitMax;
         }
         int nbp = 0;
-        for (int i = 0; i < xValues.length; i++) {
-            if (((xValues[i] > x1) & (xValues[i] < x2)) || ((xValues[i] > x3) & (xValues[i] < x4))) {
+        for (float xValue : xValues) {
+            if (((xValue > x1) & (xValue < x2)) || ((xValue > x3) & (xValue < x4))) {
                 nbp++;
             }
         }
@@ -1526,8 +1524,8 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
         }
 
         int nbp = 0;
-        for (int i = 0; i < xValues.length; i++) {
-            if ((xValues[i] > x1) & (xValues[i] < x2)) {
+        for (float xValue : xValues) {
+            if ((xValue > x1) & (xValue < x2)) {
                 nbp++;
             }
         }
@@ -1608,7 +1606,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, Clipboard
     }
 
     void drawXLabel(String yLabel, int x, int y, int height, FontMetrics fm) {
-        if (yLabel.equals("")) {
+        if ("".equals(yLabel)) {
             return;
         }
         int w = fm.stringWidth(yLabel) + 5;

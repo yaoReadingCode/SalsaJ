@@ -2,14 +2,11 @@
 package ij.gui;
 
 import java.awt.*;
-import java.awt.image.*;
 import java.awt.event.KeyEvent;
 import ij.*;
 import ij.process.*;
 import ij.measure.*;
 import ij.plugin.frame.Recorder;
-import ij.plugin.filter.Analyzer;
-import ij.macro.Interpreter;
 
 /**
  *  A rectangular region of interest and superclass for the other ROI classes.
@@ -17,7 +14,7 @@ import ij.macro.Interpreter;
  *@author     Thomas
  *@created    31 octobre 2007
  */
-public class Roi extends Object implements Cloneable, java.io.Serializable {
+public class Roi implements Cloneable, java.io.Serializable {
 
 	/**
 	 *  Description of the Field
@@ -372,7 +369,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public synchronized Object clone() {
+	@Override
+    public synchronized Object clone() {
 		try {
 		Roi r = (Roi) super.clone();
 
@@ -973,18 +971,22 @@ public class Roi extends Object implements Cloneable, java.io.Serializable {
 		if (Recorder.record) {
 		String method;
 
-			if (type == LINE) {
-				if (imp == null) {
-					return;
-				}
-			Line line = (Line) imp.getRoi();
+            switch (type) {
+                case LINE:
+                    if (imp == null) {
+                        return;
+                    }
+                    Line line = (Line) imp.getRoi();
 
-				Recorder.record("makeLine", line.x1, line.y1, line.x2, line.y2);
-			} else if (type == OVAL) {
-				Recorder.record("makeOval", x, y, width, height);
-			} else {
-				Recorder.record("makeRectangle", x, y, width, height);
-			}
+                    Recorder.record("makeLine", line.x1, line.y1, line.x2, line.y2);
+                    break;
+                case OVAL:
+                    Recorder.record("makeOval", x, y, width, height);
+                    break;
+                default:
+                    Recorder.record("makeRectangle", x, y, width, height);
+                    break;
+            }
 		}
 		//EU_HOU Changes
 		/*
@@ -1431,7 +1433,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable {
 	 *@param  obj  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public boolean equals(Object obj) {
+	@Override
+    public boolean equals(Object obj) {
 		if (obj instanceof Roi) {
 		Roi roi2 = (Roi) obj;
 
@@ -1441,11 +1444,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable {
 			if (!getBounds().equals(roi2.getBounds())) {
 				return false;
 			}
-			if (getLength() != roi2.getLength()) {
-				return false;
-			}
-			return true;
-		} else {
+            return !(getLength() != roi2.getLength());
+        } else {
 			return false;
 		}
 	}
@@ -1456,7 +1456,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public String toString() {
+	@Override
+    public String toString() {
 		return ("Roi[" + getTypeAsString() + ", x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + " , StartX=" + startX + " , StartY=" + startY + "]");
 	}
 

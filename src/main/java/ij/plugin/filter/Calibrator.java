@@ -51,7 +51,8 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		IJ.register(Calibrator.class);
 		return DOES_ALL - DOES_RGB + NO_CHANGES;
@@ -63,15 +64,15 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		global1 = imp.getGlobalCalibration() != null;
 		if (!showDialog(imp)) {
 			return;
 		}
 		if (choiceIndex == customIndex) {
 			showPlot(null, null, imp.getCalibration(), null);
-			return;
-		} else if (imp.getType() == ImagePlus.GRAY32) {
+        } else if (imp.getType() == ImagePlus.GRAY32) {
 			if (choiceIndex == 0) {
 				imp.getCalibration().setValueUnit(unit);
 			} else {
@@ -177,7 +178,7 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 	double[] y = null;
 	boolean zeroClip = false;
 		if (choiceIndex <= 0) {
-			if (oldFunction == Calibration.NONE && !yText.equals("") && !xText.equals("")) {
+			if (oldFunction == Calibration.NONE && !"".equals(yText) && !"".equals(xText)) {
 				//EU_HOU Bundle
 				IJ.error("Calibrate", "Please select a function");
 			}
@@ -197,11 +198,11 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 				}
 			}
 			zeroClip = true;
-			for (int i = 0; i < y.length; i++) {
-				if (y[i] < 0.0) {
-					zeroClip = false;
-				}
-			}
+            for (double aY : y) {
+                if (aY < 0.0) {
+                    zeroClip = false;
+                }
+            }
 		} else if (choiceIndex == inverterIndex) {
 			function = Calibration.STRAIGHT_LINE;
 			parameters = new double[2];
@@ -278,9 +279,7 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 	double[] p = cf.getParams();
 		fitGoodness = IJ.d2s(cf.getRSquared(), 6);
 	double[] parameters = new double[np];
-		for (int i = 0; i < np; i++) {
-			parameters[i] = p[i];
-		}
+        System.arraycopy(p, 0, parameters, 0, np);
 		return parameters;
 	}
 
@@ -392,9 +391,7 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 		}
 	String[] list = new String[n];
 		list[0] = NONE;
-		for (int i = 0; i < nFits; i++) {
-			list[1 + i] = CurveFitter.fitList[i];
-		}
+        System.arraycopy(CurveFitter.fitList, 0, list, 1, nFits);
 		list[spacerIndex] = "-";
 		list[inverterIndex] = INVERTER;
 		list[odIndex] = UNCALIBRATED_OD;
@@ -440,9 +437,8 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 		if (nTokens < 1) {
 			return new double[0];
 		}
-	int n = nTokens;
-	double data[] = new double[n];
-		for (int i = 0; i < n; i++) {
+        double data[] = new double[nTokens];
+		for (int i = 0; i < nTokens; i++) {
 			data[i] = getNum(st);
 		}
 		return data;
@@ -464,7 +460,7 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 			d = null;
 		}
 		if (d != null) {
-			return (d.doubleValue());
+			return (d);
 		} else {
 			return 0.0;
 		}
@@ -538,7 +534,7 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 		}
 	StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < height; i++) {
-			sb.append("" + ip.getPixelValue(0, i));
+			sb.append("").append(ip.getPixelValue(0, i));
 			sb.append("\n");
 		}
 	String s1 = null;
@@ -547,7 +543,7 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 			s1 = new String(sb);
 			sb = new StringBuffer();
 			for (int i = 0; i < height; i++) {
-				sb.append("" + ip.getPixelValue(1, i));
+				sb.append("").append(ip.getPixelValue(1, i));
 				sb.append("\n");
 			}
 			s2 = new String(sb);
@@ -571,7 +567,8 @@ public class Calibrator implements PlugInFilter, Measurements, ActionListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 	Object source = e.getSource();
 		if (source == save) {
 			save();

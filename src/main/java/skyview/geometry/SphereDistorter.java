@@ -10,23 +10,28 @@ package skyview.geometry;
 public abstract class SphereDistorter extends Transformer implements skyview.Component {
     
     /** A name for this object */
+    @Override
     public String getName() {
 	return "Generic SphereDistorter";
     } 
     
     /** What does this object do? */
+    @Override
     public String getDescription() {
 	return "Placeholder for distortions in celestial sphere";
     }
     
+    @Override
     public abstract SphereDistorter inverse();
     
     /** What is the output dimensionality of a Distorter? */
+    @Override
     protected int getOutputDimension() {
 	return 3;
     }
     
     /** What is the input dimensionality of a Distorter? */
+    @Override
     protected int getInputDimension() {
 	return 3;
     }

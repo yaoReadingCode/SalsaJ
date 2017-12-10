@@ -35,7 +35,8 @@ public class ImageProperties implements PlugInFilter, TextListener {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		return DOES_ALL + NO_CHANGES;
 	}
@@ -46,7 +47,8 @@ public class ImageProperties implements PlugInFilter, TextListener {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		showDialog(imp);
 	}
 
@@ -151,11 +153,11 @@ public class ImageProperties implements PlugInFilter, TextListener {
 		}
 
 	String unit = gd.getNextString();
-		if (unit.equals("um")) {
+		if ("um".equals(unit)) {
 			unit = IJ.micronSymbol + "m";
-		} else if (unit.equals("u")) {
+		} else if ("u".equals(unit)) {
 			unit = "" + IJ.micronSymbol;
-		} else if (unit.equals("A")) {
+		} else if ("A".equals(unit)) {
 			unit = "" + IJ.angstromSymbol;
 		}
 	double pixelWidth = gd.getNextNumber();
@@ -165,7 +167,7 @@ public class ImageProperties implements PlugInFilter, TextListener {
 		//if (calPixelWidth!=cal.pixelWidth) pixelWidth = calPixelWidth;
 		//if (calPixelHeight!=cal.pixelHeight) pixelHeight = calPixelHeight;
 		//if (calPixelDepth!=cal.pixelDepth) pixelDepth = calPixelDepth;
-		if (unit.equals("") || unit.equalsIgnoreCase("none") || pixelWidth == 0.0) {
+		if ("".equals(unit) || "none".equalsIgnoreCase(unit) || pixelWidth == 0.0) {
 			cal.setUnit(null);
 			cal.pixelWidth = 1.0;
 			cal.pixelHeight = 1.0;
@@ -182,7 +184,7 @@ public class ImageProperties implements PlugInFilter, TextListener {
 		interval = Tools.parseDouble(intAndUnit[0]);
 		cal.frameInterval = Double.isNaN(interval) ? 0.0 : interval;
 	String timeUnit = intAndUnit.length >= 2 ? intAndUnit[1] : "sec";
-		if (timeUnit.equals("usec")) {
+		if ("usec".equals(timeUnit)) {
 			timeUnit = IJ.micronSymbol + "sec";
 		}
 		cal.setTimeUnit(timeUnit);
@@ -214,7 +216,7 @@ public class ImageProperties implements PlugInFilter, TextListener {
 	 *@return           Description of the Return Value
 	 */
 	String validateInterval(String interval) {
-		if (interval.indexOf(" ") != -1) {
+		if (interval.contains(" ")) {
 			return interval;
 		}
 	int firstLetter = -1;
@@ -264,23 +266,23 @@ public class ImageProperties implements PlugInFilter, TextListener {
 	 */
 	int getUnitIndex(String unit) {
 		unit = unit.toLowerCase(Locale.US);
-		if (unit.equals("cm") || unit.startsWith("cent")) {
+		if ("cm".equals(unit) || unit.startsWith("cent")) {
 			return CENTIMETER;
-		} else if (unit.equals("mm") || unit.startsWith("milli")) {
+		} else if ("mm".equals(unit) || unit.startsWith("milli")) {
 			return MILLIMETER;
 		} else if (unit.startsWith("inch")) {
 			return INCH;
 		} else if (unit.startsWith("" + IJ.micronSymbol) || unit.startsWith("u") || unit.startsWith("micro")) {
 			return MICROMETER;
-		} else if (unit.equals("nm") || unit.startsWith("nano")) {
+		} else if ("nm".equals(unit) || unit.startsWith("nano")) {
 			return NANOMETER;
 		} else if (unit.startsWith("meter")) {
 			return METER;
-		} else if (unit.equals("km") || unit.startsWith("kilo")) {
+		} else if ("km".equals(unit) || unit.startsWith("kilo")) {
 			return KILOMETER;
-		} else if (unit.equals("ft") || unit.equals("foot") || unit.equals("feet")) {
+		} else if ("ft".equals(unit) || "foot".equals(unit) || "feet".equals(unit)) {
 			return FOOT;
-		} else if (unit.equals("mi") || unit.startsWith("mile")) {
+		} else if ("mi".equals(unit) || unit.startsWith("mile")) {
 			return MILLIMETER;
 		} else {
 			return OTHER_UNIT;
@@ -325,7 +327,8 @@ public class ImageProperties implements PlugInFilter, TextListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void textValueChanged(TextEvent e) {
+	@Override
+    public void textValueChanged(TextEvent e) {
 		textChangedCount++;
 	Object source = e.getSource();
 	TextField widthField = (TextField) nfields.elementAt(0);

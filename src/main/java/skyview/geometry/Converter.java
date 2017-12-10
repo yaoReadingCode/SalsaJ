@@ -13,10 +13,12 @@ public class Converter extends Transformer implements skyview.Component {
     private boolean checked = false;
     private static boolean doDebug = false;
     
+    @Override
     public String getName() {
 	return "Converter";
     }
     
+    @Override
     public String getDescription() {
 	return "A compound set of transformations";
     }
@@ -27,6 +29,7 @@ public class Converter extends Transformer implements skyview.Component {
     
     /** Get the dimensionality of the input vectors.
      */
+    @Override
     public int getInputDimension() {
 	if (components.size() > 0) {
 	    return components.get(0).getInputDimension();
@@ -37,6 +40,7 @@ public class Converter extends Transformer implements skyview.Component {
     
     /** Get the dimensionality of the output vectors.
      */
+    @Override
     public int getOutputDimension() {
 	if (components.size() > 0) {
 	    return components.get(components.size()-1).getOutputDimension();
@@ -73,6 +77,7 @@ public class Converter extends Transformer implements skyview.Component {
     
     
     /** Transform a vector */
+    @Override
     public void transform(double[] in, double[] out) {
 	
 	if (!checked) {
@@ -116,6 +121,7 @@ public class Converter extends Transformer implements skyview.Component {
     }
     
     /** Transform an array of vectors */
+    @Override
     public void transform(double[][] in, double[][] out) {
 	
 	if (!checked) {
@@ -221,7 +227,7 @@ public class Converter extends Transformer implements skyview.Component {
 		
 	    }
 	    // If we get this far we are done!
-	    break deleterLoop;
+	    break;
 	}
 	compArr = components.toArray(new Transformer[0]);
 	datArr  = new double[compArr.length][];
@@ -238,6 +244,7 @@ public class Converter extends Transformer implements skyview.Component {
     }
     
     /** Return the inverse of this series of transformations. */
+    @Override
     public Converter inverse() {
 	Converter x = new Converter();
 	for (int i=components.size()-1; i >= 0; i -= 1) {
@@ -251,6 +258,7 @@ public class Converter extends Transformer implements skyview.Component {
     }
     
     /** Is this the inverse of another transformation. */
+    @Override
     public boolean isInverse(Transformer t) {
 	
 	// Need to collapse rotation cascades and such
@@ -265,11 +273,7 @@ public class Converter extends Transformer implements skyview.Component {
 	// A non-converter can be an inverse if it exactly
 	// inverts the single operation
 	if (! (t instanceof Converter)) {
-	    if (components.size() != 1) {
-	        return false;
-	    } else {
-		return components.get(0).isInverse(t);
-	    }
+		return components.size() == 1 && components.get(0).isInverse(t);
 	}
 	
 	Converter c = (Converter) t;

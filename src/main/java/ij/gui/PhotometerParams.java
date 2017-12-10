@@ -127,7 +127,8 @@ JCheckBox cb = new JCheckBox("all auto");
 	/**
 	 *  Description of the Method
 	 */
-	public void dispose() {
+	@Override
+    public void dispose() {
 		WindowManager.removeWindow(this);
                 this.setVisible(false);
 		
@@ -180,8 +181,7 @@ JCheckBox cb = new JCheckBox("all auto");
 		if (op == Photometer.SKY_VAL) {
 			s = valtf.getText();
 		}
-	float f = Float.parseFloat(s);
-		return f;
+		return Float.parseFloat(s);
 	}
 
 

@@ -24,7 +24,7 @@ public class IPhot {
 
     public IPhot(String i, int x, int y, Roi r, int inten, int sky, Photometer outer) {
         this.outer = outer;
-        this.title = new String(i);
+        this.title = i;
         this.r = new OvalRoi(r.x(), r.y(), r.width(), r.height());
         this.x = x;
         this.y = y;
@@ -56,7 +56,8 @@ public class IPhot {
      *
      *@return    Description of the Return Value
      */
+    @Override
     public String toString() {
-        return new String(title + "\t" + x + "\t" + y + "\t" + inten + "\t" + r.width() / 2 + "\t" + sky + "\t" + r.height() / 2);
+        return title + "\t" + x + "\t" + y + "\t" + inten + "\t" + r.width() / 2 + "\t" + sky + "\t" + r.height() / 2;
     }
 }

@@ -8,7 +8,8 @@ public class ShortBlitter implements Blitter {
 	private int width, height;
 	private short[] pixels;
 	
-	public void setTransparentColor(Color c) {
+	@Override
+    public void setTransparentColor(Color c) {
 	}
 
 	/** Constructs a ShortBlitter from a ShortProcessor. */
@@ -20,7 +21,8 @@ public class ShortBlitter implements Blitter {
 	}
 
 	/** Copies the 16-bit image in 'ip' to (x,y) using the specified mode. */
-	public void copyBits(ImageProcessor ip, int xloc, int yloc, int mode) {
+	@Override
+    public void copyBits(ImageProcessor ip, int xloc, int yloc, int mode) {
 		Rectangle r1, r2;
 		int srcIndex, dstIndex;
 		int xSrcBase, ySrcBase;
@@ -31,8 +33,9 @@ public class ShortBlitter implements Blitter {
 		r1 = new Rectangle(srcWidth, srcHeight);
 		r1.setLocation(xloc, yloc);
 		r2 = new Rectangle(width, height);
-		if (!r1.intersects(r2))
-			return;
+		if (!r1.intersects(r2)) {
+            return;
+        }
 		srcPixels = (short [])ip.getPixels();
 //new ij.ImagePlus("srcPixels", new ShortProcessor(srcWidth, srcHeight, srcPixels, null)).show();
 		r1 = r1.intersection(r2);
@@ -44,14 +47,19 @@ public class ShortBlitter implements Blitter {
 			dstIndex = y * width + r1.x;
 			switch (mode) {
 				case COPY: case COPY_INVERTED: case COPY_TRANSPARENT:
-					for (int i=r1.width; --i>=0;)
-						pixels[dstIndex++] = srcPixels[srcIndex++];
+					for (int i=r1.width; --i>=0;) {
+                        pixels[dstIndex++] = srcPixels[srcIndex++];
+                    }
 					break;
 				case ADD:
 					for (int i=r1.width; --i>=0;) {
 						dst = (srcPixels[srcIndex++]&0xffff)+(pixels[dstIndex]&0xffff);
-						if (dst<0) dst = 0;
-						if (dst>65535) dst = 65535;
+						if (dst<0) {
+                            dst = 0;
+                        }
+						if (dst>65535) {
+                            dst = 65535;
+                        }
 						pixels[dstIndex++] = (short)dst;
 					}
 					break;
@@ -64,34 +72,47 @@ public class ShortBlitter implements Blitter {
 				case DIFFERENCE:
 					for (int i=r1.width; --i>=0;) {
 						dst = (pixels[dstIndex]&0xffff)-(srcPixels[srcIndex++]&0xffff);
-						if (dst<0) dst = -dst;
-						if (dst>65535) dst = 65535;
+						if (dst<0) {
+                            dst = -dst;
+                        }
+						if (dst>65535) {
+                            dst = 65535;
+                        }
 						pixels[dstIndex++] = (short)dst;
 					}
 					break;
 				case SUBTRACT:
 					for (int i=r1.width; --i>=0;) {
 						dst = (pixels[dstIndex]&0xffff)-(srcPixels[srcIndex++]&0xffff);
-						if (dst<0) dst = 0;
-						if (dst>65535) dst = 65535;
+						if (dst<0) {
+                            dst = 0;
+                        }
+						if (dst>65535) {
+                            dst = 65535;
+                        }
 						pixels[dstIndex++] = (short)dst;
 					}
 					break;
 				case MULTIPLY:
 					for (int i=r1.width; --i>=0;) {
 						dst = (srcPixels[srcIndex++]&0xffff)*(pixels[dstIndex]&0xffff);
-						if (dst<0) dst = 0;
-						if (dst>65535) dst = 65535;
+						if (dst<0) {
+                            dst = 0;
+                        }
+						if (dst>65535) {
+                            dst = 65535;
+                        }
 						pixels[dstIndex++] = (short)dst;
 					}
 					break;
 				case DIVIDE:
 					for (int i=r1.width; --i>=0;) {
 						src = srcPixels[srcIndex++]&0xffff;
-						if (src==0)
-							dst = 65535;
-						else
-							dst = pixels[dstIndex]/src;
+						if (src==0) {
+                            dst = 65535;
+                        } else {
+                            dst = pixels[dstIndex]/src;
+                        }
 						pixels[dstIndex++] = (short)dst;
 					}
 					break;
@@ -117,7 +138,9 @@ public class ShortBlitter implements Blitter {
 					for (int i=r1.width; --i>=0;) {
 						src = srcPixels[srcIndex++]&0xffff;
 						dst = pixels[dstIndex]&0xffff;
-						if (src<dst) dst = src;
+						if (src<dst) {
+                            dst = src;
+                        }
 						pixels[dstIndex++] = (short)dst;
 					}
 					break;
@@ -125,13 +148,16 @@ public class ShortBlitter implements Blitter {
 					for (int i=r1.width; --i>=0;) {
 						src = srcPixels[srcIndex++]&0xffff;
 						dst = pixels[dstIndex]&0xffff;
-						if (src>dst) dst = src;
+						if (src>dst) {
+                            dst = src;
+                        }
 						pixels[dstIndex++] = (short)dst;
 					}
 					break;
 			}
-			if (y%20==0)
-				ip.showProgress((double)(y-r1.y)/r1.height);
+			if (y%20==0) {
+                ip.showProgress((double)(y-r1.y)/r1.height);
+            }
 		}
 		ip.showProgress(1.0);
 	}

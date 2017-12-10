@@ -6,7 +6,6 @@ import java.io.*;
 import ij.*;
 import ij.plugin.*;
 import ij.plugin.frame.*;
-import ij.text.*;
 import ij.gui.*;
 import ij.util.*;
 import ij.io.*;
@@ -92,7 +91,7 @@ public class Fitter extends PlugInFrame implements PlugIn, ItemListener, ActionL
 	 *@param  fitType  Description of the Parameter
 	 */
 	public void doFit(int fitType) {
-		this.fitType = fitType;
+		Fitter.fitType = fitType;
 		if (!getData()) {
 			return;
 		}
@@ -122,7 +121,7 @@ public class Fitter extends PlugInFrame implements PlugIn, ItemListener, ActionL
 		a = Tools.getMinMax(py);
 		ymin = Math.min(ymin, a[0]);
 		ymax = Math.max(ymax, a[1]);
-	PlotWindow pw = new PlotWindow(cf.fList[fitType], "X", "Y", px, py);
+	PlotWindow pw = new PlotWindow(CurveFitter.fList[fitType], "X", "Y", px, py);
 		pw.setLimits(xmin, xmax, ymin, ymax);
 		pw.addPoints(x, y, PlotWindow.CIRCLE);
 		//pw.addLabel(0.02, 0.1, cf.fList[fitType]);
@@ -219,7 +218,7 @@ public class Fitter extends PlugInFrame implements PlugIn, ItemListener, ActionL
 			d = null;
 		}
 		if (d != null) {
-			return (d.doubleValue());
+			return (d);
 		} else {
 			return 0.0;
 		}
@@ -254,7 +253,6 @@ public class Fitter extends PlugInFrame implements PlugIn, ItemListener, ActionL
 			}
 		} catch (Exception e) {
 			IJ.error(e.getMessage());
-			return;
 		}
 	}
 
@@ -264,7 +262,8 @@ public class Fitter extends PlugInFrame implements PlugIn, ItemListener, ActionL
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void itemStateChanged(ItemEvent e) {
+	@Override
+    public void itemStateChanged(ItemEvent e) {
 		fitTypeStr = fit.getSelectedItem();
 	}
 
@@ -274,7 +273,8 @@ public class Fitter extends PlugInFrame implements PlugIn, ItemListener, ActionL
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == doIt) {
 			doFit(fit.getSelectedIndex());
 		} else if (e.getSource() == apply) {

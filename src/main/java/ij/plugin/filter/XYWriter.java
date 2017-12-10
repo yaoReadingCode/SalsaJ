@@ -1,8 +1,6 @@
 package ij.plugin.filter;
 
 import java.awt.*;
-import java.awt.image.*;
-import java.util.Vector;
 import java.io.*;
 import ij.*;
 import ij.process.*;
@@ -27,7 +25,8 @@ public class XYWriter implements PlugInFilter {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		return DOES_ALL + ROI_REQUIRED + NO_CHANGES;
 	}
@@ -38,7 +37,8 @@ public class XYWriter implements PlugInFilter {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		try {
 			saveXYCoordinates(imp);
 		} catch (IllegalArgumentException e) {

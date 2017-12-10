@@ -7,7 +7,6 @@ import java.util.*;
 import ij.*;
 import ij.plugin.frame.Recorder;
 import ij.plugin.ScreenGrabber;
-import ij.plugin.filter.PlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
 import ij.util.Tools;
 
@@ -95,7 +94,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      */
     public GenericDialog(String title) {
         this(title, WindowManager.getCurrentImage() != null
-                ? (Frame) WindowManager.getCurrentImage().getWindow() : IJ.getInstance() != null ? IJ.getInstance() : new Frame());
+                ? WindowManager.getCurrentImage().getWindow() : IJ.getInstance() != null ? IJ.getInstance() : new Frame());
     }
 
     /**
@@ -190,7 +189,7 @@ public class GenericDialog extends Dialog implements ActionListener,
         tf.addFocusListener(this);
         tf.addKeyListener(this);
         numberField.addElement(tf);
-        defaultValues.addElement(new Double(defaultValue));
+        defaultValues.addElement(defaultValue);
         defaultText.addElement(tf.getText());
         c.gridx = 1;
         c.gridy = y;
@@ -200,7 +199,7 @@ public class GenericDialog extends Dialog implements ActionListener,
             tf.selectAll();
         }
         firstNumericField = false;
-        if (units == null || units.equals("")) {
+        if (units == null || "".equals(units)) {
             grid.setConstraints(tf, c);
             add(tf);
         } else {
@@ -495,8 +494,8 @@ public class GenericDialog extends Dialog implements ActionListener,
 
         thisChoice.addKeyListener(this);
         thisChoice.addItemListener(this);
-        for (int i = 0; i < items.length; i++) {
-            thisChoice.addItem(items[i]);
+        for (String item : items) {
+            thisChoice.addItem(item);
         }
         thisChoice.select(defaultItem);
         c.gridx = 1;
@@ -527,7 +526,7 @@ public class GenericDialog extends Dialog implements ActionListener,
         c.gridy = y;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = getInsets(text.equals("") ? 0 : 10, 20, 0, 0);
+        c.insets = getInsets("".equals(text) ? 0 : 10, 20, 0, 0);
         grid.setConstraints(theLabel, c);
         add(theLabel);
         y++;
@@ -628,7 +627,7 @@ public class GenericDialog extends Dialog implements ActionListener,
         tf.addKeyListener(this);
         numberField.addElement(tf);
         sliderIndexes[slider.size() - 1] = numberField.size() - 1;
-        defaultValues.addElement(new Double(defaultValue));
+        defaultValues.addElement(defaultValue);
         defaultText.addElement(tf.getText());
         tf.setEditable(true);
         if (firstNumericField && firstSlider) {
@@ -804,12 +803,12 @@ public class GenericDialog extends Dialog implements ActionListener,
         String label = null;
 
         if (macro) {
-            label = (String) labels.get((Object) tf);
+            label = (String) labels.get(tf);
             theText = Macro.getValue(macroOptions, label, theText);
             //IJ.write("getNextNumber: "+label+"  "+theText);
         }
         String originalText = (String) defaultText.elementAt(nfIndex);
-        double defaultValue = ((Double) (defaultValues.elementAt(nfIndex))).doubleValue();
+        double defaultValue = (Double) (defaultValues.elementAt(nfIndex));
         double value;
 
         if (theText.equals(originalText)) {
@@ -818,7 +817,7 @@ public class GenericDialog extends Dialog implements ActionListener,
             Double d = getValue(theText);
 
             if (d != null) {
-                value = d.doubleValue();
+                value = d;
             } else {
                 invalidNumber = true;
                 //EU_HOU Bundle
@@ -863,7 +862,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *@param  value      Description of the Parameter
      */
     private void recordOption(Component component, String value) {
-        String label = (String) labels.get((Object) component);
+        String label = (String) labels.get(component);
 
         Recorder.recordOption(label, value);
     }
@@ -874,7 +873,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *@param  cb  Description of the Parameter
      */
     private void recordCheckboxOption(Checkbox cb) {
-        String label = (String) labels.get((Object) cb);
+        String label = (String) labels.get(cb);
 
         if (label != null) {
             if (cb.getState()) {// checked
@@ -940,7 +939,7 @@ public class GenericDialog extends Dialog implements ActionListener,
 
         theText = tf.getText();
         if (macro) {
-            String label = (String) labels.get((Object) tf);
+            String label = (String) labels.get(tf);
 
             theText = Macro.getValue(macroOptions, label, theText);
             //IJ.write("getNextString: "+label+"  "+theText);
@@ -969,7 +968,7 @@ public class GenericDialog extends Dialog implements ActionListener,
         boolean state = cb.getState();
 
         if (macro) {
-            String label = (String) labels.get((Object) cb);
+            String label = (String) labels.get(cb);
             String key = Macro.trimKey(label);
 
             state = isMatch(macroOptions, key + " ");
@@ -1031,7 +1030,7 @@ public class GenericDialog extends Dialog implements ActionListener,
         String item = thisChoice.getSelectedItem();
 
         if (macro) {
-            String label = (String) labels.get((Object) thisChoice);
+            String label = (String) labels.get(thisChoice);
 
             item = Macro.getValue(macroOptions, label, item);
             //IJ.write("getNextChoice: "+label+"  "+item);
@@ -1056,7 +1055,7 @@ public class GenericDialog extends Dialog implements ActionListener,
         int index = thisChoice.getSelectedIndex();
 
         if (macro) {
-            String label = (String) labels.get((Object) thisChoice);
+            String label = (String) labels.get(thisChoice);
             String oldItem = thisChoice.getSelectedItem();
             int oldIndex = thisChoice.getSelectedIndex();
             String item = Macro.getValue(macroOptions, label, oldItem);
@@ -1094,7 +1093,7 @@ public class GenericDialog extends Dialog implements ActionListener,
                 String text2 = text;
                 String cmd = Recorder.getCommand();
 
-                if (cmd != null && cmd.equals("Convolve...")) {
+                if (cmd != null && "Convolve...".equals(cmd)) {
                     text2 = text.replaceAll("\n", "\\\\n");
                     if (!text.endsWith("\n")) {
                         text2 = text2 + "\\\\n";
@@ -1302,6 +1301,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
 
@@ -1327,6 +1327,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void textValueChanged(TextEvent e) {
         notifyListeners(e);
         if (slider == null) {
@@ -1356,6 +1357,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void itemStateChanged(ItemEvent e) {
         notifyListeners(e);
     }
@@ -1365,6 +1367,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void focusGained(FocusEvent e) {
         Component c = e.getComponent();
 
@@ -1378,6 +1381,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void focusLost(FocusEvent e) {
         Component c = e.getComponent();
 
@@ -1391,6 +1395,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
@@ -1409,6 +1414,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
@@ -1417,7 +1423,7 @@ public class GenericDialog extends Dialog implements ActionListener,
         int flags = e.getModifiers();
         boolean control = (flags & KeyEvent.CTRL_MASK) != 0;
         boolean meta = (flags & KeyEvent.META_MASK) != 0;
-        boolean shift = (flags & e.SHIFT_MASK) != 0;
+        boolean shift = (flags & InputEvent.SHIFT_MASK) != 0;
 
         if (keyCode == KeyEvent.VK_G && shift && (control || meta)) {
             new ScreenGrabber().run("");
@@ -1429,6 +1435,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void keyTyped(KeyEvent e) {
     }
 
@@ -1437,6 +1444,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@return    The insets value
      */
+    @Override
     public Insets getInsets() {
         Insets i = super.getInsets();
 
@@ -1448,6 +1456,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public synchronized void adjustmentValueChanged(AdjustmentEvent e) {
         Object source = e.getSource();
 
@@ -1508,6 +1517,7 @@ public class GenericDialog extends Dialog implements ActionListener,
      *
      *@param  g  Description of the Parameter
      */
+    @Override
     public void paint(Graphics g) {
         super.paint(g);
         if (firstPaint) {

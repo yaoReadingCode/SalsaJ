@@ -24,7 +24,8 @@ public class RoiReader implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	//EU_HOU Bundle
 	OpenDialog od = new OpenDialog("Open ROI...", arg);
 	String dir = od.getDirectory();
@@ -36,7 +37,7 @@ public class RoiReader implements PlugIn {
 			openRoi(dir, name);
 		} catch (IOException e) {
 		String msg = e.getMessage();
-			if (msg == null || msg.equals("")) {
+			if (msg == null || "".equals(msg)) {
 				msg = "" + e;
 			}
 			//EU_HOU Bundle

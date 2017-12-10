@@ -11,9 +11,9 @@ import skyview.data.CoordinateFormatter;
 public class Position {
     
     /** The J2000 coordinates */
-    private double[] coords = new double[2];;
-    
-    /** The original system coordinates */
+    private double[] coords = new double[2];
+
+	/** The original system coordinates */
     private double[] orig;
     
     /** The original coordinate system */
@@ -33,7 +33,7 @@ public class Position {
 	orig[1] = b;
 	origFrame = frame;
 	
-	if (frame == null || frame.toUpperCase().equals("J2000")) {
+	if (frame == null || "J2000".equals(frame.toUpperCase())) {
 	    
 	    coords[0]  = l;
 	    coords[1]  = b;
@@ -71,7 +71,7 @@ public class Position {
     public double[] getCoordinates(String frame) throws TransformationException {
 	
 	
-	if (frame == null || frame.toUpperCase().equals("J2000")) {
+	if (frame == null || "J2000".equals(frame.toUpperCase())) {
 	    return coords;
 	    
 	} else {

@@ -69,12 +69,14 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
     private boolean isBlackWhite;
     private int maxValue;
 
+    @Override
     public void run(String arg) {
         OpenDialog od = new OpenDialog("PBM/PGM/PPM Reader...", arg);
         String directory = od.getDirectory();
         String name = od.getFileName();
-        if (name == null)
+        if (name == null) {
             return;
+        }
         String path = directory + name;
 
         IJ.showStatus("Opening: " + path);
@@ -84,7 +86,7 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
         }
         catch (IOException e) {
             String msg = e.getMessage();
-            IJ.showMessage("PBM/PGM/PPM Reader", msg.equals("") ? "" + e : msg);
+            IJ.showMessage("PBM/PGM/PPM Reader", "".equals(msg) ? "" + e : msg);
             return;
         }
         setStack(name, stack);
@@ -93,8 +95,9 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
         fi.directory = directory;
         fi.fileName = name;
         setFileInfo(fi);
-        if (arg.equals(""))
-        show();
+        if ("".equals(arg)) {
+            show();
+        }
         if (sixteenBits && stack.getSize()==3) {
         	WindowManager.setTempCurrentImage(this);
         	IJ.run("Convert Stack to RGB");
@@ -132,10 +135,11 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
 		if (!isColor) { // 8-bit grayscale
 			byte[] pixels = new byte[width * height];
 			ImageProcessor ip = new ByteProcessor(width, height, pixels, null);
-			if (rawBits)
-				openRawImage(is, width * height, pixels);
-			else
-				openAsciiImage(tok, width * height, pixels);
+			if (rawBits) {
+                openRawImage(is, width * height, pixels);
+            } else {
+                openAsciiImage(tok, width * height, pixels);
+            }
 			for (int i = pixels.length - 1; i >= 0; i--) {
 				if (isBlackWhite) {
 					if (rawBits) {
@@ -144,10 +148,12 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
 								pixels[8 * i + 7 - bit] = (byte) ((pixels[i] & ((int) Math.pow(2, bit))) == 0 ? 255 : 0);
 							}
 						}
-					} else
-						pixels[i] = (byte) (pixels[i] == 0 ? 255 : 0);
-				} else
-					pixels[i] = (byte) (0xff & (255 * (int) (0xff & pixels[i]) / maxValue));
+					} else {
+                        pixels[i] = (byte) (pixels[i] == 0 ? 255 : 0);
+                    }
+				} else {
+                    pixels[i] = (byte) (0xff & (255 * (int) (0xff & pixels[i]) / maxValue));
+                }
 			}
 			ImageStack stack = new ImageStack(width, height);
 			stack.addSlice("", ip);
@@ -158,14 +164,15 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
 			int[] pixels = new int[width * height];
 			byte[] bytePixels = new byte[3 * width * height];
 			ImageProcessor ip = new ColorProcessor(width, height, pixels);
-			if (rawBits)
-				openRawImage(is, 3 * width * height, bytePixels);
-			else
-				openAsciiImage(tok, 3 * width * height, bytePixels);
+			if (rawBits) {
+                openRawImage(is, 3 * width * height, bytePixels);
+            } else {
+                openAsciiImage(tok, 3 * width * height, bytePixels);
+            }
 			for (int i = 0; i < width * height; i++) {
-				int r = (int) (0xff & bytePixels[i * 3]);
-				int g = (int) (0xff & bytePixels[i * 3 + 1]);
-				int b = (int) (0xff & bytePixels[i * 3 + 2]);
+				int r = 0xff & bytePixels[i * 3];
+				int g = 0xff & bytePixels[i * 3 + 1];
+				int b = 0xff & bytePixels[i * 3 + 2];
 				r = (r * 255 / maxValue) << 16;
 				g = (g * 255 / maxValue) << 8;
 				b = (b * 255 / maxValue);
@@ -213,55 +220,61 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
 
     public void openHeader(StreamTokenizer tok) throws IOException {
         String magicNumber = getWord(tok);
-        if (magicNumber.equals("P1")) {
+        if ("P1".equals(magicNumber)) {
             rawBits = false;
             isColor = false;
             isBlackWhite = true;
-        } else if (magicNumber.equals("P4")) {
+        } else if ("P4".equals(magicNumber)) {
             rawBits = true;
             isColor = false;
             isBlackWhite = true;
-        } else if (magicNumber.equals("P2")) {
+        } else if ("P2".equals(magicNumber)) {
             rawBits = false;
             isColor = false;
             isBlackWhite = false;
-        } else if (magicNumber.equals("P5")) {
+        } else if ("P5".equals(magicNumber)) {
             rawBits = true;
             isColor = false;
             isBlackWhite = false;
-        } else if (magicNumber.equals("P3")) {
+        } else if ("P3".equals(magicNumber)) {
             rawBits = false;
             isColor = true;
             isBlackWhite = false;
-        } else if (magicNumber.equals("P6")) {
+        } else if ("P6".equals(magicNumber)) {
             rawBits = true;
             isColor = true;
             isBlackWhite = false;
-        } else
+        } else {
             throw new IOException("PxM files must start with \"P1\" or \"P2\" or \"P3\" or \"P4\" or \"P5\" or \"P6\"");
+        }
         width = getInt(tok);
         height = getInt(tok);
-        if (width == -1 || height == -1)
+        if (width == -1 || height == -1) {
             throw new IOException("Error opening PxM header..");
+        }
         if (! isBlackWhite) {
             maxValue = getInt(tok);
-            if (maxValue == -1)
+            if (maxValue == -1) {
                 throw new IOException("Error opening PxM header..");
+            }
             sixteenBits = maxValue > 255;
-        } else
+        } else {
             maxValue = 255;
-        if (sixteenBits && maxValue > 65535)
+        }
+        if (sixteenBits && maxValue > 65535) {
             throw new IOException("The maximum gray value is larger than 65535.");
+        }
     }
 
     public void openAsciiImage(StreamTokenizer tok, int size, byte[] pixels) throws IOException {
         int i = 0;
         int inc = size / 20;
-        while (tok.nextToken() != tok.TT_EOF) {
-            if (tok.ttype == tok.TT_NUMBER) {
+        while (tok.nextToken() != StreamTokenizer.TT_EOF) {
+            if (tok.ttype == StreamTokenizer.TT_NUMBER) {
                 pixels[i++] = (byte) (((int) tok.nval) & 255);
-                if (i % inc == 0)
+                if (i % inc == 0) {
                     IJ.showProgress(0.5 + ((double) i / size) / 2.0);
+                }
             }
         }
         IJ.showProgress(1.0);
@@ -269,19 +282,22 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
 
     public void openRawImage(InputStream is, int size, byte[] pixels) throws IOException {
         int count = 0;
-        while (count < size && count >= 0)
+        while (count < size && count >= 0) {
             count = is.read(pixels, count, size - count);
+        }
     }
 
     public ImageProcessor open16bitRawImage(InputStream is, int width, int height) throws IOException {
         int size = width * height * 2;
         byte[] bytes = new byte[size];
         int count = 0;
-        while (count < size && count >= 0)
+        while (count < size && count >= 0) {
             count = is.read(bytes, count, size - count);
+        }
         short[] pixels = new short[size / 2];
-        for (int i = 0, j = 0; i < size / 2; i++, j += 2)
+        for (int i = 0, j = 0; i < size / 2; i++, j += 2) {
             pixels[i] = (short) (((bytes[j] & 0xff) << 8) | (bytes[j + 1] & 0xff)); //big endian
+        }
         return new ShortProcessor(width, height, pixels, null);
     }
 
@@ -290,11 +306,12 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
         int size = width * height;
         int inc = size / 20; // Progress update interval
         short[] pixels = new short[size];
-        while (tok.nextToken() != tok.TT_EOF) {
-            if (tok.ttype == tok.TT_NUMBER) {
+        while (tok.nextToken() != StreamTokenizer.TT_EOF) {
+            if (tok.ttype == StreamTokenizer.TT_NUMBER) {
                 pixels[i++] = (short) (((int) tok.nval) & 65535);
-                if (i % inc == 0)
+                if (i % inc == 0) {
                     IJ.showProgress(0.5 + ((double) i / size) / 2.0);
+                }
             }
         }
         IJ.showProgress(1.0);
@@ -302,17 +319,19 @@ public class PGM_Reader extends ImagePlus implements PlugIn {
     }
 
     String getWord(StreamTokenizer tok) throws IOException {
-        while (tok.nextToken() != tok.TT_EOF) {
-            if (tok.ttype == tok.TT_WORD)
+        while (tok.nextToken() != StreamTokenizer.TT_EOF) {
+            if (tok.ttype == StreamTokenizer.TT_WORD) {
                 return tok.sval;
+            }
         }
         return null;
     }
 
     int getInt(StreamTokenizer tok) throws IOException {
-        while (tok.nextToken() != tok.TT_EOF) {
-            if (tok.ttype == tok.TT_NUMBER)
+        while (tok.nextToken() != StreamTokenizer.TT_EOF) {
+            if (tok.ttype == StreamTokenizer.TT_NUMBER) {
                 return (int) tok.nval;
+            }
         }
         return -1;
     }

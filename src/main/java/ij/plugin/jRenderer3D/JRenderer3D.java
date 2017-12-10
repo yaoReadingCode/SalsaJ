@@ -1,5 +1,4 @@
 package ij.plugin.jRenderer3D;
-import ij.IJ;
 import ij.ImagePlus;
 
 import java.awt.Color;
@@ -11,6 +10,7 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.MemoryImageSource;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *  The framework JRenderer3D provides the possibility to implement easily a 3D
@@ -527,51 +527,51 @@ public class JRenderer3D {
 
 	Point3D p0 = new Point3D();
 	Point3D p1 = new Point3D();
-		for (int i = 0; i < cubeLines3D.size(); i++) {
+        for (Object aCubeLines3D : cubeLines3D) {
 
-			if (cubeLines3D.get(i) != null && cubeLines3D.get(i) instanceof Line3D) {
-			Line3D line = (Line3D) cubeLines3D.get(i);
-			int color = line.color;
+            if (aCubeLines3D != null && aCubeLines3D instanceof Line3D) {
+                Line3D line = (Line3D) aCubeLines3D;
+                int color = line.color;
 
-				setPoints(line, p0, p1);
+                setPoints(line, p0, p1);
 
-				transform.transform(p0);
-			double x0 = transform.X;
-			double y0 = transform.Y;
-			double z0 = transform.Z;
+                transform.transform(p0);
+                double x0 = transform.X;
+                double y0 = transform.Y;
+                double z0 = transform.Z;
 
-				transform.transform(p1);
-			double x1 = transform.X;
-			double y1 = transform.Y;
-			double z1 = transform.Z;
+                transform.transform(p1);
+                double x1 = transform.X;
+                double y1 = transform.Y;
+                double z1 = transform.Z;
 
-			double dx1 = x1 - x0;
+                double dx1 = x1 - x0;
 
-			double dy1 = y1 - y0;
+                double dy1 = y1 - y0;
 
-			double dz1 = z1 - z0;
+                double dz1 = z1 - z0;
 
-			int numSteps = (int) Math.max(Math.abs(dx1), Math.abs(dy1));
-			double step = (numSteps > 0) ? 1 / (double) numSteps : 1;
+                int numSteps = (int) Math.max(Math.abs(dx1), Math.abs(dy1));
+                double step = (numSteps > 0) ? 1 / (double) numSteps : 1;
 
-				for (int s = 0; s < numSteps; s++) {
-				double f = s * step;
+                for (int s = 0; s < numSteps; s++) {
+                    double f = s * step;
 
-				int x = (int) (x0 + f * dx1);
-				int y = (int) (y0 + f * dy1);
+                    int x = (int) (x0 + f * dx1);
+                    int y = (int) (y0 + f * dy1);
 
-					if (x >= 0 && y >= 0 && x < bufferWidth && y < bufferHeight) {
-					int pos = y * bufferWidth + x;
-					double z = z0 + f * dz1;
+                    if (x >= 0 && y >= 0 && x < bufferWidth && y < bufferHeight) {
+                        int pos = y * bufferWidth + x;
+                        double z = z0 + f * dz1;
 
-						if (z <= zbufferPixels[pos]) {
-							zbufferPixels[pos] = z;
-							bufferPixels[pos] = color;
-						}
-					}
-				}
-			}
-		}
+                        if (z <= zbufferPixels[pos]) {
+                            zbufferPixels[pos] = z;
+                            bufferPixels[pos] = color;
+                        }
+                    }
+                }
+            }
+        }
 	}
 
 
@@ -854,9 +854,7 @@ public class JRenderer3D {
 		if (cubeLines3D == null) {
 			cubeLines3D = new ArrayList();
 		}
-		for (int i = 0; i < lines3D.length; i++) {
-			this.cubeLines3D.add(lines3D[i]);
-		}
+		Collections.addAll(this.cubeLines3D, lines3D);
 	}
 
 
@@ -922,14 +920,14 @@ public class JRenderer3D {
 			pointsPlot.setTransform(transform);
 		}
 
-		for (int i = 0; i < points3D.length; i++) {
-			if (points3D[i] != null) {
-				points3D[i].x -= xCenter;
-				points3D[i].y -= yCenter;
-				points3D[i].z -= zCenter;
-				pointsPlot.addPoint3D(points3D[i]);
-			}
-		}
+        for (Point3D aPoints3D : points3D) {
+            if (aPoints3D != null) {
+                aPoints3D.x -= xCenter;
+                aPoints3D.y -= yCenter;
+                aPoints3D.z -= zCenter;
+                pointsPlot.addPoint3D(aPoints3D);
+            }
+        }
 	}
 
 
@@ -1317,17 +1315,17 @@ public class JRenderer3D {
 
 //		this.lines3D.addAll(Arrays.asList(lines3D));
 
-		for (int i = 0; i < lines3D.length; i++) {
-			if (lines3D[i] != null) {
-				lines3D[i].x1 -= xCenter;
-				lines3D[i].y1 -= yCenter;
-				lines3D[i].z1 -= zCenter;
-				lines3D[i].x2 -= xCenter;
-				lines3D[i].y2 -= yCenter;
-				lines3D[i].z2 -= zCenter;
-				this.lines3D.add(lines3D[i]);
-			}
-		}
+        for (Line3D aLines3D : lines3D) {
+            if (aLines3D != null) {
+                aLines3D.x1 -= xCenter;
+                aLines3D.y1 -= yCenter;
+                aLines3D.z1 -= zCenter;
+                aLines3D.x2 -= xCenter;
+                aLines3D.y2 -= yCenter;
+                aLines3D.z2 -= zCenter;
+                this.lines3D.add(aLines3D);
+            }
+        }
 	}
 
 
@@ -1399,14 +1397,14 @@ public class JRenderer3D {
 			this.text3D = new ArrayList();
 		}
 
-		for (int i = 0; i < text3D.length; i++) {
-			if (text3D[i] != null) {
-				text3D[i].x -= xCenter;
-				text3D[i].y -= yCenter;
-				text3D[i].z -= zCenter;
-				this.text3D.add(text3D[i]);
-			}
-		}
+        for (Text3D aText3D : text3D) {
+            if (aText3D != null) {
+                aText3D.x -= xCenter;
+                aText3D.y -= yCenter;
+                aText3D.z -= zCenter;
+                this.text3D.add(aText3D);
+            }
+        }
 	}
 
 

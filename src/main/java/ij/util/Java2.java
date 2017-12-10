@@ -1,6 +1,6 @@
 package ij.util;
 import ij.*;
-import ij.Prefs;
+
 import java.awt.*;
 import javax.swing.*;
 
@@ -14,18 +14,20 @@ public class Java2 {
 
 	public static void setAntialiased(Graphics g, boolean antialiased) {
 			Graphics2D g2d = (Graphics2D)g;
-			if (antialiased)
-				g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			else
-				g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+			if (antialiased) {
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            } else {
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            }
 	}
 
 	public static void setAntialiasedText(Graphics g, boolean antialiasedText) {
 			Graphics2D g2d = (Graphics2D)g;
-			if (antialiasedText)
-				g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			else
-				g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+			if (antialiasedText) {
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            } else {
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+            }
 	}
 
 	public static int getStringWidth(String s, FontMetrics fontMetrics, Graphics g) {
@@ -35,18 +37,21 @@ public class Java2 {
 
 	public static void setBilinearInterpolation(Graphics g, boolean bilinearInterpolation) {
 			Graphics2D g2d = (Graphics2D)g;
-			if (bilinearInterpolation)
-				g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			else
-				g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+			if (bilinearInterpolation) {
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            } else {
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+            }
 	}
 	
 	/** Sets the Swing look and feel to the system look and feel. */
 	public static void setSystemLookAndFeel() {
-		if (lookAndFeelSet) return;
+		if (lookAndFeelSet) {
+            return;
+        }
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(Throwable t) {}
+		} catch(Throwable ignored) {}
 		lookAndFeelSet = true;
 		IJ.register(Java2.class);
 	}

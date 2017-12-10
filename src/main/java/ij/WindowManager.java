@@ -1,6 +1,5 @@
 //EU_HOU
 package ij;
-import ij.plugin.Converter;
 import ij.plugin.frame.Recorder;
 import ij.macro.Interpreter;
 import ij.text.TextWindow;
@@ -159,9 +158,7 @@ public class WindowManager {
 			return null;
 		}
 	int[] list = new int[nWindows + nBatchImages];
-		for (int i = 0; i < nBatchImages; i++) {
-			list[i] = batchModeImages[i];
-		}
+		System.arraycopy(batchModeImages, 0, list, 0, nBatchImages);
 	int index = 0;
 		for (int i = nBatchImages; i < nBatchImages + nWindows; i++) {
 		ImageWindow win = (ImageWindow) imageList.elementAt(index++);
@@ -178,7 +175,7 @@ public class WindowManager {
 	 */
 	public static synchronized Frame[] getNonImageWindows() {
 	Frame[] list = new Frame[nonImageList.size()];
-		nonImageList.copyInto((Frame[]) list);
+		nonImageList.copyInto(list);
 		return list;
 	}
 
@@ -264,8 +261,8 @@ public class WindowManager {
 		if (wList == null) {
 			return null;
 		}
-		for (int i = 0; i < wList.length; i++) {
-		ImagePlus imp = getImage(wList[i]);
+		for (int aWList : wList) {
+			ImagePlus imp = getImage(aWList);
 			if (imp != null && imp.getTitle().equals(title)) {
 				return imp;
 			}
@@ -282,8 +279,7 @@ public class WindowManager {
 	public static synchronized void addWindow(Frame win) {
 		//IJ.write("addWindow: "+win.getTitle());
 		if (win == null) {
-			return;
-		} else if (win instanceof ImageWindow) {
+        } else if (win instanceof ImageWindow) {
 			addImageWindow((ImageWindow) win);
 		} else {
 			Menus.insertWindowMenuItem(win);
@@ -477,8 +473,7 @@ public class WindowManager {
 			return true;
 		}
 	Frame[] list = getNonImageWindows();
-		for (int i = 0; i < list.length; i++) {
-		Frame frame = list[i];
+		for (Frame frame : list) {
 			if (frame instanceof PlugInFrame) {
 				((PlugInFrame) frame).close();
 			} else if (frame instanceof TextWindow) {
@@ -595,7 +590,7 @@ public class WindowManager {
 				if (((CheckboxMenuItem) Menus.window.getItem(j)).getState()) {
 					activateWindow(title, Menus.window.getItem(j));
 				}
-			} catch (Exception e) {}
+			} catch (Exception ignored) {}
 
 		}
 	}
@@ -658,10 +653,10 @@ public class WindowManager {
 		if (list == null) {
 			return;
 		}
-		for (int i = 0; i < list.length; i++) {
-		ImagePlus imp2 = getImage(list[i]);
+		for (int aList : list) {
+			ImagePlus imp2 = getImage(aList);
 			if (imp2 != null) {
-			ImageWindow win = imp2.getWindow();
+				ImageWindow win = imp2.getWindow();
 				if (win != null) {
 					win.repaint();
 				}

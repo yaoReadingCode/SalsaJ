@@ -4,13 +4,10 @@ import ij.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.awt.event.*;
-import java.io.*;
-import java.awt.datatransfer.*;
+
 import ij.gui.*;
 import ij.process.*;
-import ij.measure.Measurements;
 import ij.plugin.filter.Analyzer;
-import ij.text.TextWindow;
 import ij.measure.*;
 
 /**
@@ -91,7 +88,8 @@ public class CalibrationBar implements PlugInFilter {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		/*
 		 *  EU_HOU CHANGES
 		 */
@@ -105,11 +103,11 @@ public class CalibrationBar implements PlugInFilter {
 			//EU_HOU Bundle
 			locations[i] = IJ.getPluginBundle().getString(locationKeys[i]);
 		}
-		boxOutlineColor = new String(colors[8]);
-		barOutlineColor = new String(colors[3]);
-		fillColor = new String(colors[0]);
-		textColor = new String(colors[3]);
-		location = new String(locations[0]);
+		boxOutlineColor = colors[8];
+		barOutlineColor = colors[3];
+		fillColor = colors[0];
+		textColor = colors[3];
+		location = locations[0];
 		/*
 		 *  EU_HOU END
 		 */
@@ -129,11 +127,12 @@ public class CalibrationBar implements PlugInFilter {
 	 *
 	 *@param  ipPassed  Description of the Parameter
 	 */
-	public void run(ImageProcessor ipPassed) {
+	@Override
+    public void run(ImageProcessor ipPassed) {
 	ImageCanvas ic = imp.getCanvas();
 	double mag = (ic != null) ? ic.getMagnification() : 1.0;
 		if (zoom <= 1 && mag < 1) {
-			zoom = (double) 1.0 / mag;
+			zoom = 1.0 / mag;
 		}
 		ip = ipPassed.duplicate().convertToRGB();
 		impOriginal = imp;
@@ -213,7 +212,7 @@ public class CalibrationBar implements PlugInFilter {
 		numLabels = (int) gd.getNextNumber();
 		decimalPlaces = (int) gd.getNextNumber();
 		fontSize = (int) gd.getNextNumber();
-		zoom = (double) gd.getNextNumber();
+		zoom = gd.getNextNumber();
 		boldText = gd.getNextBoolean();
 		return true;
 	}
@@ -229,9 +228,7 @@ public class CalibrationBar implements PlugInFilter {
 	 *@param  length     Description of the Parameter
 	 */
 	public void verticalColorBar(ImageProcessor ip, int x, int y, int thickness, int length) {
-	int width = thickness;
-	int height = length;
-	byte[] rLUT;
+        byte[] rLUT;
 	byte[] gLUT;
 	byte[] bLUT;
 	int mapSize = 0;
@@ -286,9 +283,9 @@ public class CalibrationBar implements PlugInFilter {
 		if (c != null) {
 			ip.setColor(c);
 			ip.moveTo(x, y);
-			ip.lineTo(x + width, y);
-			ip.lineTo(x + width, y + height);
-			ip.lineTo(x, y + height);
+			ip.lineTo(x + thickness, y);
+			ip.lineTo(x + thickness, y + length);
+			ip.lineTo(x, y + length);
 			ip.lineTo(x, y);
 		}
 	}
@@ -348,7 +345,7 @@ public class CalibrationBar implements PlugInFilter {
 
 	double hmin = cal.getCValue(stats.histMin);
 	double hmax = cal.getCValue(stats.histMax);
-	double barStep = (double) (BAR_LENGTH * zoom);
+	double barStep = BAR_LENGTH * zoom;
 		if (numLabels > 2) {
 			barStep /= (numLabels - 1);
 		}
@@ -538,7 +535,8 @@ public class CalibrationBar implements PlugInFilter {
 		 *
 		 *@param  e  Description of the Parameter
 		 */
-		public void textValueChanged(TextEvent e) {
+		@Override
+        public void textValueChanged(TextEvent e) {
 
 			if (fieldNames == null) {
 				fieldNames = new String[4];
@@ -551,7 +549,7 @@ public class CalibrationBar implements PlugInFilter {
 		String name = tf.getName();
 		String value = tf.getText();
 
-			if (value.equals("")) {
+			if ("".equals(value)) {
 				return;
 			}
 
@@ -589,7 +587,7 @@ public class CalibrationBar implements PlugInFilter {
 
 			} else if (name.equals(fieldNames[3])) {
 			double d = 0;
-				d = getValue("0" + value).doubleValue();
+				d = getValue("0" + value);
 				if (d <= 0) {
 					return;
 				} else {
@@ -601,8 +599,7 @@ public class CalibrationBar implements PlugInFilter {
 			if (needsRefresh) {
 				updateColorBar();
 			}
-			return;
-		}
+        }
 
 
 		/**
@@ -610,7 +607,8 @@ public class CalibrationBar implements PlugInFilter {
 		 *
 		 *@param  e  Description of the Parameter
 		 */
-		public void itemStateChanged(ItemEvent e) {
+		@Override
+        public void itemStateChanged(ItemEvent e) {
 			location = ((Choice) (choice.elementAt(0))).getSelectedItem();
 			fillColor = ((Choice) (choice.elementAt(1))).getSelectedItem();
 			textColor = ((Choice) (choice.elementAt(2))).getSelectedItem();

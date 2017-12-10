@@ -1,8 +1,6 @@
 package ij.io;
 import ij.gui.*;
 import java.io.*;
-import java.util.*;
-import java.net.*;
 
 /*	ImageJ/NIH Image 64 byte ROI outline header
 	2 byte numbers are big-endian signed shorts
@@ -52,19 +50,23 @@ public class RoiDecoder {
 		if (path!=null) {
 			File f = new File(path);
 			size = (int)f.length();
-			if (size>500000)
-				throw new IOException("This is not an ImageJ ROI");
+			if (size>500000) {
+                throw new IOException("This is not an ImageJ ROI");
+            }
 			name = f.getName();
 			is = new FileInputStream(path);
 		}
 		data = new byte[size];
 
 		int total = 0;
-		while (total<size)
-			total += is.read(data, total, size-total);
+		while (total<size) {
+            total += is.read(data, total, size-total);
+        }
 		is.close();
 		if (getByte(0)!=73 || getByte(1)!=111)  //"Iout"
-			throw new IOException("This is not an ImageJ ROI");
+        {
+            throw new IOException("This is not an ImageJ ROI");
+        }
 		int type = getByte(6);
 		int top= getShort(8);
 		int left = getShort(10);
@@ -74,11 +76,13 @@ public class RoiDecoder {
 		int height = bottom-top;
 		int n = getShort(16);
 		
-		if (name.endsWith(".roi"))
-			name = name.substring(0, name.length()-4);
+		if (name.endsWith(".roi")) {
+            name = name.substring(0, name.length()-4);
+        }
 		boolean isComposite = getInt(36)>0;		
-		if (isComposite)
-			return getShapeRoi();
+		if (isComposite) {
+            return getShapeRoi();
+        }
 
 		Roi roi = null;
 		switch (type) {
@@ -100,7 +104,9 @@ public class RoiDecoder {
 				//IJ.write("type: "+type);
 				//IJ.write("n: "+n);
 				//IJ.write("rect: "+left+","+top+" "+width+" "+height);
-				if (n==0) break;
+				if (n==0) {
+                    break;
+                }
 				int[] x = new int[n];
 				int[] y = new int[n];
 				int base1 = 64;
@@ -108,9 +114,13 @@ public class RoiDecoder {
 				int xtmp, ytmp;
 				for (int i=0; i<n; i++) {
 					xtmp = getShort(base1+i*2);
-					if (xtmp<0) xtmp = 0;
+					if (xtmp<0) {
+                        xtmp = 0;
+                    }
 					ytmp = getShort(base2+i*2);
-					if (ytmp<0) ytmp = 0;
+					if (ytmp<0) {
+                        ytmp = 0;
+                    }
 					x[i] = left+xtmp;
 					y[i] = top+ytmp;
 					//IJ.write(i+" "+getShort(base1+i*2)+" "+getShort(base2+i*2));
@@ -120,20 +130,29 @@ public class RoiDecoder {
 					break;
 				}
 				int roiType;
-				if (type==polygon)
-					roiType = Roi.POLYGON;
-				else if (type==freehand)
-					roiType = Roi.FREEROI;
-				else if (type==traced)
-					roiType = Roi.TRACED_ROI;
-				else if (type==polyline)
-					roiType = Roi.POLYLINE;
-				else if (type==freeline)
-					roiType = Roi.FREELINE;
-				else if (type==angle)
-					roiType = Roi.ANGLE;
-				else
-					roiType = Roi.FREEROI;
+				switch (type) {
+					case polygon:
+						roiType = Roi.POLYGON;
+						break;
+					case freehand:
+						roiType = Roi.FREEROI;
+						break;
+					case traced:
+						roiType = Roi.TRACED_ROI;
+						break;
+					case polyline:
+						roiType = Roi.POLYLINE;
+						break;
+					case freeline:
+						roiType = Roi.FREELINE;
+						break;
+					case angle:
+						roiType = Roi.ANGLE;
+						break;
+					default:
+						roiType = Roi.FREEROI;
+						break;
+				}
 				roi = new PolygonRoi(x, y, n, roiType);
 				break;
 		default:
@@ -145,8 +164,9 @@ public class RoiDecoder {
 	
 	public Roi getShapeRoi() throws IOException {
 		int type = getByte(6);
-		if (type!=rect)
-			throw new IllegalArgumentException("Invalid composite ROI type");
+		if (type!=rect) {
+            throw new IllegalArgumentException("Invalid composite ROI type");
+        }
 		int top= getShort(8);
 		int left = getShort(10);
 		int bottom = getShort(12);
@@ -175,8 +195,9 @@ public class RoiDecoder {
 		int b0 = data[base]&255;
 		int b1 = data[base+1]&255;
 		int n = (short)((b0<<8) + b1);
-		if (n<-5000)
-			n = (b0<<8) + b1; // assume n>32767 and unsigned
+		if (n<-5000) {
+            n = (b0<<8) + b1; // assume n>32767 and unsigned
+        }
 		return n;		
 	}
 	

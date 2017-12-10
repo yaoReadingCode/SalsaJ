@@ -8,7 +8,6 @@ import ij.util.Tools;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Vector;
 
 /**
  *  This plugin implements the Analyze/Distribution command. It reads the data
@@ -33,7 +32,8 @@ public class Distribution implements PlugIn, TextListener {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	ResultsTable rt = ResultsTable.getResultsTable();
 	int count = rt.getCounter();
 		if (count == 0) {
@@ -161,7 +161,8 @@ public class Distribution implements PlugIn, TextListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void textValueChanged(TextEvent e) {
+	@Override
+    public void textValueChanged(TextEvent e) {
 		if (!defaultNBins.equals(nBinsField.getText())) {
 			checkbox.setState(false);
 		}
@@ -222,8 +223,8 @@ public class Distribution implements PlugIn, TextListener {
 		sdev = (float) Math.sqrt(var);
 
 		if (var > 0) {
-			skew = (float) skew / (nc * (float) Math.pow(sdev, 3));
-			kurt = (float) kurt / (nc * (float) Math.pow(var, 2)) - 3;
+			skew = skew / (nc * (float) Math.pow(sdev, 3));
+			kurt = kurt / (nc * (float) Math.pow(var, 2)) - 3;
 		}
 		pars[1] = (float) nc;
 		pars[2] = totl;

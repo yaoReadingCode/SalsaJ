@@ -26,8 +26,7 @@ public class Program implements MacroConstants {
 	public Program() {
 		if (systemTable!=null) {
 			stLoc = systemTable.length - 1;
-			for (int i=0; i<=stLoc; i++)
-			table[i] = systemTable[i];
+			System.arraycopy(systemTable, 0, table, 0, stLoc + 1);
 		} else {
 			//IJ.log("make table");
 			addKeywords();
@@ -36,8 +35,7 @@ public class Program implements MacroConstants {
 			addStringFunctions();
 			addArrayFunctions();
 			systemTable = new Symbol[stLoc+1];
-			for (int i=0; i<=stLoc; i++)
-				systemTable[i] = table[i];
+			System.arraycopy(table, 0, systemTable, 0, stLoc + 1);
 			IJ.register(Program.class);
 		}
 	}
@@ -51,28 +49,33 @@ public class Program implements MacroConstants {
 	}
 	
 	void addKeywords() {
-		for (int i=0; i<keywords.length; i++)
-			addSymbol(new Symbol(keywordIDs[i], keywords[i]));
+		for (int i=0; i<keywords.length; i++) {
+            addSymbol(new Symbol(keywordIDs[i], keywords[i]));
+        }
 	}
 
 	void addFunctions() {
-		for (int i=0; i<functions.length; i++)
-			addSymbol(new Symbol(functionIDs[i], functions[i]));
+		for (int i=0; i<functions.length; i++) {
+            addSymbol(new Symbol(functionIDs[i], functions[i]));
+        }
 	}
 
 	void addNumericFunctions() {
-		for (int i=0; i<numericFunctions.length; i++)
-			addSymbol(new Symbol(numericFunctionIDs[i], numericFunctions[i]));
+		for (int i=0; i<numericFunctions.length; i++) {
+            addSymbol(new Symbol(numericFunctionIDs[i], numericFunctions[i]));
+        }
 	}
 	
 	void addStringFunctions() {
-		for (int i=0; i<stringFunctions.length; i++)
-			addSymbol(new Symbol(stringFunctionIDs[i], stringFunctions[i]));
+		for (int i=0; i<stringFunctions.length; i++) {
+            addSymbol(new Symbol(stringFunctionIDs[i], stringFunctions[i]));
+        }
 	}
 
 	void addArrayFunctions() {
-		for (int i=0; i<arrayFunctions.length; i++)
-			addSymbol(new Symbol(arrayFunctionIDs[i], arrayFunctions[i]));
+		for (int i=0; i<arrayFunctions.length; i++) {
+            addSymbol(new Symbol(arrayFunctionIDs[i], arrayFunctions[i]));
+        }
 	}
 
 	void addSymbol(Symbol sym) {
@@ -114,12 +117,12 @@ public class Program implements MacroConstants {
 
 	void saveGlobals(Interpreter interp) {
 		//IJ.log("saveGlobals: "+interp.topOfStack);
-		if (interp.topOfStack==-1)
-			return;
+		if (interp.topOfStack==-1) {
+            return;
+        }
 		int n = interp.topOfStack+1;
 		globals = new Variable[n];
-		for (int i=0; i<n; i++)
-			globals[i] = interp.stack[i];
+		System.arraycopy(interp.stack, 0, globals, 0, n);
 	}
 	
 	public void dumpSymbolTable() {
@@ -127,8 +130,9 @@ public class Program implements MacroConstants {
 		IJ.log("Symbol Table");
 		for (int i=0; i<=maxSymbols; i++) {
 			Symbol symbol = table[i];
-			if (symbol==null)
-				break;
+			if (symbol==null) {
+                break;
+            }
 			IJ.log(i+" "+symbol);
 		}
 	}
@@ -138,8 +142,9 @@ public class Program implements MacroConstants {
 		IJ.log("Tokenized Program");
 		String str;
 		int token, address;
-		for (int i=0; i<=pc; i++) 
-			IJ.log(i+"	"+(code[i]&TOK_MASK)+"  "+decodeToken(code[i]));
+		for (int i=0; i<=pc; i++) {
+            IJ.log(i+"	"+(code[i]&TOK_MASK)+"  "+decodeToken(code[i]));
+        }
 	}
 	
 	public Variable[] getGlobals() {
@@ -174,10 +179,11 @@ public class Program implements MacroConstants {
 				break;
 			case NUMBER:
 				double v = table[address].value;
-				if ((int)v==v)
-					str = IJ.d2s(v,0);
-				else
-					str = ""+v;
+				if ((int)v==v) {
+                    str = IJ.d2s(v,0);
+                } else {
+                    str = ""+v;
+                }
 				break;
 			case EOL:
 				str = "EOL";

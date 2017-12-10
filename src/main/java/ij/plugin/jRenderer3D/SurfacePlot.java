@@ -69,18 +69,25 @@ class SurfacePlot {
 	 *  Description of the Method
 	 */
 	protected void draw() {
-		if (surfacePlotMode == JRenderer3D.SURFACEPLOT_FILLED) {
-			surfacePlotFilled();
-		} else if (surfacePlotMode == JRenderer3D.SURFACEPLOT_ISOLINES) {
-			surfacePlotIsoLines();
-		} else if (surfacePlotMode == JRenderer3D.SURFACEPLOT_MESH) {
-			surfacePlotMesh();
-		} else if (surfacePlotMode == JRenderer3D.SURFACEPLOT_LINES) {
-			surfacePlotLines();
-		} else if (surfacePlotMode == JRenderer3D.SURFACEPLOT_DOTS) {
-			surfacePlotDots();
-		} else if (surfacePlotMode == JRenderer3D.SURFACEPLOT_DOTSNOLIGHT) {
-			surfacePlotDotsNoLight();
+		switch (surfacePlotMode) {
+			case JRenderer3D.SURFACEPLOT_FILLED:
+				surfacePlotFilled();
+				break;
+			case JRenderer3D.SURFACEPLOT_ISOLINES:
+				surfacePlotIsoLines();
+				break;
+			case JRenderer3D.SURFACEPLOT_MESH:
+				surfacePlotMesh();
+				break;
+			case JRenderer3D.SURFACEPLOT_LINES:
+				surfacePlotLines();
+				break;
+			case JRenderer3D.SURFACEPLOT_DOTS:
+				surfacePlotDots();
+				break;
+			case JRenderer3D.SURFACEPLOT_DOTSNOLIGHT:
+				surfacePlotDotsNoLight();
+				break;
 		}
 	}
 
@@ -150,7 +157,7 @@ class SurfacePlot {
 					for (int y = 0; y < heightTmp; y++) {
 						for (int x = 0; x < widthTmp; x++) {
 
-						int val = (int) ((int) (0xFFFF & pixels[pos++]) * b + a - min_);
+						int val = (int) ((0xFFFF & pixels[pos++]) * b + a - min_);
 							if (val < 0f) {
 								val = 0;
 							}
@@ -169,7 +176,7 @@ class SurfacePlot {
 				int pos = 0;
 					for (int y = 0; y < heightTmp; y++) {
 						for (int x = 0; x < widthTmp; x++) {
-						float value = (float) (pixels[pos++] - min);
+						float value = pixels[pos++] - min;
 							if (value < 0f) {
 								value = 0f;
 							}
@@ -228,7 +235,7 @@ class SurfacePlot {
 
 						lum = (int) (0.299 * r + 0.587 * g + 0.114 * b);
 					} else {
-						lum = (int) (0xFF & lutPixels[i]);
+						lum = 0xFF & lutPixels[i];
 					}
 
 					pixelsOrigLum[j] = lum;
@@ -255,7 +262,7 @@ class SurfacePlot {
 					if (!isLut) {
 						lum = (int) Math.round(0.299 * r + 0.587 * g + 0.114 * b);
 					} else {
-						lum = (int) (0xFF & lutPixels[pos]);
+						lum = 0xFF & lutPixels[pos];
 					}
 
 					pixelsOrigLum[pos] = lum;
@@ -330,7 +337,7 @@ class SurfacePlot {
 					for (int y = 0; y < heightTmp; y++) {
 						for (int x = 0; x < widthTmp; x++) {
 
-						int val = (int) ((int) (0xFFFF & pixels[pos++]) * b + a - min_);
+						int val = (int) ((0xFFFF & pixels[pos++]) * b + a - min_);
 							if (val < 0f) {
 								val = 0;
 							}
@@ -349,7 +356,7 @@ class SurfacePlot {
 				int pos = 0;
 					for (int y = 0; y < heightTmp; y++) {
 						for (int x = 0; x < widthTmp; x++) {
-						float value = (float) (pixels[pos++] - min);
+						float value = pixels[pos++] - min;
 							if (value < 0f) {
 								value = 0f;
 							}
@@ -421,7 +428,7 @@ class SurfacePlot {
 
 						lum = (int) (0.299 * r + 0.587 * g + 0.114 * b);
 					} else {
-						lum = (int) (0xFF & lutPixels[i]);
+						lum = 0xFF & lutPixels[i];
 					}
 
 					pixelsOrigLum[j] = lum;
@@ -448,7 +455,7 @@ class SurfacePlot {
 					if (!isLut) {
 						lum = (int) Math.round(0.299 * r + 0.587 * g + 0.114 * b);
 					} else {
-						lum = (int) (0xFF & lutPixels[pos]);
+						lum = 0xFF & lutPixels[pos];
 					}
 
 					pixelsOrigLum[pos] = lum;
@@ -517,11 +524,7 @@ class SurfacePlot {
 							pixelsOrigLum[posOrig] - zCenter;
 
 					if (maskPixels != null) {
-						if (maskPixels[posOrig] != 0) {
-							plotList[posGrid].isVisible = true;
-						} else {
-							plotList[posGrid].isVisible = false;
-						}
+						plotList[posGrid].isVisible = maskPixels[posOrig] != 0;
 					} else {
 						plotList[posGrid].isVisible = true;
 					}
@@ -711,21 +714,26 @@ class SurfacePlot {
 
 	private int getColor(SurfacePlotData p0) {
 	int c0;
-		if (lutNr == JRenderer3D.LUT_ORIGINAL) {
-			c0 = p0.color;
-		} else if (lutNr == JRenderer3D.LUT_GRADIENT) {
-			c0 = ((int) (p0.dx * 127 + 127) << 16) | ((int) (p0.dy * 127 + 127) << 8) | (int) (p0.dz * 127 + 127);
-		} else if (lutNr == JRenderer3D.LUT_GRADIENT2) {
-			c0 = ((int) (p0.dx2 * 127 + 127) << 16) | ((int) (p0.dy2 * 127 + 127) << 8) | (int) (0);
-		} else {
-		int index = (int) (p0.z + 128);
-			if (index > 255) {
-				index = 255;
-			}
-			if (index < 0) {
-				index = 0;
-			}
-			c0 = lut.colors[index];
+		switch (lutNr) {
+			case JRenderer3D.LUT_ORIGINAL:
+				c0 = p0.color;
+				break;
+			case JRenderer3D.LUT_GRADIENT:
+				c0 = ((int) (p0.dx * 127 + 127) << 16) | ((int) (p0.dy * 127 + 127) << 8) | (int) (p0.dz * 127 + 127);
+				break;
+			case JRenderer3D.LUT_GRADIENT2:
+				c0 = ((int) (p0.dx2 * 127 + 127) << 16) | ((int) (p0.dy2 * 127 + 127) << 8);
+				break;
+			default:
+				int index = (int) (p0.z + 128);
+				if (index > 255) {
+					index = 255;
+				}
+				if (index < 0) {
+					index = 0;
+				}
+				c0 = lut.colors[index];
+				break;
 		}
 		return c0;
 	}
@@ -1458,8 +1466,8 @@ class SurfacePlot {
 	protected void setInverse(boolean b) {
 		inversefactor = (b) ? -1 : 1;
 
-		for (int i = 0; i < plotList.length; i++) {
-			plotList[i].z = inversefactor * plotList[i].zf;
+		for (SurfacePlotData aPlotList : plotList) {
+			aPlotList.z = inversefactor * aPlotList.zf;
 		}
 	}
 }

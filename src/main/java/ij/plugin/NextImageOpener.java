@@ -32,18 +32,19 @@ public class NextImageOpener implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		/*
 		 *  get changes to defaults
 		 */
-		if (arg.equals("backward") || IJ.altKeyDown()) {
+		if ("backward".equals(arg) || IJ.altKeyDown()) {
 			forward = false;
 		}
-		if (arg.equals("backwardsc")) {
+		if ("backwardsc".equals(arg)) {
 			forward = false;
 			closeCurrent = false;
 		}
-		if (arg.equals("forwardsc")) {
+		if ("forwardsc".equals(arg)) {
 			forward = true;
 			closeCurrent = false;
 		}

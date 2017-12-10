@@ -12,8 +12,9 @@ public class ImageWriter {
 	}
 	
 	private void showProgress(double progress) {
-		if (showProgressBar)
-			IJ.showProgress(progress);
+		if (showProgressBar) {
+            IJ.showProgress(progress);
+        }
 	}
 	
 	void write8BitImage(OutputStream out, byte[] pixels)  throws IOException {
@@ -22,8 +23,9 @@ public class ImageWriter {
 		int count = 8192;
 		
 		while (bytesWritten<size) {
-			if ((bytesWritten + count)>size)
-				count = size - bytesWritten;
+			if ((bytesWritten + count)>size) {
+                count = size - bytesWritten;
+            }
 			//System.out.println(bytesWritten + " " + count + " " + size);
 			out.write(pixels, bytesWritten, count);
 			bytesWritten += count;
@@ -47,24 +49,26 @@ public class ImageWriter {
 		byte[] buffer = new byte[count];
 
 		while (bytesWritten<size) {
-			if ((bytesWritten + count)>size)
-				count = size - bytesWritten;
+			if ((bytesWritten + count)>size) {
+                count = size - bytesWritten;
+            }
 			int j = bytesWritten/2;
 			int value;
-			if (fi.intelByteOrder)
-				for (int i=0; i < count; i+=2) {
-					value = pixels[j];
-					buffer[i] = (byte)value;
-					buffer[i+1] = (byte)(value>>>8);
-					j++;
-				}
-			else
-				for (int i=0; i < count; i+=2) {
-					value = pixels[j];
-					buffer[i] = (byte)(value>>>8);
-					buffer[i+1] = (byte)value;
-					j++;
-				}
+			if (fi.intelByteOrder) {
+                for (int i = 0; i < count; i+=2) {
+                    value = pixels[j];
+                    buffer[i] = (byte)value;
+                    buffer[i+1] = (byte)(value>>>8);
+                    j++;
+                }
+            } else {
+                for (int i = 0; i < count; i+=2) {
+                    value = pixels[j];
+                    buffer[i] = (byte)(value>>>8);
+                    buffer[i+1] = (byte)value;
+                    j++;
+                }
+            }
 			out.write(buffer, 0, count);
 			bytesWritten += count;
 			showProgress((double)bytesWritten/size);
@@ -115,27 +119,29 @@ public class ImageWriter {
 		int tmp;
 
 		while (bytesWritten<size) {
-			if ((bytesWritten + count)>size)
-				count = size - bytesWritten;
+			if ((bytesWritten + count)>size) {
+                count = size - bytesWritten;
+            }
 			int j = bytesWritten/4;
-			if (fi.intelByteOrder)
-				for (int i=0; i < count; i+=4) {
-					tmp = Float.floatToRawIntBits(pixels[j]);
-					buffer[i]   = (byte)tmp;
-					buffer[i+1] = (byte)(tmp>>8);
-					buffer[i+2] = (byte)(tmp>>16);
-					buffer[i+3] = (byte)(tmp>>24);
-					j++;
-				}
-			else
-				for (int i=0; i < count; i+=4) {
-					tmp = Float.floatToRawIntBits(pixels[j]);
-					buffer[i]   = (byte)(tmp>>24);
-					buffer[i+1] = (byte)(tmp>>16);
-					buffer[i+2] = (byte)(tmp>>8);
-					buffer[i+3] = (byte)tmp;
-					j++;
-				}
+			if (fi.intelByteOrder) {
+                for (int i = 0; i < count; i+=4) {
+                    tmp = Float.floatToRawIntBits(pixels[j]);
+                    buffer[i]   = (byte)tmp;
+                    buffer[i+1] = (byte)(tmp>>8);
+                    buffer[i+2] = (byte)(tmp>>16);
+                    buffer[i+3] = (byte)(tmp>>24);
+                    j++;
+                }
+            } else {
+                for (int i = 0; i < count; i+=4) {
+                    tmp = Float.floatToRawIntBits(pixels[j]);
+                    buffer[i]   = (byte)(tmp>>24);
+                    buffer[i+1] = (byte)(tmp>>16);
+                    buffer[i+2] = (byte)(tmp>>8);
+                    buffer[i+3] = (byte)tmp;
+                    j++;
+                }
+            }
 			out.write(buffer, 0, count);
 			bytesWritten += count;
 			showProgress((double)bytesWritten/size);
@@ -157,8 +163,9 @@ public class ImageWriter {
 		int count = fi.width*24;
 		byte[] buffer = new byte[count];
 		while (bytesWritten<size) {
-			if ((bytesWritten + count)>size)
-				count = size - bytesWritten;
+			if ((bytesWritten + count)>size) {
+                count = size - bytesWritten;
+            }
 			int j = bytesWritten/3;
 			for (int i=0; i < count; i+=3) {
 				buffer[i]   = (byte)(pixels[j]>>16);	//red
@@ -188,39 +195,45 @@ public class ImageWriter {
  		array of images returned by ImageStack.getImageArray()).
  		The fi.offset field is ignored. */
 	public void write(OutputStream out) throws IOException {
-		if (fi.pixels==null)
-				throw new IOException("ImageWriter: fi.pixels==null");
-		if (fi.nImages>1 && !(fi.pixels instanceof Object[]))
-				throw new IOException("ImageWriter: fi.pixels not a stack");
+		if (fi.pixels==null) {
+            throw new IOException("ImageWriter: fi.pixels==null");
+        }
+		if (fi.nImages>1 && !(fi.pixels instanceof Object[])) {
+            throw new IOException("ImageWriter: fi.pixels not a stack");
+        }
 		switch (fi.fileType) {
 			case FileInfo.GRAY8:
 			case FileInfo.COLOR8:
-				if (fi.nImages>1)
-					write8BitStack(out, (Object[])fi.pixels);
-				else
-					write8BitImage(out, (byte[])fi.pixels);
+				if (fi.nImages>1) {
+                    write8BitStack(out, (Object[])fi.pixels);
+                } else {
+                    write8BitImage(out, (byte[])fi.pixels);
+                }
 				break;
 			case FileInfo.GRAY16_SIGNED:
 			case FileInfo.GRAY16_UNSIGNED:
-				if (fi.nImages>1)
-					write16BitStack(out, (Object[])fi.pixels);
-				else
-					write16BitImage(out, (short[])fi.pixels);
+				if (fi.nImages>1) {
+                    write16BitStack(out, (Object[])fi.pixels);
+                } else {
+                    write16BitImage(out, (short[])fi.pixels);
+                }
 				break;
 			case FileInfo.RGB48:
 				writeRGB48Image(out, (Object[])fi.pixels);
 				break;
 			case FileInfo.GRAY32_FLOAT:
-				if (fi.nImages>1)
-					writeFloatStack(out, (Object[])fi.pixels);
-				else
-					writeFloatImage(out, (float[])fi.pixels);
+				if (fi.nImages>1) {
+                    writeFloatStack(out, (Object[])fi.pixels);
+                } else {
+                    writeFloatImage(out, (float[])fi.pixels);
+                }
 				break;
 			case FileInfo.RGB:
-				if (fi.nImages>1)
-					writeRGBStack(out, (Object[])fi.pixels);
-				else
-					writeRGBImage(out, (int[])fi.pixels);
+				if (fi.nImages>1) {
+                    writeRGBStack(out, (Object[])fi.pixels);
+                } else {
+                    writeRGBImage(out, (int[])fi.pixels);
+                }
 				break;
 			default:
 		}

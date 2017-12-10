@@ -1,22 +1,19 @@
 //EU_HOU
 package ij;
-import ij.util.Java2;
 import java.io.*;
 import java.util.*;
 import java.applet.*;
 import java.net.URL;
 import java.awt.*;
-import java.applet.Applet;
+
 import ij.io.*;
 import ij.util.Tools;
 import ij.gui.*;
 import ij.plugin.filter.*;
-import ij.process.ImageConverter;
 import ij.plugin.Animator;
 import ij.process.FloatBlitter;
 //EU_HOU
 //import ij.plugin.GelAnalyzer;
-import ij.plugin.JpegWriter;
 import ij.process.ColorProcessor;
 
 /**
@@ -307,7 +304,7 @@ public class Prefs {
 
 			imagesURL = url.toString();
 		}
-		catch (Exception e) {}
+		catch (Exception ignored) {}
 		return null;
 	}
 
@@ -421,7 +418,7 @@ public class Prefs {
 			return defaultValue;
 		}
 		else {
-			return s.equals("true");
+			return "true".equals(s);
 		}
 	}
 
@@ -479,7 +476,7 @@ public class Prefs {
 
 		if (s != null) {
 			try {
-				return Integer.decode(s).intValue();
+				return Integer.decode(s);
 			}
 			catch (NumberFormatException e) {
 				IJ.write("" + e);
@@ -511,7 +508,7 @@ public class Prefs {
 				d = null;
 			}
 			if (d != null) {
-				return (d.doubleValue());
+				return (d);
 			}
 		}
 		return defaultValue;
@@ -786,7 +783,7 @@ public class Prefs {
 				d = null;
 			}
 			if (d != null) {
-				return (d.doubleValue());
+				return (d);
 			}
 		}
 		return defaultValue;
@@ -809,7 +806,7 @@ public class Prefs {
 			return defaultValue;
 		}
 		else {
-			return value.equals("true");
+			return "true".equals(value);
 		}
 	}
 

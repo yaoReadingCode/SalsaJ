@@ -1,6 +1,5 @@
 package ij.plugin.filter;
 import java.awt.*;
-import java.awt.image.*;
 import java.util.*;
 import ij.*;
 import ij.process.*;
@@ -50,7 +49,8 @@ public class FractalBoxCounter implements PlugInFilter {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		return DOES_8G + NO_CHANGES;
 	}
@@ -61,7 +61,8 @@ public class FractalBoxCounter implements PlugInFilter {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 
 	GenericDialog gd = new GenericDialog("Fractal Box Counter", IJ.getInstance());
 		gd.addStringField("Box Sizes:", sizes, 20);
@@ -76,7 +77,7 @@ public class FractalBoxCounter implements PlugInFilter {
 
 		blackBackground = gd.getNextBoolean();
 
-		if (s.equals("")) {
+		if ("".equals(s)) {
 			return;
 		}
 		boxSizes = s2ints(s);
@@ -85,9 +86,9 @@ public class FractalBoxCounter implements PlugInFilter {
 		}
 		boxCountSums = new float[boxSizes.length];
 		sizes = s;
-		for (int i = 0; i < boxSizes.length; i++) {
-			maxBoxSize = Math.max(maxBoxSize, boxSizes[i]);
-		}
+        for (int boxSize : boxSizes) {
+            maxBoxSize = Math.max(maxBoxSize, boxSize);
+        }
 		counts = new int[maxBoxSize * maxBoxSize + 1];
 		imp.killRoi();
 	ImageStatistics stats = imp.getStatistics();
@@ -105,8 +106,7 @@ public class FractalBoxCounter implements PlugInFilter {
 		}
 		doBoxCounts(ip);
 		IJ.register(FractalBoxCounter.class);// keeps this class from being GC'd on 1.1 JVMs
-		return;
-	}
+    }
 
 
 	/**

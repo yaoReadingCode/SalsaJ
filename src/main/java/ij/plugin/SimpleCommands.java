@@ -1,6 +1,5 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 
 /**
@@ -21,19 +20,20 @@ public class SimpleCommands implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
-		if (arg.equals("search")) {
+	@Override
+    public void run(String arg) {
+		if ("search".equals(arg)) {
 			search();
 		}
-		if (arg.equals("import")) {
+		if ("import".equals(arg)) {
 			IJ.runMacroFile("ij.jar:ImportResultsTable");
-		} else if (arg.equals("rename")) {
+		} else if ("rename".equals(arg)) {
 			rename();
-		} else if (arg.equals("reset")) {
+		} else if ("reset".equals(arg)) {
 			reset();
-		} else if (arg.equals("about")) {
+		} else if ("about".equals(arg)) {
 			aboutPluginsHelp();
-		} else if (arg.equals("install")) {
+		} else if ("install".equals(arg)) {
 			installation();
 		}
 	}
@@ -121,8 +121,7 @@ public class SimpleCommands implements PlugIn {
 		gd.addStringField(IJ.getPluginBundle().getString("Title") + ":", imp.getTitle(), 30);
 		gd.showDialog();
 		if (gd.wasCanceled()) {
-			return;
-		} else {
+        } else {
 			imp.setTitle(gd.getNextString());
 		}
 	}

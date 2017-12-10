@@ -1,5 +1,4 @@
 package ij.plugin;
-import java.awt.*;
 import ij.*;
 import ij.gui.*;
 import ij.plugin.frame.Editor;
@@ -24,24 +23,34 @@ public class NewPlugin implements PlugIn {
 	private int saveColumns = columns;
 	private boolean saveMonospaced = monospaced;
     
+    @Override
     public void run(String arg) {
-		if (arg.equals("")&&!showDialog())
-			return;
-		if (arg.equals("text")) {
+		if ("".equals(arg) &&!showDialog()) {
+            return;
+        }
+		if ("text".equals(arg)) {
 			type = TEXT_FILE;
 			arg = "";
 		}
-		if (arg.equals("")) {
-			if (type==MACRO || type==TEXT_FILE) {
-				if (type==TEXT_FILE && name.equals("Macro"))
-					name = "Untitled.txt";
-    			createMacro(name);
-    		} else if (type==TABLE) {
-    			createTextWindow();
-    		} else
-    			createPlugin(name, type, arg);
-    	} else
-    		createPlugin("Converted_Macro.java", PLUGIN, arg);
+		if ("".equals(arg)) {
+            switch (type) {
+                case MACRO:
+                case TEXT_FILE:
+                    if (type == TEXT_FILE && "Macro".equals(name)) {
+                        name = "Untitled.txt";
+                    }
+                    createMacro(name);
+                    break;
+                case TABLE:
+                    createTextWindow();
+                    break;
+                default:
+                    createPlugin(name, type, arg);
+                    break;
+            }
+    	} else {
+            createPlugin("Converted_Macro.java", PLUGIN, arg);
+        }
     	if (IJ.macroRunning()) {
 			type = saveType;
 			name = saveName;
@@ -55,28 +64,35 @@ public class NewPlugin implements PlugIn {
 	public void createMacro(String name) {
 		int options = (monospaced?Editor.MONOSPACED:0)+(menuBar?Editor.MENU_BAR:0);
 		ed = new Editor(rows, columns, 0, options);
-		if (name.endsWith(".java"))
-			name = name.substring(0, name.length()-5);
+		if (name.endsWith(".java")) {
+            name = name.substring(0, name.length()-5);
+        }
 		//if (name.endsWith("_"))
 		//	name = name.substring(0, name.length()-1);
-		if (type==MACRO && !(name.endsWith(".txt")))
-			name += ".txt";
+		if (type==MACRO && !(name.endsWith(".txt"))) {
+            name += ".txt";
+        }
 		ed.create(name, "");
 	}
 	
 	void createTextWindow() {
 		String tableName = name;
-		if (tableName.equals("Macro")) tableName = "Table";
-		if (columns<128 || rows<75 )
-			new TextWindow(tableName, "", 350, 250);
-		else
-			new TextWindow(tableName, "", columns, rows);
+		if ("Macro".equals(tableName)) {
+            tableName = "Table";
+        }
+		if (columns<128 || rows<75 ) {
+            new TextWindow(tableName, "", 350, 250);
+        } else {
+            new TextWindow(tableName, "", columns, rows);
+        }
 	}
 
 	public void createPlugin(String name, int type, String methods) {
   		ed = (Editor)IJ.runPlugIn("ij.plugin.frame.Editor", "");
-		if (ed==null) return;
-		if (name.equals("Macro") || name.equals("Macro.txt") || name.equals("Untitled.txt")) {
+		if (ed==null) {
+            return;
+        }
+		if ("Macro".equals(name) || "Macro.txt".equals(name) || "Untitled.txt".equals(name)) {
 			switch (type) {
 				case PLUGIN: name = "My_Plugin.java"; break;
 				case PLUGIN_FILTER:  name = "Filter_Plugin.java"; break;
@@ -85,8 +101,9 @@ public class NewPlugin implements PlugIn {
 		}
 		String pluginName = name;
 		if (!(name.endsWith(".java") || name.endsWith(".JAVA"))) {
-			if (pluginName.endsWith(".txt"))
-				pluginName = pluginName.substring(0, pluginName.length()-4);
+			if (pluginName.endsWith(".txt")) {
+                pluginName = pluginName.substring(0, pluginName.length()-4);
+            }
 			pluginName += ".java";
 		}
 		//if (name.indexOf('_')==-1) {
@@ -106,10 +123,11 @@ public class NewPlugin implements PlugIn {
 				text += "public class "+className+" implements PlugIn {\n";
 				text += "\n";
 				text += "\tpublic void run(String arg) {\n";
-				if (methods.equals(""))
-					text += "\t\tIJ.showMessage(\""+className+"\",\"Hello world!\");\n";
-				else
-					text += methods;
+				if ("".equals(methods)) {
+                    text += "\t\tIJ.showMessage(\""+className+"\",\"Hello world!\");\n";
+                } else {
+                    text += methods;
+                }
 				text += "\t}\n";
 				break;
 			case PLUGIN_FILTER:
@@ -163,18 +181,27 @@ public class NewPlugin implements PlugIn {
 		gd.setInsets(0, 30, 0);
 		gd.addCheckbox("Monospaced Font", monospaced);
 		gd.showDialog();
-		if (gd.wasCanceled())
-			return false;
+		if (gd.wasCanceled()) {
+            return false;
+        }
 		name = gd.getNextString();
 		type = gd.getNextChoiceIndex();
 		columns = (int)gd.getNextNumber();
 		rows = (int)gd.getNextNumber();
 		menuBar = gd.getNextBoolean();
 		monospaced = gd.getNextBoolean();
-		if (rows<1) rows = 1;
-		if (type!=TABLE && rows>100) rows = 100;
-		if (columns<1) columns = 1;
-		if (type!=TABLE && columns>200) columns = 200;
+		if (rows<1) {
+            rows = 1;
+        }
+		if (type!=TABLE && rows>100) {
+            rows = 100;
+        }
+		if (columns<1) {
+            columns = 1;
+        }
+		if (type!=TABLE && columns>200) {
+            columns = 200;
+        }
 		return true;
 	}
 	

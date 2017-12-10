@@ -2,7 +2,6 @@ package ij.plugin;
 import ij.*;
 import ij.io.*;
 import ij.macro.*;
-import ij.text.*;
 import ij.util.*;
 import java.io.*;
 
@@ -23,14 +22,15 @@ public class Macro_Runner implements PlugIn {
 	 *
 	 *@param  name  Description of the Parameter
 	 */
-	public void run(String name) {
+	@Override
+    public void run(String name) {
 	Thread thread = Thread.currentThread();
 	String threadName = thread.getName();
 		if (!threadName.endsWith("Macro$")) {
 			thread.setName(threadName + "Macro$");
 		}
 	String path = null;
-		if (name.equals("")) {
+		if ("".equals(name)) {
 		//EU_HOU Bundle
 		OpenDialog od = new OpenDialog("Run Macro...", path);
 		String directory = od.getDirectory();
@@ -70,7 +70,7 @@ public class Macro_Runner implements PlugIn {
 			}
 		InputStreamReader isr = new InputStreamReader(is);
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		char[] b = new char[8192];
 		int n;
 			//read a block and append any characters
@@ -83,7 +83,7 @@ public class Macro_Runner implements PlugIn {
 			//new TextWindow("Macro Runner", sb.toString(), 450, 450);
 		} catch (IOException e) {
 		String msg = e.getMessage();
-			if (msg == null || msg.equals("")) {
+			if (msg == null || "".equals(msg)) {
 				msg = "" + e;
 			}
 			//EU_HOU Bundle
@@ -108,7 +108,7 @@ public class Macro_Runner implements PlugIn {
 		if (name.startsWith("ij.jar:")) {
 			return runMacroFromIJJar(name, arg);
 		}
-		if (name.indexOf(".") == -1) {
+		if (!name.contains(".")) {
 			name = name + ".txt";
 		}
 	String name2 = name;
@@ -187,7 +187,7 @@ public class Macro_Runner implements PlugIn {
 				s = Tools.fixNewLines(s);
 			}
 			//Don't show exceptions resulting from window being closed
-			if (!(s.indexOf("NullPointerException") >= 0 && s.indexOf("ij.process") >= 0)) {
+			if (!(s.contains("NullPointerException") && s.contains("ij.process"))) {
 				if (IJ.getInstance() != null) {
 					//EU_HOU Bundle
 					new ij.text.TextWindow("Exception", s, 350, 250);
@@ -221,7 +221,7 @@ public class Macro_Runner implements PlugIn {
 				return runMacroFile(name, arg);
 			}
 		InputStreamReader isr = new InputStreamReader(is);
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		char[] b = new char[8192];
 		int n;
 			while ((n = isr.read(b)) > 0) {
@@ -230,7 +230,7 @@ public class Macro_Runner implements PlugIn {
 			macro = sb.toString();
 		} catch (IOException e) {
 		String msg = e.getMessage();
-			if (msg == null || msg.equals("")) {
+			if (msg == null || "".equals(msg)) {
 				msg = "" + e;
 			}
 			//EU_HOU Bundle

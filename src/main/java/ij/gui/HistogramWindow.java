@@ -2,7 +2,6 @@
 package ij.gui;
 
 import java.awt.*;
-import java.awt.image.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
@@ -286,7 +285,8 @@ public class HistogramWindow extends ImageWindow implements Measurements, Action
 	 *@param  x  Description of the Parameter
 	 *@param  y  Description of the Parameter
 	 */
-	public void mouseMoved(int x, int y) {
+	@Override
+    public void mouseMoved(int x, int y) {
 		if (value == null || count == null) {
 			return;
 		}
@@ -514,18 +514,18 @@ public class HistogramWindow extends ImageWindow implements Measurements, Action
 	 *  Description of the Method
 	 */
 	protected void showList() {
-	StringBuffer sb = new StringBuffer();
+	StringBuilder sb = new StringBuilder();
 	String vheading = stats.binSize == 1.0 ? "value" : "bin start";
 
 		if (cal.calibrated() && !cal.isSigned16Bit()) {
 			for (int i = 0; i < stats.nBins; i++) {
-				sb.append(i + "\t" + IJ.d2s(cal.getCValue(stats.histMin + i * stats.binSize), digits) + "\t" + histogram[i] + "\n");
+				sb.append(i).append("\t").append(IJ.d2s(cal.getCValue(stats.histMin + i * stats.binSize), digits)).append("\t").append(histogram[i]).append("\n");
 			}
 		//EU_HOU Bundle
 		TextWindow tw = new TextWindow(getTitle(), IJ.getBundle().getString("HistoHead") + vheading, sb.toString(), 200, 400);
 		} else {
 			for (int i = 0; i < stats.nBins; i++) {
-				sb.append(IJ.d2s(cal.getCValue(stats.histMin + i * stats.binSize), digits) + "\t" + histogram[i] + "\n");
+				sb.append(IJ.d2s(cal.getCValue(stats.histMin + i * stats.binSize), digits)).append("\t").append(histogram[i]).append("\n");
 			}
 		//EU_HOU Bundle
 		TextWindow tw = new TextWindow(getTitle(), vheading + IJ.getBundle().getString("HistoHead"), sb.toString(), 200, 400);
@@ -617,7 +617,8 @@ public class HistogramWindow extends ImageWindow implements Measurements, Action
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 	Object b = e.getSource();
 
 		if (b == list) {
@@ -636,7 +637,8 @@ public class HistogramWindow extends ImageWindow implements Measurements, Action
 	 *@param  clipboard  Description of the Parameter
 	 *@param  contents   Description of the Parameter
 	 */
-	public void lostOwnership(Clipboard clipboard, Transferable contents) { }
+	@Override
+    public void lostOwnership(Clipboard clipboard, Transferable contents) { }
 
 
 	/**

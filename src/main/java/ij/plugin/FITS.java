@@ -55,6 +55,7 @@ public class FITS extends ImagePlus implements PlugIn
      *
      * @param arg Description of the Parameter
      */
+    @Override
     public void run(String arg)
     {
         try
@@ -167,7 +168,7 @@ public class FITS extends ImagePlus implements PlugIn
         // For radio telescope UPMC/OBSPM spectra
         if (hdu.getTelescope() != null)
         {
-            if (hdu.getTelescope().equals("SRT-PARIS"))
+            if ("SRT-PARIS".equals(hdu.getTelescope()))
             {
                 imageProcessor = processSRTParisSpectra_Oli(hdu, imgData);
             }
@@ -258,7 +259,7 @@ public class FITS extends ImagePlus implements PlugIn
                 IJ.error(e.getMessage());
             }
             setFileInfo(fileInfo); // needed for File->Revert
-            if (path.equals(""))
+            if ("".equals(path))
             {
                 show();
             }
@@ -595,232 +596,200 @@ public class FITS extends ImagePlus implements PlugIn
     {
         ImageProcessor ip;//Profiler p = new Profiler();
         ///////////////////////////// 16 BITS ///////////////////////
-        if (hdu.getBitPix() == 16)
-        {
-            short[][] itab = (short[][]) imgData.getKernel();
-            int idx = 0;
-            float[] imgtab;
-            FloatProcessor imgtmp;
-            imgtmp = new FloatProcessor(wi, he);
-            imgtab = new float[wi * he];
-            for (int y = 0; y < he; y++)
-            {
-                for (int x = 0; x < wi; x++)
-                {
-                    imgtab[idx] = (float) hdu.getBZero()
-                            + (float) hdu.getBScale() * (float) itab[y][x];
-                    idx++;
-                }
-            }
-            imgtmp.setPixels(imgtab);
-            imgtmp.resetMinAndMax();
-
-            if (he == 1)
-            {
-                imgtmp = (FloatProcessor) imgtmp.resize(wi, 100);
-            }
-            if (wi == 1)
-            {
-                imgtmp = (FloatProcessor) imgtmp.resize(100, he);
-            }
-            if (IJ.debug)
-            {
-                System.out.println("ip " + imgtmp + " imp " + this);
-            }
-            ip = imgtmp;
-            ip.flipVertical();
-            this.setProcessor(fileName, ip);
-
-        } // 8 bits
-        else if (hdu.getBitPix() == 8)
-        {
-            byte[][] itab = (byte[][]) imgData.getKernel();
-            int idx = 0;
-            float[] imgtab;
-            FloatProcessor imgtmp;
-            imgtmp = new FloatProcessor(wi, he);
-            imgtab = new float[wi * he];
-            for (int y = 0; y < he; y++)
-            {
-                for (int x = 0; x < wi; x++)
-                {
-                    if (itab[x][y] < 0)
-                    {
-                        itab[x][y] += 256;
-                    }
-                    imgtab[idx] = (float) hdu.getBZero()
-                            + (float) hdu.getBScale()
-                            * (float) (itab[y][x]);
-                    idx++;
-                }
-            }
-            imgtmp.setPixels(imgtab);
-            imgtmp.resetMinAndMax();
-
-            if (he == 1)
-            {
-                imgtmp = (FloatProcessor) imgtmp.resize(wi, 100);
-            }
-            if (wi == 1)
-            {
-                imgtmp = (FloatProcessor) imgtmp.resize(100, he);
-            }
-            if (IJ.debug)
-            {
-                System.out.println("ip " + imgtmp + " imp " + this);
-            }
-            ip = imgtmp;
-            ip.flipVertical();
-            this.setProcessor(fileName, ip);
-
-        } // 16-bits
-        ///////////////// 32 BITS ///////////////////////
-        else if (hdu.getBitPix() == 32)
-        {
-            int[][] itab = (int[][]) imgData.getKernel();
-            int idx = 0;
-            float[] imgtab;
-            FloatProcessor imgtmp;
-            imgtmp = new FloatProcessor(wi, he);
-            imgtab = new float[wi * he];
-            for (int y = 0; y < he; y++)
-            {
-                for (int x = 0; x < wi; x++)
-                {
-                    imgtab[idx] = (float) hdu.getBZero()
-                            + (float) hdu.getBScale() * (float) itab[y][x];
-                    idx++;
-                }
-            }
-            imgtmp.setPixels(imgtab);
-            imgtmp.resetMinAndMax();
-
-            if (he == 1)
-            {
-                imgtmp = (FloatProcessor) imgtmp.resize(wi, 100);
-            }
-            if (wi == 1)
-            {
-                imgtmp = (FloatProcessor) imgtmp.resize(100, he);
-            }
-
-            ip = imgtmp;
-            ip.flipVertical();
-            this.setProcessor(fileName, ip);
-
-        } // 32 bits
-        /////////////// -32 BITS ?? /////////////////////////////////
-        else if (hdu.getBitPix() == -32)
-        {
-            float[][] itab = (float[][]) imgData.getKernel();
-            int idx = 0;
-            float[] imgtab;
-            FloatProcessor imgtmp;
-            imgtmp = new FloatProcessor(wi, he);
-            imgtab = new float[wi * he];
-            for (int y = 0; y < he; y++)
-            {
-                for (int x = 0; x < wi; x++)
-                {
-                    imgtab[idx] = (float) hdu.getBZero()
-                            + (float) hdu.getBScale() * itab[y][x];
-                    idx++;
-                }
-            }
-            imgtmp.setPixels(imgtab);
-            imgtmp.resetMinAndMax();
-
-            if (he == 1)
-            {
-                imgtmp = (FloatProcessor) imgtmp.resize(wi, 100);
-            }
-            if (wi == 1)
-            {
-                imgtmp = (FloatProcessor) imgtmp.resize(100, he);
-            }
-
-            ip = imgtmp;
-            ip.flipVertical();
-            this.setProcessor(fileName, ip);
-
-            // special spectre optique transit
-            if ((hdu.getHeader().getStringValue("STATUS") != null) && (hdu
-                    .getHeader().getStringValue("STATUS")
-                    .equals("SPECTRUM")) && (
-                    hdu.getHeader().getIntValue(NAXIS) == 2))
-            {
-                if (IJ.debug)
-                {
-                    System.out.println("spectre optique");
-                }
-                //IJ.log("spectre optique");
-                float[] xValues = new float[wi];
-                float[] yValues = new float[wi];
-                for (int y = 0; y < wi; y++)
-                {
-                    yValues[y] = itab[0][y];
-                    if (yValues[y] < 0)
-                    {
-                        yValues[y] = 0;
+        switch (hdu.getBitPix()) {
+            case 16: {
+                short[][] itab = (short[][]) imgData.getKernel();
+                int idx = 0;
+                float[] imgtab;
+                FloatProcessor imgtmp;
+                imgtmp = new FloatProcessor(wi, he);
+                imgtab = new float[wi * he];
+                for (int y = 0; y < he; y++) {
+                    for (int x = 0; x < wi; x++) {
+                        imgtab[idx] = (float) hdu.getBZero()
+                                + (float) hdu.getBScale() * (float) itab[y][x];
+                        idx++;
                     }
                 }
-                String unitY;
-                unitY = bun.getString("IntensityRS") + " ";
-                String unitX;
-                unitX = bun.getString("WavelengthRS") + " ";
-                float CRVAL1 = 0;
-                float CRPIX1 = 0;
-                float CDELT1 = 0;
-                if (hdu.getHeader().getStringValue("CRVAL1") != null)
-                {
-                    CRVAL1 = Float.parseFloat(
-                            hdu.getHeader().getStringValue("CRVAL1"));
-                }
-                if (hdu.getHeader().getStringValue("CRPIX1") != null)
-                {
-                    CRPIX1 = Float.parseFloat(
-                            hdu.getHeader().getStringValue("CRPIX1"));
-                }
-                if (hdu.getHeader().getStringValue("CDELT1") != null)
-                {
-                    CDELT1 = Float.parseFloat(
-                            hdu.getHeader().getStringValue("CDELT1"));
-                }
-                for (int x = 0; x < wi; x++)
-                {
-                    xValues[x] = CRVAL1 + (x - CRPIX1) * CDELT1;
-                }
+                imgtmp.setPixels(imgtab);
+                imgtmp.resetMinAndMax();
 
-                float odiv = 1;
-                if (CRVAL1 < 0.000001)
-                {
-                    odiv = 1000000;
-                    unitX += "(µm)";
+                if (he == 1) {
+                    imgtmp = (FloatProcessor) imgtmp.resize(wi, 100);
                 }
-                else
-                {
-                    unitX += "ADU";
+                if (wi == 1) {
+                    imgtmp = (FloatProcessor) imgtmp.resize(100, he);
                 }
+                if (IJ.debug) {
+                    System.out.println("ip " + imgtmp + " imp " + this);
+                }
+                ip = imgtmp;
+                ip.flipVertical();
+                this.setProcessor(fileName, ip);
 
-                for (int x = 0; x < wi; x++)
-                {
-                    xValues[x] = xValues[x] * odiv;
-                }
-
-                Plot P = new Plot(
-                        IJ.getBundle().getString("PlotWinTitle") + " "
-                                + fileName, "X: " + unitX, "Y: " + unitY,
-                        xValues, yValues);
-                P.draw();
-            } //// end of special optique
-        } // -32 bits
-        else
-        {
-            if (IJ.debug)
-            {
-                System.out.println("other case ");
+                break;
             }
-            ip = imagePlus.getProcessor();
+            case 8: {
+                byte[][] itab = (byte[][]) imgData.getKernel();
+                int idx = 0;
+                float[] imgtab;
+                FloatProcessor imgtmp;
+                imgtmp = new FloatProcessor(wi, he);
+                imgtab = new float[wi * he];
+                for (int y = 0; y < he; y++) {
+                    for (int x = 0; x < wi; x++) {
+                        if (itab[x][y] < 0) {
+                            itab[x][y] += 256;
+                        }
+                        imgtab[idx] = (float) hdu.getBZero()
+                                + (float) hdu.getBScale()
+                                * (float) (itab[y][x]);
+                        idx++;
+                    }
+                }
+                imgtmp.setPixels(imgtab);
+                imgtmp.resetMinAndMax();
+
+                if (he == 1) {
+                    imgtmp = (FloatProcessor) imgtmp.resize(wi, 100);
+                }
+                if (wi == 1) {
+                    imgtmp = (FloatProcessor) imgtmp.resize(100, he);
+                }
+                if (IJ.debug) {
+                    System.out.println("ip " + imgtmp + " imp " + this);
+                }
+                ip = imgtmp;
+                ip.flipVertical();
+                this.setProcessor(fileName, ip);
+
+                break;
+            }
+            ///////////////// 32 BITS ///////////////////////
+            case 32: {
+                int[][] itab = (int[][]) imgData.getKernel();
+                int idx = 0;
+                float[] imgtab;
+                FloatProcessor imgtmp;
+                imgtmp = new FloatProcessor(wi, he);
+                imgtab = new float[wi * he];
+                for (int y = 0; y < he; y++) {
+                    for (int x = 0; x < wi; x++) {
+                        imgtab[idx] = (float) hdu.getBZero()
+                                + (float) hdu.getBScale() * (float) itab[y][x];
+                        idx++;
+                    }
+                }
+                imgtmp.setPixels(imgtab);
+                imgtmp.resetMinAndMax();
+
+                if (he == 1) {
+                    imgtmp = (FloatProcessor) imgtmp.resize(wi, 100);
+                }
+                if (wi == 1) {
+                    imgtmp = (FloatProcessor) imgtmp.resize(100, he);
+                }
+
+                ip = imgtmp;
+                ip.flipVertical();
+                this.setProcessor(fileName, ip);
+
+                break;
+            }
+            /////////////// -32 BITS ?? /////////////////////////////////
+            case -32: {
+                float[][] itab = (float[][]) imgData.getKernel();
+                int idx = 0;
+                float[] imgtab;
+                FloatProcessor imgtmp;
+                imgtmp = new FloatProcessor(wi, he);
+                imgtab = new float[wi * he];
+                for (int y = 0; y < he; y++) {
+                    for (int x = 0; x < wi; x++) {
+                        imgtab[idx] = (float) hdu.getBZero()
+                                + (float) hdu.getBScale() * itab[y][x];
+                        idx++;
+                    }
+                }
+                imgtmp.setPixels(imgtab);
+                imgtmp.resetMinAndMax();
+
+                if (he == 1) {
+                    imgtmp = (FloatProcessor) imgtmp.resize(wi, 100);
+                }
+                if (wi == 1) {
+                    imgtmp = (FloatProcessor) imgtmp.resize(100, he);
+                }
+
+                ip = imgtmp;
+                ip.flipVertical();
+                this.setProcessor(fileName, ip);
+
+                // special spectre optique transit
+                if ((hdu.getHeader().getStringValue("STATUS") != null) && ("SPECTRUM".equals(hdu
+                        .getHeader().getStringValue("STATUS"))) && (
+                        hdu.getHeader().getIntValue(NAXIS) == 2)) {
+                    if (IJ.debug) {
+                        System.out.println("spectre optique");
+                    }
+                    //IJ.log("spectre optique");
+                    float[] xValues = new float[wi];
+                    float[] yValues = new float[wi];
+                    for (int y = 0; y < wi; y++) {
+                        yValues[y] = itab[0][y];
+                        if (yValues[y] < 0) {
+                            yValues[y] = 0;
+                        }
+                    }
+                    String unitY;
+                    unitY = bun.getString("IntensityRS") + " ";
+                    String unitX;
+                    unitX = bun.getString("WavelengthRS") + " ";
+                    float CRVAL1 = 0;
+                    float CRPIX1 = 0;
+                    float CDELT1 = 0;
+                    if (hdu.getHeader().getStringValue("CRVAL1") != null) {
+                        CRVAL1 = Float.parseFloat(
+                                hdu.getHeader().getStringValue("CRVAL1"));
+                    }
+                    if (hdu.getHeader().getStringValue("CRPIX1") != null) {
+                        CRPIX1 = Float.parseFloat(
+                                hdu.getHeader().getStringValue("CRPIX1"));
+                    }
+                    if (hdu.getHeader().getStringValue("CDELT1") != null) {
+                        CDELT1 = Float.parseFloat(
+                                hdu.getHeader().getStringValue("CDELT1"));
+                    }
+                    for (int x = 0; x < wi; x++) {
+                        xValues[x] = CRVAL1 + (x - CRPIX1) * CDELT1;
+                    }
+
+                    float odiv = 1;
+                    if (CRVAL1 < 0.000001) {
+                        odiv = 1000000;
+                        unitX += "(µm)";
+                    } else {
+                        unitX += "ADU";
+                    }
+
+                    for (int x = 0; x < wi; x++) {
+                        xValues[x] = xValues[x] * odiv;
+                    }
+
+                    Plot P = new Plot(
+                            IJ.getBundle().getString("PlotWinTitle") + " "
+                                    + fileName, "X: " + unitX, "Y: " + unitY,
+                            xValues, yValues);
+                    P.draw();
+                } //// end of special optique
+                break;
+            }
+            default:
+                if (IJ.debug) {
+                    System.out.println("other case ");
+                }
+                ip = imagePlus.getProcessor();
+                break;
         }
         return ip;
     }
@@ -1000,6 +969,7 @@ public class FITS extends ImagePlus implements PlugIn
      * @param y Description of the Parameter
      * @return The locationAsString value
      */
+    @Override
     public String getLocationAsString(int x, int y)
     {
         String s;

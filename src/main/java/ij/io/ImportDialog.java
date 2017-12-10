@@ -1,14 +1,10 @@
 package ij.io;
 
-import java.awt.*;
-import java.awt.image.*;
 import java.io.*;
 import java.util.*;
 import ij.*;
 import ij.gui.*;
 import ij.process.*;
-import ij.util.StringSorter;
-import ij.plugin.frame.Recorder;
 import ij.plugin.FolderOpener;
 import ij.measure.Calibration;
 
@@ -59,8 +55,9 @@ public class ImportDialog {
 	}
 
 	boolean showDialog() {
-		if (choiceSelection>=types.length)
-			choiceSelection = 0;
+		if (choiceSelection>=types.length) {
+            choiceSelection = 0;
+        }
 		GenericDialog gd = new GenericDialog("Import...", IJ.getInstance());
 		gd.addChoice("Image Type:", types, types[choiceSelection]);
 		gd.addNumericField("Width:", width, 0, 6, "pixels");
@@ -72,8 +69,9 @@ public class ImportDialog {
 		gd.addCheckbox("Little-Endian Byte Order", intelByteOrder);
 		gd.addCheckbox("Open All Files in Folder", openAll);
 		gd.showDialog();
-		if (gd.wasCanceled())
-			return false;
+		if (gd.wasCanceled()) {
+            return false;
+        }
 		choiceSelection = gd.getNextChoiceIndex();
 		width = (int)gd.getNextNumber();
 		height = (int)gd.getNextNumber();
@@ -93,39 +91,47 @@ public class ImportDialog {
 		FolderOpener fo = new FolderOpener();
 		list = fo.trimFileList(list);
 		list = fo.sortFileList(list);
-		if (list==null) return;
+		if (list==null) {
+            return;
+        }
 		ImageStack stack=null;
 		ImagePlus imp=null;
 		double min = Double.MAX_VALUE;
 		double max = -Double.MAX_VALUE;
-		for (int i=0; i<list.length; i++) {
-			if (list[i].startsWith("."))
-				continue;
-			fi.fileName = list[i];
-			imp = new FileOpener(fi).open(false);
-			if (imp==null)
-				IJ.log(list[i] + ": unable to open");
-			else {
-				if (stack==null)
-					stack = imp.createEmptyStack();	
-				try {
-					ImageProcessor ip = imp.getProcessor();
-					if (ip.getMin()<min) min = ip.getMin();
-					if (ip.getMax()>max) max = ip.getMax();
-					stack.addSlice(list[i], ip);
-				}
-				catch(OutOfMemoryError e) {
-					IJ.outOfMemory("OpenAll");
-					stack.trim();
-					break;
-				}
-				IJ.showStatus((stack.getSize()+1) + ": " + list[i]);
-			}
-		}
+        for (String aList : list) {
+            if (aList.startsWith(".")) {
+                continue;
+            }
+            fi.fileName = aList;
+            imp = new FileOpener(fi).open(false);
+            if (imp == null) {
+                IJ.log(aList + ": unable to open");
+            } else {
+                if (stack == null) {
+                    stack = imp.createEmptyStack();
+                }
+                try {
+                    ImageProcessor ip = imp.getProcessor();
+                    if (ip.getMin() < min) {
+                        min = ip.getMin();
+                    }
+                    if (ip.getMax() > max) {
+                        max = ip.getMax();
+                    }
+                    stack.addSlice(aList, ip);
+                } catch (OutOfMemoryError e) {
+                    IJ.outOfMemory("OpenAll");
+                    stack.trim();
+                    break;
+                }
+                IJ.showStatus((stack.getSize() + 1) + ": " + aList);
+            }
+        }
 		if (stack!=null) {
 			imp = new ImagePlus("Imported Stack", stack);
-			if (imp.getBitDepth()==16 || imp.getBitDepth()==32)
-				imp.getProcessor().setMinAndMax(min, max);
+			if (imp.getBitDepth()==16 || imp.getBitDepth()==32) {
+                imp.getProcessor().setMinAndMax(min, max);
+            }
                 Calibration cal = imp.getCalibration();
                 if (fi.fileType==FileInfo.GRAY16_SIGNED) {
                     double[] coeff = new double[2];
@@ -141,12 +147,14 @@ public class ImportDialog {
 		Does nothing if the dialog is canceled. */
 	public void openImage() {
 		FileInfo fi = getFileInfo();
-		if (fi==null)
-			return;
+		if (fi==null) {
+            return;
+        }
 		if (openAll) {
 			String[] list = new File(directory).list();
-			if (list==null)
-				return;
+			if (list==null) {
+                return;
+            }
 			openAll(list, fi);
 		} else {
 			FileOpener fo = new FileOpener(fi);
@@ -158,52 +166,57 @@ public class ImportDialog {
 		open the image. Returns null if the dialog is canceled. The fileName 
 		and directory fields are null if the no argument constructor was used. */
 	public FileInfo getFileInfo() {
-		if (!showDialog())
-			return null;
+		if (!showDialog()) {
+            return null;
+        }
 		String imageType = types[choiceSelection];
 		FileInfo fi = new FileInfo();
-		fi.fileFormat = fi.RAW;
+		fi.fileFormat = FileInfo.RAW;
 		fi.fileName = fileName;
 		fi.directory = directory;
 		fi.width = width;
 		fi.height = height;
-		if (offset>2147483647)
-			fi.longOffset = offset;
-		else
-			fi.offset = (int)offset;
+		if (offset>2147483647) {
+            fi.longOffset = offset;
+        } else {
+            fi.offset = (int)offset;
+        }
 		fi.nImages = nImages;
 		fi.gapBetweenImages = gapBetweenImages;
 		fi.intelByteOrder = intelByteOrder;
 		fi.whiteIsZero = whiteIsZero;
-		if (imageType.equals("8-bit"))
-			fi.fileType = FileInfo.GRAY8;
-		else if (imageType.equals("16-bit Signed"))
-			fi.fileType = FileInfo.GRAY16_SIGNED;
-		else if (imageType.equals("16-bit Unsigned"))
-			fi.fileType = FileInfo.GRAY16_UNSIGNED;
-		else if (imageType.equals("32-bit Signed"))
-			fi.fileType = FileInfo.GRAY32_INT;
-		else if (imageType.equals("32-bit Unsigned"))
-			fi.fileType = FileInfo.GRAY32_UNSIGNED;
-		else if (imageType.equals("32-bit Real"))
-			fi.fileType = FileInfo.GRAY32_FLOAT;
-		else if (imageType.equals("64-bit Real"))
-			fi.fileType = FileInfo.GRAY64_FLOAT;
-		else if (imageType.equals("24-bit RGB"))
-			fi.fileType = FileInfo.RGB;
-		else if (imageType.equals("24-bit RGB Planar"))
-			fi.fileType = FileInfo.RGB_PLANAR;
-		else if (imageType.equals("24-bit BGR"))
-			fi.fileType = FileInfo.BGR;
-		else if (imageType.equals("24-bit Integer"))
-			fi.fileType = FileInfo.GRAY24_UNSIGNED;
-		else if (imageType.equals("32-bit ARGB"))
-			fi.fileType = FileInfo.ARGB;
-		else if (imageType.equals("1-bit Bitmap"))
-			fi.fileType = FileInfo.BITMAP;
-		else
-			fi.fileType = FileInfo.GRAY8;
-		if (IJ.debugMode) IJ.log("ImportDialog: "+fi);
+		if ("8-bit".equals(imageType)) {
+            fi.fileType = FileInfo.GRAY8;
+        } else if ("16-bit Signed".equals(imageType)) {
+            fi.fileType = FileInfo.GRAY16_SIGNED;
+        } else if ("16-bit Unsigned".equals(imageType)) {
+            fi.fileType = FileInfo.GRAY16_UNSIGNED;
+        } else if ("32-bit Signed".equals(imageType)) {
+            fi.fileType = FileInfo.GRAY32_INT;
+        } else if ("32-bit Unsigned".equals(imageType)) {
+            fi.fileType = FileInfo.GRAY32_UNSIGNED;
+        } else if ("32-bit Real".equals(imageType)) {
+            fi.fileType = FileInfo.GRAY32_FLOAT;
+        } else if ("64-bit Real".equals(imageType)) {
+            fi.fileType = FileInfo.GRAY64_FLOAT;
+        } else if ("24-bit RGB".equals(imageType)) {
+            fi.fileType = FileInfo.RGB;
+        } else if ("24-bit RGB Planar".equals(imageType)) {
+            fi.fileType = FileInfo.RGB_PLANAR;
+        } else if ("24-bit BGR".equals(imageType)) {
+            fi.fileType = FileInfo.BGR;
+        } else if ("24-bit Integer".equals(imageType)) {
+            fi.fileType = FileInfo.GRAY24_UNSIGNED;
+        } else if ("32-bit ARGB".equals(imageType)) {
+            fi.fileType = FileInfo.ARGB;
+        } else if ("1-bit Bitmap".equals(imageType)) {
+            fi.fileType = FileInfo.BITMAP;
+        } else {
+            fi.fileType = FileInfo.GRAY8;
+        }
+		if (IJ.debugMode) {
+            IJ.log("ImportDialog: "+fi);
+        }
 		return fi;
 	}
 
@@ -216,10 +229,12 @@ public class ImportDialog {
 		prefs.put(N, Integer.toString(nImages));
 		prefs.put(GAP, Integer.toString(gapBetweenImages));
 		int options = 0;
-		if (whiteIsZero)
-			options |= WHITE_IS_ZERO;
-		if (intelByteOrder)
-			options |= INTEL_BYTE_ORDER;
+		if (whiteIsZero) {
+            options |= WHITE_IS_ZERO;
+        }
+		if (intelByteOrder) {
+            options |= INTEL_BYTE_ORDER;
+        }
 		//if (openAll)
 		//	options |= OPEN_ALL;
 		prefs.put(OPTIONS, Integer.toString(options));

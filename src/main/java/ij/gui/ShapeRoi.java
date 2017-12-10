@@ -2,14 +2,10 @@ package ij.gui;
 import java.awt.*;
 import java.awt.image.*;
 import java.awt.geom.*;
-import java.awt.event.KeyEvent;
 import java.util.*;
 import ij.*;
 import ij.process.*;
 import ij.measure.*;
-import ij.plugin.frame.Recorder;
-import ij.plugin.filter.Analyzer;
-import ij.util.Tools;
 
 /**
  *  A subclass of <code>ij.gui.Roi</code> (2D Regions Of Interest) implemented
@@ -229,7 +225,8 @@ public class ShapeRoi extends Roi {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public synchronized Object clone() {// the equivalent of "operator=" ?
+	@Override
+    public synchronized Object clone() {// the equivalent of "operator=" ?
 	ShapeRoi sr = (ShapeRoi) super.clone();
 
 		sr.type = COMPOSITE;
@@ -1624,7 +1621,7 @@ public class ShapeRoi extends Roi {
 		}
 	Roi[] array = new Roi[rois.size()];
 
-		rois.copyInto((Roi[]) array);
+		rois.copyInto(array);
 		return array;
 	}
 
@@ -1637,7 +1634,7 @@ public class ShapeRoi extends Roi {
 	Roi[] getSavedRois() {
 	Roi[] array = new Roi[savedRois.size()];
 
-		savedRois.copyInto((Roi[]) array);
+		savedRois.copyInto(array);
 		return array;
 	}
 
@@ -1740,8 +1737,8 @@ public class ShapeRoi extends Roi {
 	int[] yPoints = new int[yCoords.size()];
 
 		for (int i = 0; i < xPoints.length; i++) {
-			xPoints[i] = ((Integer) xCoords.elementAt(i)).intValue() + x;
-			yPoints[i] = ((Integer) yCoords.elementAt(i)).intValue() + y;
+			xPoints[i] = (Integer) xCoords.elementAt(i) + x;
+			yPoints[i] = (Integer) yCoords.elementAt(i) + y;
 		}
 
 	int startX = 0;
@@ -1818,12 +1815,10 @@ public class ShapeRoi extends Roi {
 	 *@param  y  Description of the Parameter
 	 *@return    Description of the Return Value
 	 */
-	public boolean contains(int x, int y) {
-		if (shape == null) {
-			return false;
-		}
-		return shape.contains(x - this.x, y - this.y);
-	}
+	@Override
+    public boolean contains(int x, int y) {
+        return shape != null && shape.contains(x - this.x, y - this.y);
+    }
 
 
 	/**
@@ -1835,7 +1830,8 @@ public class ShapeRoi extends Roi {
 	 *
 	 *@return    The feretsDiameter value
 	 */
-	public double getFeretsDiameter() {
+	@Override
+    public double getFeretsDiameter() {
 		if (shape == null) {
 			return 0.0;
 		}
@@ -1910,7 +1906,8 @@ public class ShapeRoi extends Roi {
 	 *
 	 *@return    The length value
 	 */
-	public double getLength() {
+	@Override
+    public double getLength() {
 		if (shape == null) {
 			return 0.0;
 		}
@@ -2173,7 +2170,7 @@ public class ShapeRoi extends Roi {
 	int index = 0;
 
 		for (int i = 0; i < s.size(); i++) {
-			segType = ((Integer) s.elementAt(i)).intValue();
+			segType = (Integer) s.elementAt(i);
 			switch (segType) {
 							case PathIterator.SEG_MOVETO:
 							case PathIterator.SEG_LINETO:
@@ -2340,7 +2337,7 @@ public class ShapeRoi extends Roi {
 			coords = new double[6];
 			ucoords = new double[6];
 			segType = pIter.currentSegment(coords);
-			segments.add(new Integer(segType));
+			segments.add(segType);
 			count++;
 			System.arraycopy(coords, 0, ucoords, 0, coords.length);
 			scaleCoords(coords, pw, ph);
@@ -2349,8 +2346,8 @@ public class ShapeRoi extends Roi {
 								if (subPaths > 0) {
 									closed = ((int) ux0 == (int) usX && (int) uy0 == (int) usY);
 									if (closed && (int) ux0 != (int) usX && (int) uy0 != (int) usY) {// this may only happen after a SEG_CLOSE
-										xCoords.add(new Integer(((Integer) xCoords.elementAt(0)).intValue()));
-										yCoords.add(new Integer(((Integer) yCoords.elementAt(0)).intValue()));
+										xCoords.add((int) (Integer) xCoords.elementAt(0));
+										yCoords.add((int) (Integer) yCoords.elementAt(0));
 									}
 									if (rois != null) {
 										roiType = guessType(count, linesOnly, curvesOnly, closed);
@@ -2375,26 +2372,26 @@ public class ShapeRoi extends Roi {
 								x0 = coords[0];
 								y0 = coords[1];
 								handles.add(new Point2D.Double(ucoords[0], ucoords[1]));
-								xCoords.add(new Integer((int) ucoords[0]));
-								yCoords.add(new Integer((int) ucoords[1]));
+								xCoords.add((int) ucoords[0]);
+								yCoords.add((int) ucoords[1]);
 								closed = false;
 								break;
 							case PathIterator.SEG_LINETO:
-								linesOnly = linesOnly & true;
-								curvesOnly = curvesOnly & false;
+								linesOnly = linesOnly;
+								curvesOnly = false;
 								pathLength += Math.sqrt(Math.pow((y0 - coords[1]), 2.0) + Math.pow((x0 - coords[0]), 2.0));
 								ux0 = ucoords[0];
 								uy0 = ucoords[1];
 								x0 = coords[0];
 								y0 = coords[1];
 								handles.add(new Point2D.Double(ucoords[0], ucoords[1]));
-								xCoords.add(new Integer((int) ucoords[0]));
-								yCoords.add(new Integer((int) ucoords[1]));
+								xCoords.add((int) ucoords[0]);
+								yCoords.add((int) ucoords[1]);
 								closed = ((int) ux0 == (int) usX && (int) uy0 == (int) usY);
 								break;
 							case PathIterator.SEG_QUADTO:
-								linesOnly = linesOnly & false;
-								curvesOnly = curvesOnly & true;
+								linesOnly = false;
+								curvesOnly = curvesOnly;
 								curve = new QuadCurve2D.Double(x0, y0, coords[0], coords[2], coords[2], coords[3]);
 								pathLength += qBezLength((QuadCurve2D.Double) curve);
 								ux0 = ucoords[2];
@@ -2403,13 +2400,13 @@ public class ShapeRoi extends Roi {
 								y0 = coords[3];
 								handles.add(new Point2D.Double(ucoords[0], ucoords[1]));
 								handles.add(new Point2D.Double(ucoords[2], ucoords[3]));
-								xCoords.add(new Integer((int) ucoords[2]));
-								yCoords.add(new Integer((int) ucoords[3]));
+								xCoords.add((int) ucoords[2]);
+								yCoords.add((int) ucoords[3]);
 								closed = ((int) ux0 == (int) usX && (int) uy0 == (int) usY);
 								break;
 							case PathIterator.SEG_CUBICTO:
-								linesOnly = linesOnly & false;
-								curvesOnly = curvesOnly & true;
+								linesOnly = false;
+								curvesOnly = curvesOnly;
 								curve = new CubicCurve2D.Double(x0, y0, coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
 								pathLength += cBezLength((CubicCurve2D.Double) curve);
 								ux0 = ucoords[4];
@@ -2419,8 +2416,8 @@ public class ShapeRoi extends Roi {
 								handles.add(new Point2D.Double(ucoords[0], ucoords[1]));
 								handles.add(new Point2D.Double(ucoords[2], ucoords[3]));
 								handles.add(new Point2D.Double(ucoords[4], ucoords[5]));
-								xCoords.add(new Integer((int) ucoords[4]));
-								yCoords.add(new Integer((int) ucoords[5]));
+								xCoords.add((int) ucoords[4]);
+								yCoords.add((int) ucoords[5]);
 								closed = ((int) ux0 == (int) usX && (int) uy0 == (int) usY);
 								break;
 							case PathIterator.SEG_CLOSE:
@@ -2436,8 +2433,8 @@ public class ShapeRoi extends Roi {
 			done = pIter.isDone() || (shapeToRoi && rois != null && rois.size() == 1);
 			if (done) {
 				if (closed && (int) x0 != (int) sX && (int) y0 != (int) sY) {// this may only happen after a SEG_CLOSE
-					xCoords.add(new Integer(((Integer) xCoords.elementAt(0)).intValue()));
-					yCoords.add(new Integer(((Integer) yCoords.elementAt(0)).intValue()));
+					xCoords.add((int) (Integer) xCoords.elementAt(0));
+					yCoords.add((int) (Integer) yCoords.elementAt(0));
 				}
 				if (rois != null) {
 					roiType = shapeToRoi ? TRACED_ROI : guessType(count + 1, linesOnly, curvesOnly, closed);
@@ -2474,7 +2471,8 @@ public class ShapeRoi extends Roi {
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void draw(Graphics g) {
+	@Override
+    public void draw(Graphics g) {
 		if (ic == null) {
 			return;
 		}
@@ -2534,7 +2532,8 @@ public class ShapeRoi extends Roi {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void drawPixels(ImageProcessor ip) {
+	@Override
+    public void drawPixels(ImageProcessor ip) {
 	PathIterator pIter = getFlatteningPathIterator(shape, flatness);
 	float[] coords = new float[6];
 	float sx = 0f;
@@ -2569,7 +2568,8 @@ public class ShapeRoi extends Roi {
 	 *
 	 *@return    The mask value
 	 */
-	public ImageProcessor getMask() {
+	@Override
+    public ImageProcessor getMask() {
 		if (shape == null) {
 			return null;
 		}

@@ -82,7 +82,8 @@ public class DICOM extends ImagePlus implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	//EU_HOU Bundle
 	OpenDialog od = new OpenDialog("Open Dicom...", arg);
 	String directory = od.getDirectory();
@@ -99,7 +100,7 @@ public class DICOM extends ImagePlus implements PlugIn {
 		} catch (IOException e) {
 		String msg = e.getMessage();
 			IJ.showStatus("");
-			if (msg.indexOf("EOF") < 0 && showErrors) {
+			if (!msg.contains("EOF") && showErrors) {
 				IJ.error("DicomDecoder", e.getClass().getName() + "\n \n" + msg);
 				return;
 			} else if (!dd.dicmFound() && showErrors) {
@@ -152,7 +153,7 @@ public class DICOM extends ImagePlus implements PlugIn {
 			setCalibration(imp.getCalibration());
 			setProperty("Info", dd.getDicomInfo());
 			setFileInfo(fi);// needed for revert
-			if (arg.equals("")) {
+			if ("".equals(arg)) {
 				show();
 			}
 		} else if (showErrors) {
@@ -193,12 +194,12 @@ public class DICOM extends ImagePlus implements PlugIn {
 	short[] pixels = (short[]) ip.getPixels();
 	int min = Integer.MAX_VALUE;
 	int value;
-		for (int i = 0; i < pixels.length; i++) {
-			value = pixels[i] & 0xffff;
-			if (value < min) {
-				min = value;
-			}
-		}
+        for (short pixel : pixels) {
+            value = pixel & 0xffff;
+            if (value < min) {
+                min = value;
+            }
+        }
 		if (IJ.debugMode) {
 			IJ.log("min: " + (min - 32768));
 		}
@@ -510,7 +511,7 @@ class DicomDecoder {
 	long skipCount;
 	FileInfo fi = new FileInfo();
 	int bitsAllocated = 16;
-		fi.fileFormat = fi.RAW;
+		fi.fileFormat = FileInfo.RAW;
 		fi.fileName = fileName;
 		if (directory.indexOf("://") > 0) {// is URL
 		URL u = new URL(directory + fileName);
@@ -588,7 +589,7 @@ class DicomDecoder {
 							case TRANSFER_SYNTAX_UID:
 								s = getString(elementLength);
 								addInfo(tag, s);
-								if (s.indexOf("1.2.4") > -1 || s.indexOf("1.2.5") > -1) {
+								if (s.contains("1.2.4") || s.contains("1.2.5")) {
 									f.close();
 								//EU_HOU Bundle
 								String msg = "ImageJ cannot open compressed DICOM images.\n \n";
@@ -596,7 +597,7 @@ class DicomDecoder {
 									msg += "Transfer Syntax UID = " + s;
 									throw new IOException(msg);
 								}
-								if (s.indexOf("1.2.840.10008.1.2.2") >= 0) {
+								if (s.contains("1.2.840.10008.1.2.2")) {
 									bigEndianTransferSyntax = true;
 								}
 								break;
@@ -795,12 +796,11 @@ class DicomDecoder {
 			info = ">" + info;
 		}
 		if (info != null && tag != ITEM) {
-		int group = tag >>> 16;
-			//if (group!=previousGroup && (previousInfo!=null&&previousInfo.indexOf("Sequence:")==-1))
+            //if (group!=previousGroup && (previousInfo!=null&&previousInfo.indexOf("Sequence:")==-1))
 			//	dicomInfo.append("\n");
-			previousGroup = group;
+			previousGroup = tag >>> 16;
 			previousInfo = info;
-			dicomInfo.append(tag2hex(tag) + info + "\n");
+			dicomInfo.append(tag2hex(tag)).append(info).append("\n");
 		}
 		if (IJ.debugMode) {
 			if (info == null) {
@@ -912,7 +912,7 @@ class DicomDecoder {
 							location += elementLength;
 							value = "";
 		}
-		if (value != null && id == null && !value.equals("")) {
+		if (value != null && id == null && !"".equals(value)) {
 			return "---: " + value;
 		} else if (id == null) {
 			return null;
@@ -982,7 +982,7 @@ class DicomDecoder {
 			d = null;
 		}
 		if (d != null) {
-			return (d.doubleValue());
+			return (d);
 		} else {
 			return (0.0);
 		}
@@ -1038,9 +1038,9 @@ class DicomDictionary {
 	 */
 	Properties getDictionary() {
 	Properties p = new Properties();
-		for (int i = 0; i < dict.length; i++) {
-			p.put(dict[i].substring(0, 8), dict[i].substring(9));
-		}
+        for (String aDict : dict) {
+            p.put(aDict.substring(0, 8), aDict.substring(9));
+        }
 		return p;
 	}
 

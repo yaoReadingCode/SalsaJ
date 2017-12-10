@@ -166,7 +166,7 @@ public class Histogram implements PlugIn, TextListener {
         xMin = gd.getNextNumber();
         xMax = gd.getNextNumber();
         yMax = gd.getNextString();
-        stackHistogram = (stackSize > 1) ? gd.getNextBoolean() : false;
+        stackHistogram = (stackSize > 1) && gd.getNextBoolean();
         IJ.register(Histogram.class);
         return true;
     }
@@ -196,7 +196,7 @@ public class Histogram implements PlugIn, TextListener {
         if (stackSize > 1) {
             String macroOptions = Macro.getOptions();
             if (macroOptions != null) {
-                if (macroOptions.indexOf("stack ") >= 0) {
+                if (macroOptions.contains("stack ")) {
                     return flags + PlugInFilter.DOES_STACKS;
                 } else {
                     return flags;

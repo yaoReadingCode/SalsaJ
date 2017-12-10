@@ -39,10 +39,12 @@ public class ImageStack {
 
 	/** Adds an image in the forma of a pixel array to the end of the stack. */
 	public void addSlice(String sliceLabel, Object pixels) {
-		if (pixels==null) 
-			throw new IllegalArgumentException("'pixels' is null!");
-		if (!pixels.getClass().isArray()) 
-			throw new IllegalArgumentException("'pixels' is not an array");
+		if (pixels==null) {
+            throw new IllegalArgumentException("'pixels' is null!");
+        }
+		if (!pixels.getClass().isArray()) {
+            throw new IllegalArgumentException("'pixels' is not an array");
+        }
 		nSlices++;
 		if (nSlices==stack.length) {
 			Object[] tmp1 = new Object[nSlices*2];
@@ -65,19 +67,22 @@ public class ImageStack {
 	public void addSlice(String sliceLabel, ImageProcessor ip) {
 		if (ip.getWidth()!=width || ip.getHeight()!=height)
 			//throw new IllegalArgumentException("Dimensions do not match");
-		if (nSlices==0) {
-			cm = ip.getColorModel();
-			min = ip.getMin();
-			max = ip.getMax();
-		}
+        {
+            if (nSlices==0) {
+                cm = ip.getColorModel();
+                min = ip.getMin();
+                max = ip.getMax();
+            }
+        }
 		addSlice(sliceLabel, ip.getPixels());
 	}
 	
 	/** Adds the image in 'ip' to the stack following slice 'n'. Adds
 		the slice to the beginning of the stack if 'n' is zero. */
 	public void addSlice(String sliceLabel, ImageProcessor ip, int n) {
-		if (n<0 || n>nSlices)
-			throw new IllegalArgumentException(outOfRange+n);
+		if (n<0 || n>nSlices) {
+            throw new IllegalArgumentException(outOfRange+n);
+        }
 		addSlice(sliceLabel, ip);
 		Object tempSlice = stack[nSlices-1];
 		String tempLabel = label[nSlices-1];
@@ -92,10 +97,12 @@ public class ImageStack {
 	
 	/** Deletes the specified slice, were 1<=n<=nslices. */
 	public void deleteSlice(int n) {
-		if (n<1 || n>nSlices)
-			throw new IllegalArgumentException(outOfRange+n);
-		if (nSlices<1)
-			return;
+		if (n<1 || n>nSlices) {
+            throw new IllegalArgumentException(outOfRange+n);
+        }
+		if (nSlices<1) {
+            return;
+        }
 		for (int i=n; i<nSlices; i++) {
 			stack[i-1] = stack[i];
 			label[i-1] = label[i];
@@ -107,8 +114,9 @@ public class ImageStack {
 	
 	/** Deletes the last slice in the stack. */
 	public void deleteLastSlice() {
-		if (nSlices>0)
-			deleteSlice(nSlices);
+		if (nSlices>0) {
+            deleteSlice(nSlices);
+        }
 	}
 	
     public int getWidth() {
@@ -140,18 +148,21 @@ public class ImageStack {
 	
 	/** Returns the pixel array for the specified slice, were 1<=n<=nslices. */
 	public Object getPixels(int n) {
-		if (n<1 || n>nSlices)
-			throw new IllegalArgumentException(outOfRange+n);
+		if (n<1 || n>nSlices) {
+            throw new IllegalArgumentException(outOfRange+n);
+        }
 		return stack[n-1];
 	}
 	
 	/** Assigns a pixel array to the specified slice,
 		were 1<=n<=nslices. */
 	public void setPixels(Object pixels, int n) {
-		if (pixels==null) 
-			throw new IllegalArgumentException("'pixels' is null!");
-		if (n<1 || n>nSlices)
-			throw new IllegalArgumentException(outOfRange+n);
+		if (pixels==null) {
+            throw new IllegalArgumentException("'pixels' is null!");
+        }
+		if (n<1 || n>nSlices) {
+            throw new IllegalArgumentException(outOfRange+n);
+        }
 		stack[n-1] = pixels;
 	}
 	
@@ -173,18 +184,20 @@ public class ImageStack {
 		the number of slices currently in the stack. Returns null
 		if the stack is empty or the label of the first slice is null.  */
 	public String[] getSliceLabels() {
-		if (nSlices==0 || label[0]==null)
-			return null;
-		else
-			return label;
+		if (nSlices==0 || label[0]==null) {
+            return null;
+        } else {
+            return label;
+        }
 	}
 	
 	/** Returns the label of the specified slice, were 1<=n<=nslices.
 		Returns null if the slice does not have a label. For DICOM
 		and FITS stacks, labels may contain header information. */
 	public String getSliceLabel(int n) {
-		if (n<1 || n>nSlices)
-			throw new IllegalArgumentException(outOfRange+n);
+		if (n<1 || n>nSlices) {
+            throw new IllegalArgumentException(outOfRange+n);
+        }
 		return label[n-1];
 	}
 	
@@ -193,23 +206,31 @@ public class ImageStack {
 		Returns null if the slice does not have a label. */
 	public String getShortSliceLabel(int n) {
 		String shortLabel = getSliceLabel(n);
-		if (shortLabel==null) return null;
+		if (shortLabel==null) {
+            return null;
+        }
     	int newline = shortLabel.indexOf('\n');
-    	if (newline==0) return null;
-    	if (newline>0)
-    		shortLabel = shortLabel.substring(0, newline);
+    	if (newline==0) {
+            return null;
+        }
+    	if (newline>0) {
+            shortLabel = shortLabel.substring(0, newline);
+        }
     	int len = shortLabel.length();
-		if (len>4 && shortLabel.charAt(len-4)=='.' && !Character.isDigit(shortLabel.charAt(len-1)))
-			shortLabel = shortLabel.substring(0,len-4);
-		if (shortLabel.length()>60)
-			shortLabel = shortLabel.substring(0, 60);
+		if (len>4 && shortLabel.charAt(len-4)=='.' && !Character.isDigit(shortLabel.charAt(len-1))) {
+            shortLabel = shortLabel.substring(0,len-4);
+        }
+		if (shortLabel.length()>60) {
+            shortLabel = shortLabel.substring(0, 60);
+        }
 		return shortLabel;
 	}
 
 	/** Sets the label of the specified slice, were 1<=n<=nslices. */
 	public void setSliceLabel(String label, int n) {
-		if (n<1 || n>nSlices)
-			throw new IllegalArgumentException(outOfRange+n);
+		if (n<1 || n>nSlices) {
+            throw new IllegalArgumentException(outOfRange+n);
+        }
 		this.label[n-1] = label;
 	}
 	
@@ -218,25 +239,30 @@ public class ImageStack {
 	*/
 	public ImageProcessor getProcessor(int n) {
 		ImageProcessor ip;
-		if (n<1 || n>nSlices)
-			throw new IllegalArgumentException(outOfRange+n);
-		if (nSlices==0)
-			return null;
-		if (stack[0] instanceof byte[])
-			ip = new ByteProcessor(width, height, null, cm);
-		else if (stack[0] instanceof short[])
-			ip = new ShortProcessor(width, height, null, cm);
-		else if (stack[0] instanceof int[])
-			ip = new ColorProcessor(width, height, null);
-		else if (stack[0] instanceof float[])
-			ip = new FloatProcessor(width, height, null, cm);		
-		else
-			throw new IllegalArgumentException("Unknown stack type");
+		if (n<1 || n>nSlices) {
+            throw new IllegalArgumentException(outOfRange+n);
+        }
+		if (nSlices==0) {
+            return null;
+        }
+		if (stack[0] instanceof byte[]) {
+            ip = new ByteProcessor(width, height, null, cm);
+        } else if (stack[0] instanceof short[]) {
+            ip = new ShortProcessor(width, height, null, cm);
+        } else if (stack[0] instanceof int[]) {
+            ip = new ColorProcessor(width, height, null);
+        } else if (stack[0] instanceof float[]) {
+            ip = new FloatProcessor(width, height, null, cm);
+        } else {
+            throw new IllegalArgumentException("Unknown stack type");
+        }
 		ip.setPixels(stack[n-1]);
-		if (min!=Double.MAX_VALUE && ip!=null && !(ip instanceof ColorProcessor))
-			ip.setMinAndMax(min, max);
-		if (cTable!=null)
-			ip.setCalibrationTable(cTable);
+		if (min!=Double.MAX_VALUE && ip!=null && !(ip instanceof ColorProcessor)) {
+            ip.setMinAndMax(min, max);
+        }
+		if (cTable!=null) {
+            ip.setCalibrationTable(cTable);
+        }
 		return ip;
 	}
 	
@@ -252,18 +278,12 @@ public class ImageStack {
 	
 	/** Returns true if this is a 3-slice RGB stack. */
 	public boolean isRGB() {
-    	if (nSlices==3 && (stack[0] instanceof byte[]) && getSliceLabel(1)!=null && getSliceLabel(1).equals("Red"))	
-			return true;
-		else
-			return false;
+        return nSlices == 3 && (stack[0] instanceof byte[]) && getSliceLabel(1) != null && "Red".equals(getSliceLabel(1));
 	}
 	
 	/** Returns true if this is a 3-slice HSB stack. */
 	public boolean isHSB() {
-    	if (nSlices==3 && getSliceLabel(1)!=null && getSliceLabel(1).equals("Hue"))	
-			return true;
-		else
-			return false;
+        return nSlices == 3 && getSliceLabel(1) != null && "Hue".equals(getSliceLabel(1));
 	}
 
 	/** Returns true if this is a virtual (disk resident) stack. 
@@ -281,7 +301,8 @@ public class ImageStack {
 		}
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 		return ("width="+width+", height="+height+", nSlices="+nSlices+", cm="+cm);
 	}
 		

@@ -20,7 +20,7 @@ public interface PlugInFilter {
         the setup method will be called again, this time with
         arg = "final" after all other processing is done.
      */
-	public int setup(String arg, ImagePlus imp);
+    int setup(String arg, ImagePlus imp);
 
 	/** Filters use this method to process the image. If the
 	 	SUPPORTS_STACKS flag was set, it is called for each slice in
@@ -33,53 +33,53 @@ public interface PlugInFilter {
         and not the DONE flag, run(ip) is called once with the
         argument <code>null</code>.
      */
-	public void run(ImageProcessor ip);
+    void run(ImageProcessor ip);
 
 	/** Set this flag if the filter handles 8-bit grayscale images. */
-	public int DOES_8G = 1;
+    int DOES_8G = 1;
 	/** Set this flag if the filter handles 8-bit indexed color images. */
-	public int DOES_8C = 2;
+    int DOES_8C = 2;
 	/** Set this flag if the filter handles 16-bit images. */
-	public int DOES_16 = 4;
+    int DOES_16 = 4;
 	/** Set this flag if the filter handles float images. */
-	public int DOES_32 = 8;
+    int DOES_32 = 8;
 	/** Set this flag if the filter handles RGB images. */
-	public int DOES_RGB = 16;
+    int DOES_RGB = 16;
 	/** Set this flag if the filter handles all types of images. */
-	public int DOES_ALL = DOES_8G+DOES_8C+DOES_16+DOES_32+DOES_RGB;
+    int DOES_ALL = DOES_8G+DOES_8C+DOES_16+DOES_32+DOES_RGB;
 	/** Set this flag if the filter wants its run() method to be
 		called for all the slices in a stack. */
-	public int DOES_STACKS = 32;
+    int DOES_STACKS = 32;
 	/** Set this flag if the filter wants ImageJ, for non-rectangular
 		ROIs, to restore that part of the image that's inside the bounding
 		rectangle but outside of the ROI. */
-	public int SUPPORTS_MASKING = 64;
+    int SUPPORTS_MASKING = 64;
 	/** Set this flag if the filter makes no changes to the pixel data and does not require undo. */
-	public int NO_CHANGES = 128;
+    int NO_CHANGES = 128;
 	/** Set this flag if the filter does not require undo. */
-	public int NO_UNDO = 256;
+    int NO_UNDO = 256;
 	/** Set this flag if the filter does not require that an image be open. */
-	public int NO_IMAGE_REQUIRED = 512;
+    int NO_IMAGE_REQUIRED = 512;
 	/** Set this flag if the filter requires an ROI. */
-	public int ROI_REQUIRED = 1024;
+    int ROI_REQUIRED = 1024;
 	/** Set this flag if the filter requires a stack. */
-	public int STACK_REQUIRED = 2048;
+    int STACK_REQUIRED = 2048;
 	/** Set this flag if the filter does not want its run method called. */
-	public int DONE = 4096;
+    int DONE = 4096;
 	/** Set this flag to have the ImageProcessor that is passed to the run() method 
 		converted  to a FloatProcessor. With  RGB images, the run() method is  
 		called three times, once for each channel. */
-	public int CONVERT_TO_FLOAT = 8192;
+    int CONVERT_TO_FLOAT = 8192;
 	/** Set this flag if the filter requires a snapshot (copy of the pixels array). */
-	public int SNAPSHOT = 16384;
+    int SNAPSHOT = 16384;
     /** Set this flag if the filter wants to be called with arg = "dialog" after
         being invocated the first time */
     /** Set this flag if the slices of a stack may be processed in parallel threads */
-    public final int PARALLELIZE_STACKS = 32768;
+    int PARALLELIZE_STACKS = 32768;
     /** Set this flag if the setup method of the filter should be called again after
      *  the calls to the run(ip) have finished. The argument <code>arg</code> of setup
      *  will be "final" in that case. */
-    public final int FINAL_PROCESSING = 65536;
+    int FINAL_PROCESSING = 65536;
     
 
     // flags 0x01000000 and above are reserved for ExtendedPlugInFilter

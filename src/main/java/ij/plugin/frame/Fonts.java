@@ -34,18 +34,19 @@ public class Fonts extends PlugInFrame implements PlugIn, ItemListener {
 		font.add("SansSerif");
 		font.add("Serif");
 		font.add("Monospaced");
-		for (int i=0; i<fonts.length; i++) {
-			String f = fonts[i];
-			if (!(f.equals("SansSerif")||f.equals("Serif")||f.equals("Monospaced")))
-				font.add(f);
-		}
+        for (String f : fonts) {
+            if (!("SansSerif".equals(f) || "Serif".equals(f) || "Monospaced".equals(f))) {
+                font.add(f);
+            }
+        }
 		font.select(TextRoi.getFont());
 		font.addItemListener(this);
 		add(font);
 
 		size = new Choice();
-		for (int i=0; i<sizes.length; i++)
-			size.add(sizes[i]);
+        for (String size1 : sizes) {
+            size.add(size1);
+        }
 		size.select(getSizeIndex());
 		size.addItemListener(this);
 		add(size);
@@ -57,12 +58,17 @@ public class Fonts extends PlugInFrame implements PlugIn, ItemListener {
 		style.add("Bold+Italic");
 		int i = TextRoi.getStyle();
 		String s = "Plain";
-		if (i==Font.BOLD)
-			s = "Bold";
-		else if (i==Font.ITALIC)
-			s = "Italic";
-		else if (i==(Font.BOLD+Font.ITALIC))
-			s = "Bold+Italic";
+        switch (i) {
+            case Font.BOLD:
+                s = "Bold";
+                break;
+            case Font.ITALIC:
+                s = "Italic";
+                break;
+            case (Font.BOLD + Font.ITALIC):
+                s = "Bold+Italic";
+                break;
+        }
 		style.select(s);
 		style.addItemListener(this);
 		add(style);
@@ -81,27 +87,31 @@ public class Fonts extends PlugInFrame implements PlugIn, ItemListener {
 		int size = TextRoi.getSize();
 		int index=0;
 		for (int i=0; i<isizes.length; i++) {
-			if (size>=isizes[i])
-				index = i;
+			if (size>=isizes[i]) {
+                index = i;
+            }
 		}
 		return index;
 	}
 	
-	public void itemStateChanged(ItemEvent e) {
+	@Override
+    public void itemStateChanged(ItemEvent e) {
 		String fontName = font.getSelectedItem();
 		int fontSize = Integer.parseInt(size.getSelectedItem());
 		String styleName = style.getSelectedItem();
 		int fontStyle = Font.PLAIN;
-		if (styleName.equals("Bold"))
-			fontStyle = Font.BOLD;
-		else if (styleName.equals("Italic"))
-			fontStyle = Font.ITALIC;
-		else if (styleName.equals("Bold+Italic"))
-			fontStyle = Font.BOLD+Font.ITALIC;
+		if ("Bold".equals(styleName)) {
+            fontStyle = Font.BOLD;
+        } else if ("Italic".equals(styleName)) {
+            fontStyle = Font.ITALIC;
+        } else if ("Bold+Italic".equals(styleName)) {
+            fontStyle = Font.BOLD+Font.ITALIC;
+        }
 		TextRoi.setFont(fontName, fontSize, fontStyle, checkbox.getState());
 		IJ.showStatus(fontSize+" point "+fontName + " " + styleName);
 	}
 	
+    @Override
     public void windowClosing(WindowEvent e) {
 		super.windowClosing(e);
 		instance = null;

@@ -45,7 +45,7 @@ public class FitsDecoder {
      */
     public FileInfo getInfo() throws IOException {
         FileInfo fi = new FileInfo();
-        fi.fileFormat = fi.FITS;
+        fi.fileFormat = FileInfo.FITS;
         fi.fileName = fileName;
         fi.directory = directory;
         fi.width = 0;
@@ -76,7 +76,7 @@ public class FitsDecoder {
         f = stream;
         //f = new DataInputStream(new FileInputStream(directory + fileName));
         String s = getString(80);
-        info.append(s + "\n");
+        info.append(s).append("\n");
         if (!s.startsWith("SIMPLE")) {
             f.close();
             return null;
@@ -94,7 +94,7 @@ public class FitsDecoder {
 
             if (s.matches(".*\\w.*"))
             {
-                info.append(s + "\n");
+                info.append(s).append("\n");
             }
             if (s.startsWith("NAXIS ")) {
                 naxis = getInteger(s);
@@ -102,26 +102,33 @@ public class FitsDecoder {
             else if (s.startsWith("BITPIX")) {
 
                 int bitsPerPixel = getInteger(s);
-                if (bitsPerPixel == 8) {
-                    fi.fileType = FileInfo.GRAY8;
-                } else if (bitsPerPixel == 16) {
-                    fi.fileType = FileInfo.GRAY16_SIGNED;
-                    // By oli, for these -16 bitpix zoombie files, do as for
-                } else if (bitsPerPixel == -16) {
-                    fi.fileType = FileInfo.GRAY16_SIGNED;
-                    //fi.fileType = FileInfo.GRAY16_SIGNEDBAD;
-                    // end by Oli
-                } else if (bitsPerPixel == 32) {
-                    fi.fileType = FileInfo.GRAY32_INT;
-                } else if (bitsPerPixel == -32) {
-                    fi.fileType = FileInfo.GRAY32_FLOAT;
-                } else if (bitsPerPixel == -64) {
-                    fi.fileType = FileInfo.GRAY64_FLOAT;
-                } else {
-                    //EU_HOU Bundle
-                    IJ.error("BITPIX must be 8, 16, 32, -32 (float) or -64 (double).");
-                    f.close();
-                    return null;
+                switch (bitsPerPixel) {
+                    case 8:
+                        fi.fileType = FileInfo.GRAY8;
+                        break;
+                    case 16:
+                        fi.fileType = FileInfo.GRAY16_SIGNED;
+                        // By oli, for these -16 bitpix zoombie files, do as for
+                        break;
+                    case -16:
+                        fi.fileType = FileInfo.GRAY16_SIGNED;
+                        //fi.fileType = FileInfo.GRAY16_SIGNEDBAD;
+                        // end by Oli
+                        break;
+                    case 32:
+                        fi.fileType = FileInfo.GRAY32_INT;
+                        break;
+                    case -32:
+                        fi.fileType = FileInfo.GRAY32_FLOAT;
+                        break;
+                    case -64:
+                        fi.fileType = FileInfo.GRAY64_FLOAT;
+                        break;
+                    default:
+                        //EU_HOU Bundle
+                        IJ.error("BITPIX must be 8, 16, 32, -32 (float) or -64 (double).");
+                        f.close();
+                        return null;
                 }
             } else if (s.startsWith("NAXIS1")) {
                 fi.width = getInteger(s);
@@ -228,7 +235,7 @@ public class FitsDecoder {
             d = null;
         }
         if (d != null) {
-            return (d.doubleValue());
+            return (d);
         } else {
             return 0.0;
         }

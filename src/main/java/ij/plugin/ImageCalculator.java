@@ -32,6 +32,7 @@ public class ImageCalculator implements PlugIn {
      *
      *@param  arg  Description of the Parameter
      */
+    @Override
     public void run(String arg) {
         int[] wList = WindowManager.getIDList();
         if (wList == null) {
@@ -56,7 +57,7 @@ public class ImageCalculator implements PlugIn {
         //EU_HOU Bundle
         GenericDialog gd = new GenericDialog(bundle.getString("TitleStr"), IJ.getInstance());
         String defaultItem;
-        if (title1.equals("")) {
+        if ("".equals(title1)) {
             defaultItem = titles[0];
         } else {
             defaultItem = title1;
@@ -64,7 +65,7 @@ public class ImageCalculator implements PlugIn {
         //EU_HOU Bundle
         gd.addChoice(bundle.getString("Image1"), titles, defaultItem);
         gd.addChoice(bundle.getString("Operation"), locoperators, locoperators[operator]);
-        if (title2.equals("")) {
+        if ("".equals(title2)) {
             defaultItem = titles[0];
         } else {
             defaultItem = title2;
@@ -104,12 +105,12 @@ public class ImageCalculator implements PlugIn {
         }
         params = params.toLowerCase();
         int op = -1;
-        if (params.indexOf("xor") != -1) {
+        if (params.contains("xor")) {
             op = 6;
         }
         if (op == -1) {
             for (int i = 0; i < lcOperators.length; i++) {
-                if (params.indexOf(lcOperators[i]) != -1) {
+                if (params.contains(lcOperators[i])) {
                     op = i;
                     break;
                 }
@@ -121,9 +122,9 @@ public class ImageCalculator implements PlugIn {
             return;
         }
         operator = op;
-        createWindow = params.indexOf("create") != -1;
-        floatResult = params.indexOf("32") != -1 || params.indexOf("float") != -1;
-        processStack = params.indexOf("stack") != -1;
+        createWindow = params.contains("create");
+        floatResult = params.contains("32") || params.contains("float");
+        processStack = params.contains("stack");
         calculate(img1, img2, true);
     }
 

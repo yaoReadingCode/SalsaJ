@@ -19,6 +19,7 @@ public class JulianCoordinateSystem extends CoordinateSystem
     /**
      * Get the name of this object.
      */
+    @Override
     public String getName() {
 	return "J"+epoch;
     }
@@ -26,6 +27,7 @@ public class JulianCoordinateSystem extends CoordinateSystem
     /**
      * Get a description of the object.
      */
+    @Override
     public String getDescription() {
 	return "A Julian (FK5-based) equatorial coordinate system with epoch of the equinox of "+epoch;
     }
@@ -42,6 +44,7 @@ public class JulianCoordinateSystem extends CoordinateSystem
      * Return the rotation associated with the coordinate system.
      */
       
+    @Override
     public Rotater getRotater() {
         if (epoch == 2000) {
 	    return null;

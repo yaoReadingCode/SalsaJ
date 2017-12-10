@@ -33,8 +33,9 @@ public class Resizer implements PlugInFilter, TextListener, ItemListener {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
-		crop = arg.equals("crop");
+	@Override
+    public int setup(String arg, ImagePlus imp) {
+		crop = "crop".equals(arg);
 		this.imp = imp;
 		IJ.register(Resizer.class);
 		if (crop) {
@@ -50,7 +51,8 @@ public class Resizer implements PlugInFilter, TextListener, ItemListener {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 	Roi roi = imp.getRoi();
 		if (roi != null && roi.isLine()) {
 			//EU_HOU Bundle
@@ -59,8 +61,7 @@ public class Resizer implements PlugInFilter, TextListener, ItemListener {
 		}
 	Rectangle r = ip.getRoi();
 		origWidth = r.width;
-		;
-		origHeight = r.height;
+        origHeight = r.height;
 		sizeToHeight = false;
 	boolean restoreRoi = crop && roi != null && roi.getType() != Roi.RECTANGLE;
 		if (roi != null) {
@@ -188,7 +189,8 @@ public class Resizer implements PlugInFilter, TextListener, ItemListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void textValueChanged(TextEvent e) {
+	@Override
+    public void textValueChanged(TextEvent e) {
 	TextField widthField = (TextField) fields.elementAt(0);
 	TextField heightField = (TextField) fields.elementAt(1);
 	int width = (int) Tools.parseDouble(widthField.getText(), -99);
@@ -231,7 +233,8 @@ public class Resizer implements PlugInFilter, TextListener, ItemListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void itemStateChanged(ItemEvent e) {
+	@Override
+    public void itemStateChanged(ItemEvent e) {
 	Checkbox cb = (Checkbox) checkboxes.elementAt(0);
 	boolean newConstrain = cb.getState();
 		if (newConstrain && newConstrain != constrain) {

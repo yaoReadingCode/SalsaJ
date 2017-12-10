@@ -1,14 +1,12 @@
 //EU_HOU
 package ij.io;
 
-import java.awt.*;
 import java.io.*;
 import java.util.zip.*;
 import ij.*;
 import ij.process.*;
 import ij.measure.Calibration;
 import ij.plugin.filter.Analyzer;
-import ij.plugin.frame.Recorder;
 import ij.plugin.JpegWriter;
 
 /**
@@ -56,7 +54,7 @@ public class FileSaver {
             ofi = imp.getOriginalFileInfo();
         }
         boolean validName = ofi != null && imp.getTitle().equals(ofi.fileName);
-        if (validName && ofi.fileFormat == FileInfo.TIFF && imp.getStackSize() == 1 && ofi.nImages == 1 && (ofi.url == null || ofi.url.equals(""))) {
+        if (validName && ofi.fileFormat == FileInfo.TIFF && imp.getStackSize() == 1 && ofi.nImages == 1 && (ofi.url == null || "".equals(ofi.url))) {
             name = imp.getTitle();
             directory = ofi.directory;
             String path = directory + name;
@@ -92,8 +90,7 @@ public class FileSaver {
         }
         directory = sd.getDirectory();
         imp.startTiming();
-        String path = directory + name;
-        return path;
+        return directory + name;
     }
 
     /**
@@ -136,7 +133,7 @@ public class FileSaver {
             showErrorMessage(e);
             return false;
         }
-        updateImp(fi, fi.TIFF);
+        updateImp(fi, FileInfo.TIFF);
         return true;
     }
 
@@ -170,7 +167,7 @@ public class FileSaver {
             showErrorMessage(e);
             return false;
         }
-        updateImp(fi, fi.TIFF);
+        updateImp(fi, FileInfo.TIFF);
         return true;
     }
 
@@ -182,11 +179,7 @@ public class FileSaver {
      */
     public boolean saveAsZip() {
         String path = getPath("TIFF/ZIP", ".zip");
-        if (path == null) {
-            return false;
-        } else {
-            return saveAsZip(path);
-        }
+        return path != null && saveAsZip(path);
     }
 
     /**
@@ -226,7 +219,7 @@ public class FileSaver {
             showErrorMessage(e);
             return false;
         }
-        updateImp(fi, fi.TIFF);
+        updateImp(fi, FileInfo.TIFF);
         return true;
     }
 
@@ -258,11 +251,7 @@ public class FileSaver {
             return false;
         }
         String path = getPath("GIF", ".gif");
-        if (path == null) {
-            return false;
-        } else {
-            return saveAsGif(path);
-        }
+        return path != null && saveAsGif(path);
     }
 
     /**
@@ -280,7 +269,7 @@ public class FileSaver {
         WindowManager.setTempCurrentImage(imp);
         IJ.runPlugIn("ij.plugin.GifWriter", path);
         WindowManager.setTempCurrentImage(tempImage);
-        updateImp(fi, fi.GIF_OR_JPG);
+        updateImp(fi, FileInfo.GIF_OR_JPG);
         return true;
     }
 
@@ -305,11 +294,7 @@ public class FileSaver {
     public boolean saveAsJpeg() {
         String type = "JPEG (" + getJpegQuality() + ")";
         String path = getPath(type, ".jpg");
-        if (path == null) {
-            return false;
-        } else {
-            return saveAsJpeg(path);
-        }
+        return path != null && saveAsJpeg(path);
     }
 
     /**
@@ -336,11 +321,7 @@ public class FileSaver {
      */
     public boolean saveAsBmp() {
         String path = getPath("BMP", ".bmp");
-        if (path == null) {
-            return false;
-        } else {
-            return saveAsBmp(path);
-        }
+        return path != null && saveAsBmp(path);
     }
 
     /**
@@ -367,11 +348,7 @@ public class FileSaver {
     public boolean saveAsPgm() {
         String extension = imp.getBitDepth() == 24 ? ".pnm" : ".pgm";
         String path = getPath("PGM", extension);
-        if (path == null) {
-            return false;
-        } else {
-            return saveAsPgm(path);
-        }
+        return path != null && saveAsPgm(path);
     }
 
     /**
@@ -402,11 +379,7 @@ public class FileSaver {
             return false;
         }
         String path = getPath("PNG", ".png");
-        if (path == null) {
-            return false;
-        } else {
-            return saveAsPng(path);
-        }
+        return path != null && saveAsPng(path);
     }
 
     /**
@@ -435,11 +408,7 @@ public class FileSaver {
             return false;
         }
         String path = getPath("FITS", ".fits");
-        if (path == null) {
-            return false;
-        } else {
-            return saveAsFits(path);
-        }
+        return path != null && saveAsFits(path);
     }
 
     /**
@@ -533,7 +502,7 @@ public class FileSaver {
                 pixels[i] = (short) (pixels[i] + 32768);
             }
         }
-        updateImp(fi, fi.RAW);
+        updateImp(fi, FileInfo.RAW);
         return true;
     }
 
@@ -580,7 +549,7 @@ public class FileSaver {
                 }
             }
         }
-        updateImp(fi, fi.RAW);
+        updateImp(fi, FileInfo.RAW);
         return true;
     }
 
@@ -592,10 +561,7 @@ public class FileSaver {
      */
     public boolean saveAsText() {
         String path = getPath("Text", ".txt");
-        if (path == null) {
-            return false;
-        }
-        return saveAsText(path);
+        return path != null && saveAsText(path);
     }
 
     /**
@@ -632,10 +598,7 @@ public class FileSaver {
             return false;
         }
         String path = getPath("LUT", ".lut");
-        if (path == null) {
-            return false;
-        }
-        return saveAsLut(path);
+        return path != null && saveAsLut(path);
     }
 
     /**
@@ -727,31 +690,31 @@ public class FileSaver {
         StringBuffer sb = new StringBuffer(100);
         sb.append("ImageJ=" + ImageJ.VERSION + "\n");
         if (fi.nImages > 1 && fi.fileType != FileInfo.RGB48) {
-            sb.append("images=" + fi.nImages + "\n");
+            sb.append("images=").append(fi.nImages).append("\n");
         }
         int channels = imp.getNChannels();
         if (channels > 1) {
-            sb.append("channels=" + channels + "\n");
+            sb.append("channels=").append(channels).append("\n");
         }
         int slices = imp.getNSlices();
         if (slices > 1) {
-            sb.append("slices=" + slices + "\n");
+            sb.append("slices=").append(slices).append("\n");
         }
         int frames = imp.getNFrames();
         if (frames > 1) {
-            sb.append("frames=" + frames + "\n");
+            sb.append("frames=").append(frames).append("\n");
         }
         if (fi.unit != null) {
-            sb.append("unit=" + fi.unit + "\n");
+            sb.append("unit=").append(fi.unit).append("\n");
         }
         if (fi.valueUnit != null && fi.calibrationFunction != Calibration.CUSTOM) {
-            sb.append("cf=" + fi.calibrationFunction + "\n");
+            sb.append("cf=").append(fi.calibrationFunction).append("\n");
             if (fi.coefficients != null) {
                 for (int i = 0; i < fi.coefficients.length; i++) {
-                    sb.append("c" + i + "=" + fi.coefficients[i] + "\n");
+                    sb.append("c").append(i).append("=").append(fi.coefficients[i]).append("\n");
                 }
             }
-            sb.append("vunit=" + fi.valueUnit + "\n");
+            sb.append("vunit=").append(fi.valueUnit).append("\n");
             if (cal.zeroClip()) {
                 sb.append("zeroclip=true\n");
             }
@@ -760,25 +723,25 @@ public class FileSaver {
         // get stack z-spacing and fps
         if (fi.nImages > 1) {
             if (fi.pixelDepth != 0.0 && fi.pixelDepth != 1.0) {
-                sb.append("spacing=" + fi.pixelDepth + "\n");
+                sb.append("spacing=").append(fi.pixelDepth).append("\n");
             }
             if (cal.fps != 0.0) {
                 if ((int) cal.fps == cal.fps) {
-                    sb.append("fps=" + (int) cal.fps + "\n");
+                    sb.append("fps=").append((int) cal.fps).append("\n");
                 } else {
-                    sb.append("fps=" + cal.fps + "\n");
+                    sb.append("fps=").append(cal.fps).append("\n");
                 }
             }
-            sb.append("loop=" + (cal.loop ? "true" : "false") + "\n");
+            sb.append("loop=").append(cal.loop ? "true" : "false").append("\n");
             if (cal.frameInterval != 0.0) {
                 if ((int) cal.frameInterval == cal.frameInterval) {
-                    sb.append("finterval=" + (int) cal.frameInterval + "\n");
+                    sb.append("finterval=").append((int) cal.frameInterval).append("\n");
                 } else {
-                    sb.append("finterval=" + cal.frameInterval + "\n");
+                    sb.append("finterval=").append(cal.frameInterval).append("\n");
                 }
             }
-            if (!cal.getTimeUnit().equals("sec")) {
-                sb.append("tunit=" + cal.getTimeUnit() + "\n");
+            if (!"sec".equals(cal.getTimeUnit())) {
+                sb.append("tunit=").append(cal.getTimeUnit()).append("\n");
             }
         }
 
@@ -789,22 +752,22 @@ public class FileSaver {
         int type = imp.getType();
         boolean enhancedLut = (type == ImagePlus.GRAY8 || type == ImagePlus.COLOR_256) && (min != 0.0 || max != 255.0);
         if (enhancedLut || type == ImagePlus.GRAY16 || type == ImagePlus.GRAY32) {
-            sb.append("min=" + min + "\n");
-            sb.append("max=" + max + "\n");
+            sb.append("min=").append(min).append("\n");
+            sb.append("max=").append(max).append("\n");
         }
 
         // get non-zero origins
         if (cal.xOrigin != 0.0) {
-            sb.append("xorigin=" + cal.xOrigin + "\n");
+            sb.append("xorigin=").append(cal.xOrigin).append("\n");
         }
         if (cal.yOrigin != 0.0) {
-            sb.append("yorigin=" + cal.yOrigin + "\n");
+            sb.append("yorigin=").append(cal.yOrigin).append("\n");
         }
         if (cal.zOrigin != 0.0) {
-            sb.append("zorigin=" + cal.zOrigin + "\n");
+            sb.append("zorigin=").append(cal.zOrigin).append("\n");
         }
         if (cal.info != null && cal.info.length() <= 64 && cal.info.indexOf('=') == -1 && cal.info.indexOf('\n') == -1) {
-            sb.append("info=" + cal.info + "\n");
+            sb.append("info=").append(cal.info).append("\n");
         }
         sb.append((char) 0);
         return new String(sb);

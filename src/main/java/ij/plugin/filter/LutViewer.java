@@ -7,7 +7,7 @@ import ij.text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.awt.Panel.*;
+
 import ij.measure.Calibration;
 
 /**
@@ -26,6 +26,7 @@ public class LutViewer implements PlugInFilter {
      * @param imp Description of the Parameter
      * @return Description of the Return Value
      */
+    @Override
     public int setup(String arg, ImagePlus imp) {
         this.imp = imp;
         return DOES_ALL - DOES_RGB + NO_UNDO + NO_CHANGES;
@@ -40,6 +41,7 @@ public class LutViewer implements PlugInFilter {
      *
      * @param ip Description of the Parameter
      */
+    @Override
     public void run(ImageProcessor ip) {
         ImagePlus LUTview = prepare(ip, imp.createLut(), imp.getCalibration());
         new LutWindow(LUTview, new ImageCanvas(LUTview));
@@ -187,6 +189,7 @@ class LutWindow extends ImageWindow implements ActionListener {
      *
      * @param e Description of the Parameter
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         Object b = e.getSource();
 
@@ -214,11 +217,11 @@ class LutWindow extends ImageWindow implements ActionListener {
         icm.getReds(r);
         icm.getGreens(g);
         icm.getBlues(b);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         //EU_HOU Bundle
         String headings = IJ.getPluginBundle().getString("LUTHead");
         for (int i = 0; i < size; i++) {
-            sb.append(i + "\t" + (r[i] & 255) + "\t" + (g[i] & 255) + "\t" + (b[i] & 255) + "\n");
+            sb.append(i).append("\t").append(r[i] & 255).append("\t").append(g[i] & 255).append("\t").append(b[i] & 255).append("\n");
         }
 //EU_HOU Bundle
         TextWindow tw = new TextWindow(IJ.getPluginBundle().getString("LUTTextTitle"), headings, sb.toString(), 250, 400);

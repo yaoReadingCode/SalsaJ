@@ -10,23 +10,28 @@ package skyview.geometry;
 public abstract class Distorter extends Transformer implements skyview.Component {
     
     /** A name for this object */
+    @Override
     public String getName() {
 	return "Generic Distorter";
     } 
     
     /** What does this object do? */
+    @Override
     public String getDescription() {
 	return "Placeholder for distortions in projection plane";
     }
     
+    @Override
     public abstract Distorter inverse();
     
     /** What is the output dimensionality of a Distorter? */
+    @Override
     protected int getOutputDimension() {
 	return 2;
     }
     
     /** What is the input dimensionality of a Distorter? */
+    @Override
     protected int getInputDimension() {
 	return 2;
     }

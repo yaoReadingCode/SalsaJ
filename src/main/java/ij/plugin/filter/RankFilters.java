@@ -6,7 +6,6 @@ import ij.gui.DialogListener;
 import ij.process.*;
 import ij.plugin.ContrastEnhancer;
 import java.awt.*;
-import java.awt.event.*;
 
 /**
  * This plugin implements the Mean, Minimum, Maximum, Variance, Median, Remove
@@ -40,23 +39,24 @@ public class RankFilters implements ExtendedPlugInFilter, DialogListener {
      * @param imp The ImagePlus to be processed
      * @return Flags specifying further action of the PlugInFilterRunner
      */
+    @Override
     public int setup(String arg, ImagePlus imp) {
         this.imp = imp;
-        if (arg.equals("mean")) {
+        if ("mean".equals(arg)) {
             filterType = MEAN;
-        } else if (arg.equals("min")) {
+        } else if ("min".equals(arg)) {
             filterType = MIN;
-        } else if (arg.equals("max")) {
+        } else if ("max".equals(arg)) {
             filterType = MAX;
-        } else if (arg.equals("variance")) {
+        } else if ("variance".equals(arg)) {
             filterType = VARIANCE;
-        } else if (arg.equals("median")) {
+        } else if ("median".equals(arg)) {
             filterType = MEDIAN;
-        } else if (arg.equals("outliers")) {
+        } else if ("outliers".equals(arg)) {
             filterType = OUTLIERS;
-        } else if (arg.equals("despeckle")) {
+        } else if ("despeckle".equals(arg)) {
             filterType = DESPECKLE;
-        } else if (arg.equals("masks")) {
+        } else if ("masks".equals(arg)) {
             showMasks();
             return DONE;
         } else {
@@ -66,6 +66,7 @@ public class RankFilters implements ExtendedPlugInFilter, DialogListener {
         return flags;
     }
 
+    @Override
     public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
         if (filterType == DESPECKLE) {
             filterType = MEDIAN;
@@ -89,6 +90,7 @@ public class RankFilters implements ExtendedPlugInFilter, DialogListener {
         return IJ.setupDialog(imp, flags);  //ask whether to process all slices of stack (if a stack)
     }
 
+    @Override
     public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
         radius = gd.getNextNumber();
         if (filterType == OUTLIERS) {
@@ -102,12 +104,13 @@ public class RankFilters implements ExtendedPlugInFilter, DialogListener {
         return true;
     }
 
+    @Override
     public void run(ImageProcessor ip) {
         //copy class variables to local ones - this is necessary for preview
         int[] lineRadius;
         int kRadius, kNPoints;
         synchronized (this) {						//the two following items must be consistent
-            lineRadius = (int[]) (this.lineRadius.clone()); //cloning also required by doFiltering method
+            lineRadius = this.lineRadius.clone(); //cloning also required by doFiltering method
             kRadius = this.kRadius;
             kNPoints = this.kNPoints;
         }
@@ -338,7 +341,6 @@ public class RankFilters implements ExtendedPlugInFilter, DialogListener {
         }
         sums[0] = sum;
         sums[1] = sum2;
-        return;
     }
 
     /**
@@ -360,7 +362,6 @@ public class RankFilters implements ExtendedPlugInFilter, DialogListener {
         }
         sums[0] += sum;
         sums[1] += sum2;
-        return;
     }
 
     /**
@@ -487,6 +488,7 @@ public class RankFilters implements ExtendedPlugInFilter, DialogListener {
      * This method is called by ImageJ to set the number of calls to run(ip)
      * corresponding to 100% of the progress bar
      */
+    @Override
     public void setNPasses(int nPasses) {
         this.nPasses = nPasses;
         pass = 0;

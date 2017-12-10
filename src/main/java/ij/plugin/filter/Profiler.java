@@ -3,7 +3,6 @@ import ij.*;
 import ij.process.*;
 import ij.gui.*;
 import java.awt.*;
-import java.awt.event.*;
 
 /**
  *  Implements the Process/Plot Profile and Edit/Options/Profile Plot Options
@@ -32,8 +31,9 @@ public class Profiler implements PlugInFilter {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
-		if (arg.equals("set")) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
+		if ("set".equals(arg)) {
 			doOptions();
 			return DONE;
 		}
@@ -47,7 +47,8 @@ public class Profiler implements PlugInFilter {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 	boolean averageHorizontally = verticalProfile || IJ.altKeyDown();
 		new ProfilePlot(imp, averageHorizontally).createWindow();
                 //System.out.println("plot profil");

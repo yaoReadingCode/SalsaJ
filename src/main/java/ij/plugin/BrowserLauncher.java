@@ -1,17 +1,10 @@
 package ij.plugin;
 import ij.IJ;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.applet.Applet;
 import java.net.*;
-import java.util.*;
 
 /**
  *  This plugin implements the File/Import/URL command and the commands in the
@@ -80,13 +73,14 @@ public class BrowserLauncher implements PlugIn {
 	 *
 	 *@param  theURL  Description of the Parameter
 	 */
-	public void run(String theURL) {
+	@Override
+    public void run(String theURL) {
 		System.out.println(theURL);
 	String urlEuHou = "http://www.euhou.net/";
 		if (error) {
 			return;
 		}
-		if (theURL == null || theURL.equals("")) {
+		if (theURL == null || "".equals(theURL)) {
 			theURL = urlEuHou;
 		} else {
 			theURL = urlEuHou + theURL;
@@ -97,13 +91,13 @@ public class BrowserLauncher implements PlugIn {
 				applet.getAppletContext().showDocument(new URL(theURL), "_blank");
 				System.out.println("ok 1");
 
-			} catch (Exception e) {}
+			} catch (Exception ignored) {}
 			return;
 		}
 		try {
 			openURL(theURL);
 			System.out.println("ok 2");
-		} catch (IOException e) {}
+		} catch (IOException ignored) {}
 	}
 
 
@@ -117,9 +111,9 @@ public class BrowserLauncher implements PlugIn {
 	String errorMessage = "";
 		if (IJ.isMacOSX()) {
 			try {
-			Method aMethod = mrjFileUtilsClass.getDeclaredMethod("sharedWorkspace", new Class[]{});
-			Object aTarget = aMethod.invoke(mrjFileUtilsClass, new Object[]{});
-				openURL.invoke(aTarget, new Object[]{new java.net.URL(url)});
+			Method aMethod = mrjFileUtilsClass.getDeclaredMethod("sharedWorkspace");
+			Object aTarget = aMethod.invoke(mrjFileUtilsClass);
+				openURL.invoke(aTarget, new URL(url));
 			} catch (Exception e) {
 				errorMessage = "" + e;
 			}
@@ -177,7 +171,7 @@ public class BrowserLauncher implements PlugIn {
 				} else {
 					mrjFileUtilsClass = Class.forName("com.apple.cocoa.application.NSWorkspace");
 				}
-				openURL = mrjFileUtilsClass.getDeclaredMethod("openURL", new Class[]{java.net.URL.class});
+				openURL = mrjFileUtilsClass.getDeclaredMethod("openURL", URL.class);
 			} catch (Exception e) {
 				//EU_HOU Bundle
 				IJ.log("BrowserLauncher" + e);

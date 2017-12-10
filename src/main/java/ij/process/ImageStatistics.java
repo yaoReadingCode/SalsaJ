@@ -211,8 +211,8 @@ public class ImageStatistics implements Measurements {
         int t1 = (int) ip.getMinThreshold();
         int t2 = (int) ip.getMaxThreshold();
         if (t1 == ImageProcessor.NO_THRESHOLD) {
-            for (int i = 0; i < hist.length; i++) {
-                total += hist[i];
+            for (int aHist : hist) {
+                total += aHist;
             }
             sum = total - hist[0];
         } else {

@@ -3,7 +3,7 @@ import ij.*;
 import ij.gui.*;
 import ij.io.*;
 import ij.util.*;
-import java.awt.*;
+
 import java.io.*;
 import java.util.*;
 import java.lang.reflect.*;
@@ -30,7 +30,8 @@ public class Installer implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		installPlugin();
 	}
 
@@ -63,7 +64,7 @@ public class Installer implements PlugIn {
 	String argument = gd.getNextString();
 		IJ.register(Installer.class);
 		defaultPlugin = plugin;
-		if (command.equals("")) {
+		if ("".equals(command)) {
 			//EU_HOU Bundle
 			IJ.showMessage(TITLE, "Command required");
 			return;
@@ -87,7 +88,7 @@ public class Installer implements PlugIn {
 		} else if (menuStr.equals(menus[6])) {
 			menu = Menus.UTILITIES_MENU;
 		}
-		if (!argument.equals("")) {
+		if (!"".equals(argument)) {
 			plugin += "(\"" + argument + "\")";
 		}
 	int err = Menus.installPlugin(plugin, menu, command, shortcut, IJ.getInstance());
@@ -126,11 +127,11 @@ public class Installer implements PlugIn {
 		try {
 		Class c = loader.loadClass(plugin);
 		//EU_HOU Bundle
-		Method m = c.getDeclaredMethod("showAbout", new Class[0]);
+		Method m = c.getDeclaredMethod("showAbout");
 			if (m != null) {
 				hasShowAboutMethod = true;
 			}
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 		//IJ.write("installAbout: "+plugin+" "+hasShowAboutMethod);
 		if (hasShowAboutMethod) {
 			//EU_HOU Bundle
@@ -155,20 +156,20 @@ public class Installer implements PlugIn {
 			return null;
 		}
 	Vector v = new Vector();
-		for (int i = 0; i < list.length; i++) {
-		String className = list[i];
-		boolean isClassFile = className.endsWith(".class");
-			if (className.indexOf('_') >= 0 && isClassFile && className.indexOf('$') < 0) {
-				className = className.substring(0, className.length() - 6);
-				v.addElement(className);
-			} else {
-				if (!isClassFile) {
-					getSubdirectoryPlugins(path, className, v);
-				}
-			}
-		}
+        for (String aList : list) {
+            String className = aList;
+            boolean isClassFile = className.endsWith(".class");
+            if (className.indexOf('_') >= 0 && isClassFile && className.indexOf('$') < 0) {
+                className = className.substring(0, className.length() - 6);
+                v.addElement(className);
+            } else {
+                if (!isClassFile) {
+                    getSubdirectoryPlugins(path, className, v);
+                }
+            }
+        }
 		list = new String[v.size()];
-		v.copyInto((String[]) list);
+		v.copyInto(list);
 		StringSorter.sort(list);
 		return list;
 	}
@@ -195,14 +196,14 @@ public class Installer implements PlugIn {
 			return;
 		}
 		dir += "/";
-		for (int i = 0; i < list.length; i++) {
-		String name = list[i];
-			if (name.indexOf('_') >= 0 && name.endsWith(".class") && name.indexOf('$') < 0) {
-				name = name.substring(0, name.length() - 6);// remove ".class"
-				v.addElement(name);
-				//IJ.write("File: "+f+"/"+name);
-			}
-		}
+        for (String aList : list) {
+            String name = aList;
+            if (name.indexOf('_') >= 0 && name.endsWith(".class") && name.indexOf('$') < 0) {
+                name = name.substring(0, name.length() - 6);// remove ".class"
+                v.addElement(name);
+                //IJ.write("File: "+f+"/"+name);
+            }
+        }
 	}
 
 }

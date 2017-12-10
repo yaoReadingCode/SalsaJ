@@ -11,6 +11,7 @@ public class GalacticCoordinateSystem extends CoordinateSystem
     /**
      * Get the name of this object.
      */
+    @Override
     public String getName() {
 	return "Galactic";
     }
@@ -18,6 +19,7 @@ public class GalacticCoordinateSystem extends CoordinateSystem
     /**
      * Get a description of the object.
      */
+    @Override
     public String getDescription() {
 	return "Coordinate system based upon the orientation and center of the Galaxy";
     }
@@ -26,6 +28,7 @@ public class GalacticCoordinateSystem extends CoordinateSystem
      * Return the rotation associated with the coordinate system.
      */
       
+    @Override
     public Rotater getRotater() {
 	double[] poles = new double[] {122.931918, 27.128251, 192.859481};
 	return new Rotater("ZYZ", Math.toRadians(poles[2]),

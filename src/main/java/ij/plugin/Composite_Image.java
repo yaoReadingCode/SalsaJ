@@ -1,10 +1,5 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
-import ij.gui.*;
-import java.awt.*;
-import java.awt.image.*;
-import ij.plugin.frame.ContrastAdjuster;
 
 /**
  *  Description of the Class
@@ -19,7 +14,8 @@ public class Composite_Image implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	ImagePlus imp = IJ.getImage();
 		if (imp instanceof CompositeImage) {
 			return;

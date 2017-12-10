@@ -1,6 +1,5 @@
 package ij.plugin;
 
-import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import ij.*;
@@ -29,8 +28,9 @@ public class URLOpener implements PlugIn {
      *
      *@param  urlOrName  Description of the Parameter
      */
+    @Override
     public void run(String urlOrName) {
-        if (!urlOrName.equals("")) {
+        if (!"".equals(urlOrName)) {
             if (urlOrName.endsWith("StartupMacros.txt")) {
                 openTextFile(urlOrName, true);
             } else {
@@ -58,7 +58,7 @@ public class URLOpener implements PlugIn {
         }
         url = gd.getNextString();
         url = url.trim();
-        if (url.indexOf("://") == -1) {
+        if (!url.contains("://")) {
             url = "http://" + url;
         }
         if (url.endsWith("/")) {
@@ -97,7 +97,7 @@ public class URLOpener implements PlugIn {
             sb = new StringBuffer();
             String line;
             while ((line = br.readLine()) != null) {
-                sb.append(line + "\n");
+                sb.append(line).append("\n");
             }
             in.close();
         } catch (IOException e) {

@@ -1,7 +1,7 @@
 //EU_HOU
 package ij.gui;
 import java.awt.*;
-import java.awt.image.*;
+
 import ij.*;
 import ij.process.*;
 import ij.measure.*;
@@ -81,17 +81,22 @@ public class PolygonRoi extends Roi {
 		/*
 		 *  EU_HOU END
 		 */
-		if (type == POLYGON) {
-			this.type = POLYGON;
-		} else if (type == TRACED_ROI) {
-			this.type = TRACED_ROI;
-		} else if (type == POLYLINE) {
-			this.type = POLYLINE;
-		} else if (type == FREELINE) {
-			this.type = FREELINE;
-		} else {
-			throw new IllegalArgumentException("Invalid type");
-		}
+        switch (type) {
+            case POLYGON:
+                this.type = POLYGON;
+                break;
+            case TRACED_ROI:
+                this.type = TRACED_ROI;
+                break;
+            case POLYLINE:
+                this.type = POLYLINE;
+                break;
+            case FREELINE:
+                this.type = FREELINE;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid type");
+        }
 		maxPoints = nPoints;
 		this.nPoints = nPoints;
 		xp = xPoints;
@@ -204,7 +209,8 @@ public class PolygonRoi extends Roi {
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void draw(Graphics g) {
+	@Override
+    public void draw(Graphics g) {
 		updatePolygon();
 		g.setColor(instanceColor != null ? instanceColor : ROIColor);
 		if (xSpline != null) {
@@ -270,7 +276,8 @@ public class PolygonRoi extends Roi {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void drawPixels(ImageProcessor ip) {
+	@Override
+    public void drawPixels(ImageProcessor ip) {
 		if (xSpline != null) {
 			ip.moveTo(x + xSpline[0], y + ySpline[0]);
 			for (int i = 1; i < splinePoints; i++) {
@@ -308,7 +315,8 @@ public class PolygonRoi extends Roi {
 	 *@param  sx  Description of the Parameter
 	 *@param  sy  Description of the Parameter
 	 */
-	protected void grow(int sx, int sy) {
+	@Override
+    protected void grow(int sx, int sy) {
 		// Overrides grow() in Roi class
 	}
 
@@ -541,7 +549,8 @@ public class PolygonRoi extends Roi {
 	 *@param  sx  Description of the Parameter
 	 *@param  sy  Description of the Parameter
 	 */
-	protected void moveHandle(int sx, int sy) {
+	@Override
+    protected void moveHandle(int sx, int sy) {
 		if (clipboard != null) {
 			return;
 		}
@@ -732,7 +741,8 @@ public class PolygonRoi extends Roi {
 	 *@param  sx      Description of the Parameter
 	 *@param  sy      Description of the Parameter
 	 */
-	protected void mouseDownInHandle(int handle, int sx, int sy) {
+	@Override
+    protected void mouseDownInHandle(int handle, int sx, int sy) {
 		if (state == CONSTRUCTING) {
 			return;
 		}
@@ -1005,7 +1015,8 @@ public class PolygonRoi extends Roi {
 	 *@param  sx  Description of the Parameter
 	 *@param  sy  Description of the Parameter
 	 */
-	protected void handleMouseUp(int sx, int sy) {
+	@Override
+    protected void handleMouseUp(int sx, int sy) {
 		if (state == MOVING) {
 			state = NORMAL;
 			return;
@@ -1035,8 +1046,7 @@ public class PolygonRoi extends Roi {
 			nPoints--;
 			addOffset();
 			finishPolygon();
-			return;
-		} else if (!samePoint) {
+        } else if (!samePoint) {
 			mouseUpTime = System.currentTimeMillis();
 			if (type == ANGLE && nPoints == 3) {
 				addOffset();
@@ -1072,7 +1082,8 @@ public class PolygonRoi extends Roi {
 	 *@param  y  Description of the Parameter
 	 *@return    Description of the Return Value
 	 */
-	public boolean contains(int x, int y) {
+	@Override
+    public boolean contains(int x, int y) {
 		if (!super.contains(x, y)) {
 			return false;
 		}
@@ -1096,7 +1107,8 @@ public class PolygonRoi extends Roi {
 	 *@param  sy  Description of the Parameter
 	 *@return     The handle value
 	 */
-	public int isHandle(int sx, int sy) {
+	@Override
+    public int isHandle(int sx, int sy) {
 		if (!(xSpline != null || type == POLYGON || type == POLYLINE || type == ANGLE || type == POINT) || clipboard != null) {
 			return -1;
 		}
@@ -1132,7 +1144,8 @@ public class PolygonRoi extends Roi {
 	//	}
 	//}
 
-	public ImageProcessor getMask() {
+	@Override
+    public ImageProcessor getMask() {
 		if (cachedMask != null && cachedMask.getPixels() != null) {
 			return cachedMask;
 		}
@@ -1189,8 +1202,7 @@ public class PolygonRoi extends Roi {
 			y1 = y2;
 			y2 = y3;
 			y3 = y4;
-			;
-			if ((i + 2) < nPoints) {
+            if ((i + 2) < nPoints) {
 				x4 = xp[i + 2];
 				y4 = yp[i + 2];
 			}
@@ -1243,8 +1255,7 @@ public class PolygonRoi extends Roi {
 			y1 = y2;
 			y2 = y3;
 			y3 = y4;
-			;
-			if ((i + 2) < nPoints) {
+            if ((i + 2) < nPoints) {
 				x4 = xp[i + 2];
 				y4 = yp[i + 2];
 			} else {
@@ -1333,7 +1344,8 @@ public class PolygonRoi extends Roi {
 	 *
 	 *@return    The length value
 	 */
-	public double getLength() {
+	@Override
+    public double getLength() {
 		if (type == TRACED_ROI) {
 			return getTracedPerimeter();
 		}
@@ -1391,7 +1403,8 @@ public class PolygonRoi extends Roi {
 	 *
 	 *@return    The feretsDiameter value
 	 */
-	public double getFeretsDiameter() {
+	@Override
+    public double getFeretsDiameter() {
 	double w2 = 1.0;
 	double h2 = 1.0;
 
@@ -1483,7 +1496,8 @@ public class PolygonRoi extends Roi {
 	 *@see       ij.process.ImageProcessor#drawPolygon
 	 *@see       ij.process.ImageProcessor#fillPolygon
 	 */
-	public Polygon getPolygon() {
+	@Override
+    public Polygon getPolygon() {
 	int n;
 	int[] xpoints1;
 	int[] ypoints1;
@@ -1514,7 +1528,8 @@ public class PolygonRoi extends Roi {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	public synchronized Object clone() {
+	@Override
+    public synchronized Object clone() {
 	PolygonRoi r = (PolygonRoi) super.clone();
 
 		r.xp = new int[maxPoints];

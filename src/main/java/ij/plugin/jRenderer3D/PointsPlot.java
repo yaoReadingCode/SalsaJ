@@ -24,8 +24,9 @@ class PointsPlot {
 	
 	protected void removeLastPoint() {
 		int size = point3D.size();
-		if (size > 0)
-			this.point3D.remove(size-1);
+		if (size > 0) {
+            this.point3D.remove(size-1);
+        }
 	}
 	
 	protected void draw() {
@@ -35,12 +36,17 @@ class PointsPlot {
 				if (point3D.get(i)!= null && point3D.get(i) instanceof Point3D){
 					Point3D pt = (Point3D)point3D.get(i);
 					if (pt != null) {
-						if (pt.drawMode == Point3D.DOT)
-							pointsColoredDots(pt);
-						else if (pt.drawMode == Point3D.CIRCLE)
-							pointsColoredCircles(pt);
-						else if (pt.drawMode == Point3D.SPHERE)
-							pointsColoredSpheres(pt);
+						switch (pt.drawMode) {
+							case Point3D.DOT:
+								pointsColoredDots(pt);
+								break;
+							case Point3D.CIRCLE:
+								pointsColoredCircles(pt);
+								break;
+							case Point3D.SPHERE:
+								pointsColoredSpheres(pt);
+								break;
+						}
 					}
 				}
 			}
@@ -190,58 +196,65 @@ class PointsPlot {
 	static int fred_sqrt(int x) {
 		int xn;
 
-	    if (x >= 0x10000)
-	        if (x >= 0x1000000)
-	            if (x >= 0x10000000)
-	                if (x >= 0x40000000) {
-	                    if (x >= 65535*65535)
-	                        return 65535;
-	                    xn = sqq_table[ (x>>24)] << 8;
-	                } else
-	                    xn = sqq_table[ (x>>22)] << 7;
-	            else
-	                if (x >= 0x4000000)
-	                    xn = sqq_table[ (x>>20)] << 6;
-	                else
-	                    xn = sqq_table[ (x>>18)] << 5;
-	        else {
-	            if (x >= 0x100000)
-	                if (x >= 0x400000)
-	                    xn = sqq_table[ (x>>16)] << 4;
-	                else
-	                    xn = sqq_table[ (x>>14)] << 3;
-	            else
-	                if (x >= 0x40000)
-	                    xn = sqq_table[ (x>>12)] << 2;
-	                else
-	                    xn = sqq_table[ (x>>10)] << 1;
+	    if (x >= 0x10000) {
+            if (x >= 0x1000000) {
+                if (x >= 0x10000000) {
+                    if (x >= 0x40000000) {
+                        if (x >= 65535 * 65535) {
+                            return 65535;
+                        }
+                        xn = sqq_table[(x >> 24)] << 8;
+                    } else {
+                        xn = sqq_table[(x >> 22)] << 7;
+                    }
+                } else if (x >= 0x4000000) {
+                    xn = sqq_table[(x >> 20)] << 6;
+                } else {
+                    xn = sqq_table[(x >> 18)] << 5;
+                }
+            } else {
+                if (x >= 0x100000) {
+                    if (x >= 0x400000) {
+                        xn = sqq_table[(x >> 16)] << 4;
+                    } else {
+                        xn = sqq_table[(x >> 14)] << 3;
+                    }
+                } else
+                    if (x >= 0x40000) {
+                        xn = sqq_table[(x >> 12)] << 2;
+                    } else {
+                        xn = sqq_table[(x >> 10)] << 1;
+                    }
 
-	            xn = (xn + 1 + x / xn) / 2;
+                xn = (xn + 1 + x / xn) / 2;
 //	            if (xn * xn > x) /* Correct rounding if necessary */
 //	     	       xn--;
 
-	     	    return  xn;
-	          
-	        }
-	    else
+                 return  xn;
+
+            }
+        } else
 	        if (x >= 0x100) {
-	            if (x >= 0x1000)
-	                if (x >= 0x4000)
-	                    xn = (sqq_table[ (x>>8)] >> 0) + 1;
-	                else
-	                    xn = (sqq_table[ (x>>6)] >> 1) + 1;
-	            else
-	                if (x >= 0x400)
-	                    xn = (sqq_table[ (x>>4)] >> 2) + 1;
-	                else
-	                    xn = (sqq_table[ (x>>2)] >> 3) + 1;
+	            if (x >= 0x1000) {
+                    if (x >= 0x4000) {
+                        xn = (sqq_table[(x >> 8)] >> 0) + 1;
+                    } else {
+                        xn = (sqq_table[(x >> 6)] >> 1) + 1;
+                    }
+                } else
+	                if (x >= 0x400) {
+                        xn = (sqq_table[ (x>>4)] >> 2) + 1;
+                    } else {
+                        xn = (sqq_table[ (x>>2)] >> 3) + 1;
+                    }
 	
 //	            if (xn * xn > x) /* Correct rounding if necessary */
 //	     	       xn--;
 	     	    return  xn;
 	     	    	    
-	        } else
-	            return sqq_table[ x] >> 4;
+	        } else {
+                return sqq_table[ x] >> 4;
+            }
 
 	/* Run two iterations of the standard convergence formula */
 

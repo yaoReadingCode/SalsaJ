@@ -2,7 +2,6 @@ package ij.plugin;
 import ij.*;
 import ij.process.*;
 import ij.gui.*;
-import java.awt.*;
 
 /**
  *  Implements the conversion commands in the Image/Type submenu.
@@ -24,7 +23,8 @@ public class Converter implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		imp = WindowManager.getCurrentImage();
 		if (imp != null) {
 			if (imp.lock()) {//v1.24f
@@ -64,26 +64,26 @@ public class Converter implements PlugIn {
 			if (stack != null) {
 				// do stack conversions
 				//EU_HOU Bundle
-				if (stack.isRGB() && item.equals("RGB Color")) {
+				if (stack.isRGB() && "RGB Color".equals(item)) {
 					new ImageConverter(imp).convertRGBStackToRGB();
 					if (win != null) {
 						new ImageWindow(imp, imp.getCanvas());
 					}// replace StackWindow with ImageWindow
-				} else if (stack.isHSB() && item.equals("RGB Color")) {
+				} else if (stack.isHSB() && "RGB Color".equals(item)) {
 					new ImageConverter(imp).convertHSBToRGB();
 					if (win != null) {
 						new ImageWindow(imp, imp.getCanvas());
 					}
 					//EU_HOU Bundle
-				} else if (item.equals("8-bit")) {
+				} else if ("8-bit".equals(item)) {
 					new StackConverter(imp).convertToGray8();
-				} else if (item.equals("16-bit")) {
+				} else if ("16-bit".equals(item)) {
 					new StackConverter(imp).convertToGray16();
-				} else if (item.equals("32-bit")) {
+				} else if ("32-bit".equals(item)) {
 					new StackConverter(imp).convertToGray32();
-				} else if (item.equals("RGB Color")) {
+				} else if ("RGB Color".equals(item)) {
 					new StackConverter(imp).convertToRGB();
-				} else if (item.equals("8-bit Color")) {
+				} else if ("8-bit Color".equals(item)) {
 				int nColors = getNumber();
 					if (nColors != 0) {
 						new StackConverter(imp).convertToIndexedColor(nColors);
@@ -96,21 +96,21 @@ public class Converter implements PlugIn {
 				Undo.setup(Undo.TYPE_CONVERSION, imp);
 			ImageConverter ic = new ImageConverter(imp);
 				//EU_HOU Bundle
-				if (item.equals("8-bit")) {
+				if ("8-bit".equals(item)) {
 					ic.convertToGray8();
-				} else if (item.equals("16-bit")) {
+				} else if ("16-bit".equals(item)) {
 					ic.convertToGray16();
-				} else if (item.equals("32-bit")) {
+				} else if ("32-bit".equals(item)) {
 					ic.convertToGray32();
-				} else if (item.equals("RGB Stack")) {
+				} else if ("RGB Stack".equals(item)) {
 					Undo.reset();// Reversible; no need for Undo
 					ic.convertToRGBStack();
-				} else if (item.equals("HSB Stack")) {
+				} else if ("HSB Stack".equals(item)) {
 					Undo.reset();
 					ic.convertToHSB();
-				} else if (item.equals("RGB Color")) {
+				} else if ("RGB Color".equals(item)) {
 					ic.convertToRGB();
-				} else if (item.equals("8-bit Color")) {
+				} else if ("8-bit Color".equals(item)) {
 				int nColors = getNumber();
 					start = System.currentTimeMillis();
 					if (nColors != 0) {

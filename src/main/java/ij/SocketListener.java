@@ -21,7 +21,8 @@ public class SocketListener implements Runnable {
 		thread.start(); 
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 		ServerSocket serverSocket = null;
 		BufferedReader is;
 		Socket clientSocket;
@@ -30,13 +31,17 @@ public class SocketListener implements Runnable {
 			while (true) {
 				clientSocket = serverSocket.accept();
 				try {
-					if (IJ.debugMode) IJ.log("SocketServer: waiting on port "+ImageJ.getPort());
+					if (IJ.debugMode) {
+                        IJ.log("SocketServer: waiting on port "+ImageJ.getPort());
+                    }
 					is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 					String cmd = is.readLine();
-					if (IJ. debugMode) IJ.log("SocketServer: command: \""+ cmd+"\"");
-					if (cmd.startsWith("open "))
-						(new Opener()).openAndAddToRecent(cmd.substring(5));
-					else if (cmd.startsWith("macro ")) {
+					if (IJ. debugMode) {
+                        IJ.log("SocketServer: command: \""+ cmd+"\"");
+                    }
+					if (cmd.startsWith("open ")) {
+                        (new Opener()).openAndAddToRecent(cmd.substring(5));
+                    } else if (cmd.startsWith("macro ")) {
 						String name = cmd.substring(6);
 						String name2 = name;
 						String arg = null;
@@ -48,19 +53,23 @@ public class SocketListener implements Runnable {
 							}
 						}
 						IJ.runMacroFile(name, arg);
-					} else if (cmd.startsWith("run "))
-						IJ.run(cmd.substring(4));
-					else if (cmd.startsWith("eval ")) {
+					} else if (cmd.startsWith("run ")) {
+                        IJ.run(cmd.substring(4));
+                    } else if (cmd.startsWith("eval ")) {
 						String rtn = IJ.runMacro(cmd.substring(5));
-						if (rtn!=null)
-							System.out.print(rtn);
-					} else if (cmd.startsWith("user.dir "))
-						OpenDialog.setDefaultDirectory(cmd.substring(9));
-				} catch (Throwable e) {}
+						if (rtn!=null) {
+                            System.out.print(rtn);
+                        }
+					} else if (cmd.startsWith("user.dir ")) {
+                        OpenDialog.setDefaultDirectory(cmd.substring(9));
+                    }
+				} catch (Throwable ignored) {}
 				clientSocket.close();
-				if (IJ. debugMode) IJ.log("SocketServer: connection closed");
+				if (IJ. debugMode) {
+                    IJ.log("SocketServer: connection closed");
+                }
 			}
- 		} catch (IOException e) {}
+ 		} catch (IOException ignored) {}
 	}
 
 }

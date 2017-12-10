@@ -15,30 +15,35 @@ import skyview.geometry.Transformer;
 public class ZeaProjecter extends Projecter {
 
     /** Get a name for the component */
-    public String getName() {
+    @Override
+	public String getName() {
 	return "ZeaProjecter";
     }
     
     /** Get a description for the component */
-    public String getDescription() {
+    @Override
+	public String getDescription() {
 	return "Zenithal Equal Area projecter";
     }
     
     /** Get this inverse of the transformation */
-    public Deprojecter inverse() {
+    @Override
+	public Deprojecter inverse() {
 	return new ZeaProjecter.ZeaDeprojecter();
     }
 
     /** Is this an inverse of some other transformation? */
-    public boolean isInverse(Transformer t) {
-	return t.getName().equals("ZeaDeprojecter");
+    @Override
+	public boolean isInverse(Transformer t) {
+	return "ZeaDeprojecter".equals(t.getName());
     }
     
     /** Project a point from the sphere to the plane.
      *  @param sphere a double[3] unit vector
      *  @param plane  a double[2] preallocated vector.
      */
-    public final void transform(double[] sphere, double[] plane) {
+    @Override
+	public final void transform(double[] sphere, double[] plane) {
 	
 	if (Double.isNaN(sphere[2])) {
 	    plane[0] = Double.NaN;
@@ -66,23 +71,27 @@ public class ZeaProjecter extends Projecter {
     public class ZeaDeprojecter extends Deprojecter {
 	
 	/** Get the name of the component */
+	@Override
 	public String getName() {
 	    return "ZeaDeprojecter";
 	}
 	
 	/** Get the description of the compontent */
+	@Override
 	public String getDescription() {
 	    return "Zenithal equal area deprojecter";
 	}
 	
 	/** Get the inverse transformation */
+	@Override
 	public Projecter inverse() {
 	    return ZeaProjecter.this;
 	}
 	 
         /** Is this an inverse of some other transformation? */
-        public boolean isInverse(Transformer t) {
-	    return t.getName().equals("ZeaProjecter");
+        @Override
+		public boolean isInverse(Transformer t) {
+	    return "ZeaProjecter".equals(t.getName());
         }
 	
 	
@@ -90,7 +99,8 @@ public class ZeaProjecter extends Projecter {
          *  @param plane a double[2] vector in the tangent plane.
          *  @param spehre a preallocated double[3] vector.
          */
-        public final void transform(double[] plane, double[] sphere) {
+        @Override
+		public final void transform(double[] plane, double[] sphere) {
 	
 	    double r = Math.sqrt(plane[0]*plane[0] + plane[1]*plane[1]);
 	

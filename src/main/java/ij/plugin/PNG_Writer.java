@@ -1,7 +1,7 @@
 package ij.plugin;
 import ij.*;
 import ij.io.*;
-import ij.process.*;
+
 import java.awt.*;
 import java.io.*;
 import java.awt.image.*;
@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 public class PNG_Writer implements PlugIn {
     ImagePlus imp;
 
+    @Override
     public void run(String path) {
         if (!IJ.isJava14()) {
         	IJ.showMessage("PNG Writer" , "The command requires java 1.4 or later");
@@ -21,11 +22,12 @@ public class PNG_Writer implements PlugIn {
         if (imp==null)
         	{IJ.noImage(); return;}
 
-        if (path.equals("")) {
+        if ("".equals(path)) {
             SaveDialog sd = new SaveDialog("Save as PNG...", imp.getTitle(), ".png");
             String name = sd.getFileName();
-            if (name==null)
+            if (name==null) {
                 return;
+            }
             String dir = sd.getDirectory();
             path = dir + name;
         }
@@ -34,8 +36,9 @@ public class PNG_Writer implements PlugIn {
             writeImage(imp, path);
         } catch (Exception e) {
             String msg = e.getMessage();
-            if (msg==null || msg.equals(""))
+            if (msg==null || "".equals(msg)) {
                 msg = ""+e;
+            }
             IJ.showMessage("PNG Writer", "An error occured writing the file.\n \n" + msg);
         }
         IJ.showStatus("");

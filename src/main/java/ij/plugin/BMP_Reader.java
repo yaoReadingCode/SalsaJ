@@ -22,7 +22,8 @@ public class BMP_Reader extends ImagePlus implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 	//EU_HOU Bundle
 	OpenDialog od = new OpenDialog("Open BMP...", arg);
 	String directory = od.getDirectory();
@@ -40,7 +41,7 @@ public class BMP_Reader extends ImagePlus implements PlugIn {
 			bmp.read(is);
 		} catch (Exception e) {
 		String msg = e.getMessage();
-			if (msg == null || msg.equals("")) {
+			if (msg == null || "".equals(msg)) {
 				msg = "" + e;
 			}
 			IJ.error("BMP Decoder", msg);
@@ -49,7 +50,7 @@ public class BMP_Reader extends ImagePlus implements PlugIn {
 			if (is != null) {
 				try {
 					is.close();
-				} catch (IOException e) {}
+				} catch (IOException ignored) {}
 			}
 		}
 
@@ -68,7 +69,7 @@ public class BMP_Reader extends ImagePlus implements PlugIn {
 		if (bmp.topDown) {
 			getProcessor().flipVertical();
 		}
-		if (arg.equals("")) {
+		if ("".equals(arg)) {
 			show();
 		}
 	}
@@ -117,7 +118,7 @@ class BMPDecoder {
 	int b3 = is.read();
 	int b4 = is.read();
 		curPos += 4;
-		return ((b4 << 24) + (b3 << 16) + (b2 << 8) + (b1 << 0));
+		return ((b4 << 24) + (b3 << 16) + (b2 << 8) + (b1));
 	}
 
 
@@ -369,13 +370,17 @@ class BMPDecoder {
 				//EU_HOU Bundle
 				throw new Exception("Scan line ended prematurely after " + n + " bytes");
 			}
-			if (bitsPerPixel == 24) {
-				unpack24(rawData, rawOffset, intData, offset, width);
-			} else if (bitsPerPixel == 32) {
-				unpack32(rawData, rawOffset, intData, offset, width);
-			} else {// 8-bits or less
-				unpack(rawData, rawOffset, bitsPerPixel, byteData, offset, width);
-			}
+            switch (bitsPerPixel) {
+                case 24:
+                    unpack24(rawData, rawOffset, intData, offset, width);
+                    break;
+                case 32:
+                    unpack32(rawData, rawOffset, intData, offset, width);
+                    break;
+                default: // 8-bits or less
+                    unpack(rawData, rawOffset, bitsPerPixel, byteData, offset, width);
+                    break;
+            }
 			rawOffset += len;
 			offset -= width;
 		}

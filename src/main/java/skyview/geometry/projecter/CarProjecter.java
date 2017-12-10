@@ -5,10 +5,6 @@ import skyview.geometry.*;
 import static java.lang.Double.NaN;
 import static java.lang.Math.*;
 
-import skyview.geometry.Projecter;
-import skyview.geometry.Deprojecter;
-import skyview.geometry.Transformer;
-
 
 /** This class implements the Cartesian (rectangular)
  *  projection.  Note that the tangent point
@@ -20,27 +16,32 @@ import skyview.geometry.Transformer;
 public final class CarProjecter extends Projecter {
     
     /** Get the name of the compontent */
-    public String getName() {
+    @Override
+	public String getName() {
 	return "CarProjecter";
     }
     
     /** Return a description of the component */
-    public String getDescription() {
+    @Override
+	public String getDescription() {
 	return "Transform from the celestial sphere to the plane described by Lon/Lat directly";
     }
     
     /** Get the inverse transformation */
-    public Deprojecter inverse() {
+    @Override
+	public Deprojecter inverse() {
 	return new  CarProjecter.CarDeprojecter();
     }
     
     /** Is this an inverse of some other transformation? */
-    public boolean isInverse(Transformer t) {
-	return t.getName().equals("CarDeprojecter");
+    @Override
+	public boolean isInverse(Transformer t) {
+	return "CarDeprojecter".equals(t.getName());
     }
     
     /** Do the transfromation */
-    public final void transform(double[] sphere, double[] plane) {
+    @Override
+	public final void transform(double[] sphere, double[] plane) {
 	
 	if (Double.isNaN(sphere[2]) ) {
 	    plane[0] = NaN;
@@ -55,21 +56,25 @@ public final class CarProjecter extends Projecter {
     
     public class CarDeprojecter extends Deprojecter {
         /** Get the name of the compontent */
-        public String getName() {
+        @Override
+		public String getName() {
 	    return "CarDeprojecter";
         }
     
         /** Is this an inverse of some other transformation? */
-        public boolean isInverse(Transformer t) {
-	    return t.getName().equals("CarProjecter");
+        @Override
+		public boolean isInverse(Transformer t) {
+	    return "CarProjecter".equals(t.getName());
         }
 	
         /** Return a description of the component */
-        public String getDescription() {
+        @Override
+		public String getDescription() {
 	    return "Transform from the Lat/Lon to the corresponding unit vector.";
 	}
 	
 	/** Get the inverse */
+	@Override
 	public Projecter inverse() {
 	    return CarProjecter.this;
 	}
@@ -78,7 +83,8 @@ public final class CarProjecter extends Projecter {
          *  @param plane a double[2] vector in the tangent plane.
          *  @param spehre a preallocated double[3] vector.
          */
-        public final void transform(double[] plane, double[] sphere) {
+        @Override
+		public final void transform(double[] plane, double[] sphere) {
 	
 	    if (Double.isNaN(plane[0])) {
 	        sphere[0] = NaN;

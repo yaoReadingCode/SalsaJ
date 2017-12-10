@@ -18,7 +18,6 @@ import ij.text.TextWindow;
 import ij.util.Java2;
 import java.awt.event.KeyEvent;
 import javax.imageio.ImageIO;
-import ij.plugin.filter.Profiler;
 
 /**
  * Opens tiff (and tiff stacks), dicom, fits, pgm, jpeg, bmp or gif images, and
@@ -34,7 +33,7 @@ public class Opener {
      */
     public final static int UNKNOWN = 0, TIFF = 1, DICOM = 2, FITS = 3, PGM = 4, JPEG = 5,
             GIF = 6, LUT = 7, BMP = 8, ZIP = 9, JAVA_OR_TEXT = 10, ROI = 11, TEXT = 12, PNG = 13,
-            TIFF_AND_DICOM = 14, CUSTOM = 15, DAT = 16,OJJ=17, TABLE=18; ;
+            TIFF_AND_DICOM = 14, CUSTOM = 15, DAT = 16,OJJ=17, TABLE=18;
     private final static String[] types = {"unknown", "tif", "dcm", "fits", "pgm",
         "jpg", "gif", "lut", "bmp", "zip", "java/txt", "roi", "txt", "png", "t&d", "custom","dat","ojj","table"};
     private static String defaultDirectory = null;
@@ -78,7 +77,9 @@ public class Opener {
 	public static void openResultsTable(String path) {
 		try {
 			ResultsTable rt = ResultsTable.open(path);
-			if (rt!=null) rt.show("Results");
+			if (rt!=null) {
+                rt.show("Results");
+            }
 		} catch(IOException e) {
 			IJ.error("Open Results", e.getMessage());
 		}
@@ -99,6 +100,7 @@ public class Opener {
             EventQueue.invokeAndWait(
                     new Runnable() {
 
+                        @Override
                         public void run() {
                             JFileChooser fc = new JFileChooser();
                             fc.setMultiSelectionEnabled(true);
@@ -122,7 +124,7 @@ public class Opener {
                             omDirectory = fc.getCurrentDirectory().getPath() + File.separator;
                         }
                     });
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         if (omDirectory == null) {
             return;
@@ -151,11 +153,8 @@ public class Opener {
             lastSlash = 0;
         }
         int lastDot = path.lastIndexOf(".");
-        if (lastDot == -1 || lastDot < lastSlash || (path.length() - lastDot) > 6) {
-            return true;  // no extension
-        } else {
-            return false;
-        }
+        // no extension
+        return lastDot == -1 || lastDot < lastSlash || (path.length() - lastDot) > 6;
     }
 
     /**
@@ -247,7 +246,7 @@ public class Opener {
                     long size = file.length();
                     if (size >= 28000) {
                         String osName = System.getProperty("os.name");
-                        if (osName.equals("Windows 95") || osName.equals("Windows 98") || osName.equals("Windows Me")) {
+                        if ("Windows 95".equals(osName) || "Windows 98".equals(osName) || "Windows Me".equals(osName)) {
                             maxSize = 60000;
                         }
                     }
@@ -420,7 +419,7 @@ public class Opener {
      * @return Description of the Return Value
      */
     public ImagePlus openImage(String path) {
-        if (path == null || path.equals("")) {
+        if (path == null || "".equals(path)) {
             return null;
         }
         ImagePlus img = null;
@@ -466,7 +465,7 @@ public class Opener {
                 if (imp != null && imp.getWidth() == 0) {
                     imp = null;
                 }
-            } else if (url.indexOf("fits") != -1) {
+            } else if (url.contains("fits")) {
                 System.out.println("FITS");
                 IJ.runPlugIn("ij.plugin.FITS", url);
             } else {
@@ -476,7 +475,7 @@ public class Opener {
             return imp;
         } catch (Exception e) {
             String msg = e.getMessage();
-            if (msg == null || msg.equals("")) {
+            if (msg == null || "".equals(msg)) {
                 msg = "" + e;
             }
             //EU_HOU Bundle
@@ -532,8 +531,7 @@ public class Opener {
         }
         Image img = Toolkit.getDefaultToolkit().createImage(url);
         if (img != null) {
-            ImagePlus imp = new ImagePlus(title, img);
-            return imp;
+            return new ImagePlus(title, img);
         } else {
             return null;
         }
@@ -559,7 +557,7 @@ public class Opener {
                 convertGrayJpegTo8Bits(imp);
             }
             FileInfo fi = new FileInfo();
-            fi.fileFormat = fi.GIF_OR_JPG;
+            fi.fileFormat = FileInfo.GIF_OR_JPG;
             fi.fileName = name;
             fi.directory = dir;
             imp.setFileInfo(fi);
@@ -586,7 +584,7 @@ public class Opener {
             return null;// error loading image
         }
         FileInfo fi = new FileInfo();
-        fi.fileFormat = fi.IMAGEIO;
+        fi.fileFormat = FileInfo.IMAGEIO;
         fi.fileName = f.getName();
         fi.directory = f.getParent() + File.separator;
         imp.setFileInfo(fi);
@@ -768,7 +766,7 @@ public class Opener {
             info = td.getTiffInfo();
         } catch (IOException e) {
             String msg = e.getMessage();
-            if (msg == null || msg.equals("")) {
+            if (msg == null || "".equals(msg)) {
                 msg = "" + e;
             }//EU_HOU Bundle
             IJ.error("TiffDecoder", msg);
@@ -1097,7 +1095,7 @@ public class Opener {
     InputStream createInputStream(FileInfo fi) throws IOException, MalformedURLException {
         if (fi.inputStream != null) {
             return fi.inputStream;
-        } else if (fi.url != null && !fi.url.equals("")) {
+        } else if (fi.url != null && !"".equals(fi.url)) {
             return new URL(fi.url + fi.fileName).openStream();
         } else {
             File f = new File(fi.directory + fi.fileName);

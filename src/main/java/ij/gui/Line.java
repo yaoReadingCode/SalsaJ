@@ -1,6 +1,6 @@
 package ij.gui;
 import java.awt.*;
-import java.awt.image.*;
+
 import ij.*;
 import ij.process.*;
 import ij.measure.*;
@@ -133,7 +133,8 @@ public class Line extends Roi {
 	 *@param  sx  Description of the Parameter
 	 *@param  sy  Description of the Parameter
 	 */
-	protected void grow(int sx, int sy) {
+	@Override
+    protected void grow(int sx, int sy) {
 	double xend = ic != null ? ic.offScreenXD(sx) : sx;
 	double yend = ic != null ? ic.offScreenYD(sy) : sy;
 		if (xend < 0.0) {
@@ -194,7 +195,8 @@ public class Line extends Roi {
 	 *@param  sx  Description of the Parameter
 	 *@param  sy  Description of the Parameter
 	 */
-	void move(int sx, int sy) {
+    @Override
+    void move(int sx, int sy) {
 	int xNew = ic.offScreenX(sx);
 	int yNew = ic.offScreenY(sy);
 		x += xNew - startxd;
@@ -221,7 +223,8 @@ public class Line extends Roi {
 	 *@param  sx  Description of the Parameter
 	 *@param  sy  Description of the Parameter
 	 */
-	protected void moveHandle(int sx, int sy) {
+	@Override
+    protected void moveHandle(int sx, int sy) {
 	double ox = ic.offScreenXD(sx);
 	double oy = ic.offScreenYD(sy);
 		x1d = x + x1R;
@@ -297,7 +300,8 @@ public class Line extends Roi {
 	 *@param  sx      Description of the Parameter
 	 *@param  sy      Description of the Parameter
 	 */
-	protected void mouseDownInHandle(int handle, int sx, int sy) {
+	@Override
+    protected void mouseDownInHandle(int handle, int sx, int sy) {
 		state = MOVING_HANDLE;
 		activeHandle = handle;
 		if (lineWidth <= 3) {
@@ -311,7 +315,8 @@ public class Line extends Roi {
 	 *
 	 *@param  g  Description of the Parameter
 	 */
-	public void draw(Graphics g) {
+	@Override
+    public void draw(Graphics g) {
 		if (ic == null) {
 			return;
 		}
@@ -363,7 +368,8 @@ public class Line extends Roi {
 	 *
 	 *@return    The length value
 	 */
-	public double getLength() {
+	@Override
+    public double getLength() {
 		if (imp == null || IJ.altKeyDown()) {
 			return getRawLength();
 		} else {
@@ -463,7 +469,8 @@ public class Line extends Roi {
 	 *
 	 *@return    The polygon value
 	 */
-	public Polygon getPolygon() {
+	@Override
+    public Polygon getPolygon() {
 	Polygon p = new Polygon();
 		if (lineWidth == 1) {
 			p.addPoint(x1, y1);
@@ -493,7 +500,8 @@ public class Line extends Roi {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void drawPixels(ImageProcessor ip) {
+	@Override
+    public void drawPixels(ImageProcessor ip) {
 		ip.setLineWidth(1);
 		if (lineWidth == 1) {
 			ip.moveTo(x1, y1);
@@ -512,13 +520,10 @@ public class Line extends Roi {
 	 *@param  y  Description of the Parameter
 	 *@return    Description of the Return Value
 	 */
-	public boolean contains(int x, int y) {
-		if (lineWidth > 1) {
-			return getPolygon().contains(x, y);
-		} else {
-			return false;
-		}
-	}
+	@Override
+    public boolean contains(int x, int y) {
+        return lineWidth > 1 && getPolygon().contains(x, y);
+    }
 
 
 	/**
@@ -529,7 +534,8 @@ public class Line extends Roi {
 	 *@param  sy  Description of the Parameter
 	 *@return     The handle value
 	 */
-	public int isHandle(int sx, int sy) {
+	@Override
+    public int isHandle(int sx, int sy) {
 	int size = HANDLE_SIZE + 5;
 		if (lineWidth > 1) {
 			size += (int) Math.log(lineWidth);
@@ -601,7 +607,8 @@ public class Line extends Roi {
 	 *
 	 *@return    The bounds value
 	 */
-	public Rectangle getBounds() {
+	@Override
+    public Rectangle getBounds() {
 	int xmin = (int) Math.round(Math.min(x1d, x2d));
 	int ymin = (int) Math.round(Math.min(y1d, y2d));
 	int w = (int) Math.round(Math.abs(x2d - x1d));
@@ -615,7 +622,8 @@ public class Line extends Roi {
 	 *
 	 *@param  key  Description of the Parameter
 	 */
-	public void nudgeCorner(int key) {
+	@Override
+    public void nudgeCorner(int key) {
 		if (ic == null) {
 			return;
 		}

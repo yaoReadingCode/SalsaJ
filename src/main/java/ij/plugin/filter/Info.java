@@ -1,6 +1,6 @@
 package ij.plugin.filter;
 import java.awt.*;
-import java.util.*;
+
 import ij.*;
 import ij.gui.*;
 import ij.process.*;
@@ -14,17 +14,20 @@ import ij.util.Tools;
 public class Info implements PlugInFilter {
     private ImagePlus imp;
 
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		return DOES_ALL+NO_CHANGES;
 	}
 
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		String info = getImageInfo(imp, ip);
-		if (info.indexOf("----")>0)
-			showInfo(info, 450, 500);
-		else
-			showInfo(info, 300, 300);
+		if (info.indexOf("----")>0) {
+            showInfo(info, 450, 500);
+        } else {
+            showInfo(info, 300, 300);
+        }
 	}
 
 	public String getImageInfo(ImagePlus imp, ImageProcessor ip) {
@@ -32,20 +35,23 @@ public class Info implements PlugInFilter {
 		if (imp.getStackSize()>1) {
 			ImageStack stack = imp.getStack();
 			String label = stack.getSliceLabel(imp.getCurrentSlice());
-			if (label!=null && label.indexOf('\n')>0)
-				infoProperty = label;
+			if (label!=null && label.indexOf('\n')>0) {
+                infoProperty = label;
+            }
 		}
                 String info = getInfo(imp, ip);
-		if (infoProperty==null)
-			infoProperty = (String)imp.getProperty("Info");
-		if (infoProperty!=null)
-			return infoProperty + "\n------------------------\n" + info;
-		else
-			return info;		
+		if (infoProperty==null) {
+            infoProperty = (String)imp.getProperty("Info");
+        }
+		if (infoProperty!=null) {
+            return infoProperty + "\n------------------------\n" + info;
+        } else {
+            return info;
+        }
 	}
 
 	String getInfo(ImagePlus imp, ImageProcessor ip) {
-		String s = new String("\n");
+		String s = "\n";
 		s += "Title: " + imp.getTitle() + "\n";
 		Calibration cal = imp.getCalibration();
     	int nSlices = imp.getStackSize();
@@ -55,24 +61,27 @@ public class Info implements PlugInFilter {
 			String units = cal.getUnits();
 	    	s += "Width:  "+IJ.d2s(imp.getWidth()*cal.pixelWidth,2)+" " + units+" ("+imp.getWidth()+")\n";
 	    	s += "Height:  "+IJ.d2s(imp.getHeight()*cal.pixelHeight,2)+" " + units+" ("+imp.getHeight()+")\n";
-	    	if (nSlices>1)
-	    		s += "Depth:  "+IJ.d2s(nSlices*cal.pixelDepth,2)+" " + units+" ("+nSlices+")\n";	    			    	
-	    	if (nSlices>1)
-	    		s += "Voxel size: "+IJ.d2s(cal.pixelWidth,2) + "x" + IJ.d2s(cal.pixelHeight,2)+"x"+IJ.d2s(cal.pixelDepth,2) + "\n";	    		
+	    	if (nSlices>1) {
+                s += "Depth:  "+IJ.d2s(nSlices*cal.pixelDepth,2)+" " + units+" ("+nSlices+")\n";
+            }
+	    	if (nSlices>1) {
+                s += "Voxel size: "+IJ.d2s(cal.pixelWidth,2) + "x" + IJ.d2s(cal.pixelHeight,2)+"x"+IJ.d2s(cal.pixelDepth,2) + "\n";
+            }
 	    	double xResolution = 1.0/cal.pixelWidth;
 	    	double yResolution = 1.0/cal.pixelHeight;
 	    	int places = Tools.getDecimalPlaces(xResolution, yResolution);
-	    	if (xResolution==yResolution)
-	    		s += "Resolution:  "+IJ.d2s(xResolution,places) + " pixels per "+unit+"\n";
-	    	else {
+	    	if (xResolution==yResolution) {
+                s += "Resolution:  "+IJ.d2s(xResolution,places) + " pixels per "+unit+"\n";
+            } else {
 	    		s += "X Resolution:  "+IJ.d2s(xResolution,places) + " pixels per "+unit+"\n";
 	    		s += "Y Resolution:  "+IJ.d2s(yResolution,places) + " pixels per "+unit+"\n";
 	    	}
 	    } else {
 	    	s += "Width:  " + imp.getWidth() + " pixels\n";
 	    	s += "Height:  " + imp.getHeight() + " pixels\n";
-	    	if (nSlices>1)
-	    		s += "Depth:  " + nSlices + " pixels\n";
+	    	if (nSlices>1) {
+                s += "Depth:  " + nSlices + " pixels\n";
+            }
 	    }
 	    String zOrigin = nSlices>1||cal.zOrigin!=0.0?","+d2s(cal.zOrigin):"";
 	    s += "Coordinate origin:  " + d2s(cal.xOrigin)+","+d2s(cal.yOrigin)+zOrigin+"\n";
@@ -81,20 +90,23 @@ public class Info implements PlugInFilter {
 	    	case ImagePlus.GRAY8:
 	    		s += "Bits per pixel: 8 ";
 	    		String lut = "LUT";
-	    		if (imp.getProcessor().isColorLut())
-	    			lut = "color " + lut;
-	    		else
-	    			lut = "grayscale " + lut;
-	    		if (imp.isInvertedLut())
-	    			lut = "inverting " + lut;
+	    		if (imp.getProcessor().isColorLut()) {
+                    lut = "color " + lut;
+                } else {
+                    lut = "grayscale " + lut;
+                }
+	    		if (imp.isInvertedLut()) {
+                    lut = "inverting " + lut;
+                }
 	    		s += "(" + lut + ")\n";
 	    		break;
 	    	case ImagePlus.GRAY16: case ImagePlus.GRAY32:
 	    		if (type==ImagePlus.GRAY16) {
 	    			String sign = cal.isSigned16Bit()?"signed":"unsigned";
 	    			s += "Bits per pixel: 16 ("+sign+")\n";
-	    		} else
-	    			s += "Bits per pixel: 32 (float)\n";
+	    		} else {
+                    s += "Bits per pixel: 32 (float)\n";
+                }
 				s += "Display range: ";
 				double min = ip.getMin();
 				double max = ip.getMax();
@@ -118,25 +130,28 @@ public class Info implements PlugInFilter {
     		int slice = imp.getCurrentSlice();
     		String number = slice + "/" + nSlices;
     		String label = stack.getShortSliceLabel(slice);
-    		if (label!=null && label.length()>0)
-    			label = " (" + label + ")";
-    		else
-    			label = "";
+    		if (label!=null && label.length()>0) {
+                label = " (" + label + ")";
+            } else {
+                label = "";
+            }
 			if (interval>0.0 || fps!=0.0) {
 				s += "Frame: " + number + label + "\n";
 				if (fps!=0.0) {
 					String sRate = Math.abs(fps-Math.round(fps))<0.00001?IJ.d2s(fps,0):IJ.d2s(fps,5);
 					s += "Frame rate: " + sRate + " fps\n";
 				}
-				if (interval!=0.0)
-					s += "Frame interval: " + ((int)interval==interval?IJ.d2s(interval,0):IJ.d2s(interval,5)) + " " + cal.getTimeUnit() + "\n";
-			} else
-				s += "Slice: " + number + label + "\n";
+				if (interval!=0.0) {
+                    s += "Frame interval: " + ((int)interval==interval?IJ.d2s(interval,0):IJ.d2s(interval,5)) + " " + cal.getTimeUnit() + "\n";
+                }
+			} else {
+                s += "Slice: " + number + label + "\n";
+            }
 		}
 
-		if (ip.getMinThreshold()==ImageProcessor.NO_THRESHOLD)
-	    	s += "No Threshold\n";
-	    else {
+		if (ip.getMinThreshold()==ImageProcessor.NO_THRESHOLD) {
+            s += "No Threshold\n";
+        } else {
 	    	double lower = ip.getMinThreshold();
 	    	double upper = ip.getMaxThreshold();
 			int dp = digits;
@@ -149,47 +164,59 @@ public class Info implements PlugInFilter {
 		}
 		ImageCanvas ic = imp.getCanvas();
     	double mag = ic!=null?ic.getMagnification():1.0;
-    	if (mag!=1.0)
-			s += "Magnification: " + mag + "\n";
+    	if (mag!=1.0) {
+            s += "Magnification: " + mag + "\n";
+        }
 			
 	    if (cal.calibrated()) {
 	    	s += " \n";
 	    	int curveFit = cal.getFunction();
 			s += "Calibration Function: ";
-			if (curveFit==Calibration.UNCALIBRATED_OD)
-				s += "Uncalibrated OD\n";	    	
-			else if (curveFit==Calibration.CUSTOM)
-				s += "Custom lookup table\n";	    	
-			else
-				s += CurveFitter.fList[curveFit]+"\n";
+            switch (curveFit) {
+                case Calibration.UNCALIBRATED_OD:
+                    s += "Uncalibrated OD\n";
+                    break;
+                case Calibration.CUSTOM:
+                    s += "Custom lookup table\n";
+                    break;
+                default:
+                    s += CurveFitter.fList[curveFit] + "\n";
+                    break;
+            }
 			double[] c = cal.getCoefficients();
 			if (c!=null) {
 				s += "  a: "+IJ.d2s(c[0],6)+"\n";
 				s += "  b: "+IJ.d2s(c[1],6)+"\n";
-				if (c.length>=3)
-					s += "  c: "+IJ.d2s(c[2],6)+"\n";
-				if (c.length>=4)
-					s += "  c: "+IJ.d2s(c[3],6)+"\n";
-				if (c.length>=5)
-					s += "  c: "+IJ.d2s(c[4],6)+"\n";
+				if (c.length>=3) {
+                    s += "  c: "+IJ.d2s(c[2],6)+"\n";
+                }
+				if (c.length>=4) {
+                    s += "  c: "+IJ.d2s(c[3],6)+"\n";
+                }
+				if (c.length>=5) {
+                    s += "  c: "+IJ.d2s(c[4],6)+"\n";
+                }
 			}
 			s += "  Unit: \""+cal.getValueUnit()+"\"\n";	    	
-	    } else
-	    	s += "Uncalibrated\n";
+	    } else {
+            s += "Uncalibrated\n";
+        }
 
 	    FileInfo fi = imp.getOriginalFileInfo();
 		if (fi!=null) {
-			if (fi.directory!=null && fi.fileName!=null)
-				s += "Path: " + fi.directory + fi.fileName + "\n";
-			if (fi.url!=null && !fi.url.equals("")) {
+			if (fi.directory!=null && fi.fileName!=null) {
+                s += "Path: " + fi.directory + fi.fileName + "\n";
+            }
+			if (fi.url!=null && !"".equals(fi.url)) {
 				s += "URL: " + fi.url + "\n";
 			}
 		}
 	    
 	    Roi roi = imp.getRoi();
 	    if (roi == null) {
-			if (cal.calibrated())
-	    		s += " \n";
+			if (cal.calibrated()) {
+                s += " \n";
+            }
 	    	s += "No Selection\n";
 	    } else {
 	    	s += " \n";
@@ -203,9 +230,12 @@ public class Info implements PlugInFilter {
     		String name = roi.getName();
     		if (name!=null) {
 				s += " (\"" + name + "\")";
-				if (points!=null) s += "\n " + points;		
-			} else if (points!=null)
-				s += points;
+				if (points!=null) {
+                    s += "\n " + points;
+                }
+			} else if (points!=null) {
+                s += points;
+            }
 			s += "\n";		
 	    	Rectangle r = roi.getBounds();
 	    	if (roi instanceof Line) {

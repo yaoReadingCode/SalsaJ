@@ -89,6 +89,7 @@ public class DSSDistorter extends Distorter
     }
 
     
+    @Override
     public void transform(double[] x, double[] y) {
 		  
         int    max_iterations = 50;
@@ -152,10 +153,12 @@ public class DSSDistorter extends Distorter
     }
     
     /** Get the name of this component */
+    @Override
     public String getName() {
 	return "DSS Distorter";
     }
     
+    @Override
     public String getDescription() {
 	return "Transform from a fiducial projection plane to the DSS distorted projection plane.";
     }
@@ -229,11 +232,13 @@ public class DSSDistorter extends Distorter
     /** The inverse Distorter (i.e., the undistorter) uses much of the same
      *  machinery, so we generate it as a inner class of the distorter.
      */
+    @Override
     public Distorter inverse() {
 	return new DSSDistorter.DSSInvDistorter();
     }
     
     /** Is this the inverse of another distorter? */
+    @Override
     public boolean isInverse(Transformer t) {
 	
 	try {
@@ -258,26 +263,31 @@ public class DSSDistorter extends Distorter
 	}
 	
 	/** Get the name of this component */
-	public String getName() {
+	@Override
+    public String getName() {
 	    return "DSSInvDistorter";
 	}
 	
 	/** Get a description of this component */
-	public String getDescription() {
+	@Override
+    public String getDescription() {
 	    return "Transform from DSS distorted coordinates to the ficucial projection plane";
 	}
 	
 	/** Get the inverse Distorter */
-	public Distorter inverse() {
+	@Override
+    public Distorter inverse() {
 	    return DSSDistorter.this;
 	}
      
         /** Is this the inverse of another distorter? */
+        @Override
         public boolean isInverse(Transformer t) {
 	    return t == DSSDistorter.this;
         }
 	
 	/** Transform a point */
+        @Override
         public void transform(double[] x, double[] y) {
 
             // Need to convert from radians to mm

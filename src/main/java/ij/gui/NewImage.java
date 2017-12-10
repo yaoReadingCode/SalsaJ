@@ -1,10 +1,6 @@
 //EU_HOU
 package ij.gui;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
-import java.awt.event.*;
 import java.util.*;
 import ij.*;
 import ij.process.*;
@@ -144,8 +140,7 @@ public class NewImage {
 					IJ.beep();
 					break;
 				}
-				;
-			}
+            }
 		} catch (OutOfMemoryError e) {
 			IJ.outOfMemory(imp.getTitle());
 			stack.trim();
@@ -446,12 +441,16 @@ public class NewImage {
 	public static void open(String title, int width, int height, int nSlices, int type, int options) {
 	int bitDepth = 8;
 		System.out.println("open type=" + type);
-		if (type == GRAY16) {
-			bitDepth = 16;
-		} else if (type == GRAY32) {
-			bitDepth = 32;
-		} else if (type == RGB) {
-			bitDepth = 24;
+		switch (type) {
+			case GRAY16:
+				bitDepth = 16;
+				break;
+			case GRAY32:
+				bitDepth = 32;
+				break;
+			case RGB:
+				bitDepth = 24;
+				break;
 		}
 	long startTime = System.currentTimeMillis();
 	ImagePlus imp = createImage(title, width, height, nSlices, bitDepth, options);

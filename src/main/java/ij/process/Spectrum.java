@@ -119,8 +119,7 @@ public abstract class Spectrum {
         PlotWindow.Base_Line_subtracted = false;
         PlotWindow.Base_Line = false;
         PlotWindow.ZERO_LINE = false;
-        PlotWindow pw = new PlotWindow(IJ.getBundle().getString("PlotWinTitle") + "  " + "test-spectrum", xLabel, yLabel, XdataDisplay, YdataDisplay, impdata);
 
-        return pw;
+        return new PlotWindow(IJ.getBundle().getString("PlotWinTitle") + "  " + "test-spectrum", xLabel, yLabel, XdataDisplay, YdataDisplay, impdata);
     }
 }

@@ -94,10 +94,11 @@ public class Calibration implements Cloneable {
 	
    	/** Sets the default length unit (e.g. "mm", "inch"). */
  	public void setUnit(String unit) {
- 		if (unit==null || unit.equals(""))
- 			this.unit = "pixel";
- 		else
- 			this.unit = unit;
+ 		if (unit==null || "".equals(unit)) {
+			this.unit = "pixel";
+		} else {
+			this.unit = unit;
+		}
  		units = null;
  	}
  	
@@ -139,24 +140,26 @@ public class Calibration implements Cloneable {
 	/** Returns the plural form of the length unit (e.g. "microns", "inches"). */
  	public String getUnits() {
  		if (units==null) {
-  			if (unit.equals("pixel"))
- 				units = "pixels";
- 			else if (unit.equals("micron"))
- 				units = "microns";
-  			else if (unit.equals("inch"))
- 				units = "inches";
-			else
- 				units = unit;
+  			if ("pixel".equals(unit)) {
+				units = "pixels";
+			} else if ("micron".equals(unit)) {
+				units = "microns";
+			} else if ("inch".equals(unit)) {
+				units = "inches";
+			} else {
+				units = unit;
+			}
  		}
  		return units;
  	}
  	
    	/** Sets the time unit (e.g. "sec", "msec"). */
  	public void setTimeUnit(String unit) {
- 		if (unit==null || unit.equals(""))
- 			timeUnit = "sec";
- 		else
- 			timeUnit = unit;
+ 		if (unit==null || "".equals(unit)) {
+			timeUnit = "sec";
+		} else {
+			timeUnit = unit;
+		}
  	}
 
  	/** Returns the distance unit (e.g. "sec", "msec"). */
@@ -178,12 +181,14 @@ public class Calibration implements Cloneable {
  		taking into account the invertY and global "Invert Y Coordinates" flags. */
  	public double getY(double y, int imageHeight) {
  		if (invertY || (Analyzer.getMeasurements()&Measurements.INVERT_Y)!=0) {
-			if (yOrigin!=0.0)
+			if (yOrigin!=0.0) {
 				return (yOrigin-y)*pixelHeight;
-			else
+			} else {
 				return (imageHeight-y-1)*pixelHeight;
-		} else
-   			return (y-yOrigin)*pixelHeight;
+			}
+		} else {
+			return (y-yOrigin)*pixelHeight;
+		}
 	}
 
   	/** Converts a z-coodinate in pixels to physical units (e.g. mm). */
@@ -203,20 +208,23 @@ public class Calibration implements Cloneable {
  	public void setFunction(int function, double[] coefficients, String unit, boolean zeroClip) {
  		if (function==NONE)
  			{disableDensityCalibration(); return;}
- 		if (coefficients==null && function>=STRAIGHT_LINE && function<=RODBARD2)
- 			return;
+ 		if (coefficients==null && function>=STRAIGHT_LINE && function<=RODBARD2) {
+			return;
+		}
  		this.function = function;
  		this.coefficients = coefficients;
  		this.zeroClip = zeroClip;
- 		if (unit!=null)
- 			valueUnit = unit;
+ 		if (unit!=null) {
+			valueUnit = unit;
+		}
  		cTable = null;
  	}
 
  	/** Disables the density calibation if the specified image has a differenent bit depth. */
  	public void setImage(ImagePlus imp) {
- 		if (imp==null)
- 			return;
+ 		if (imp==null) {
+			return;
+		}
  		int type = imp.getType();
  		int newBitDepth = imp.getBitDepth();
  		if (newBitDepth==16 && imp.getLocalCalibration().isSigned16Bit()) {
@@ -225,7 +233,9 @@ public class Calibration implements Cloneable {
 		} else if (newBitDepth!=bitDepth || type==ImagePlus.GRAY32 || type==ImagePlus.COLOR_RGB) {
 			String saveUnit = valueUnit;
 			disableDensityCalibration();
-			if (type==ImagePlus.GRAY32) valueUnit = saveUnit;
+			if (type==ImagePlus.GRAY32) {
+				valueUnit = saveUnit;
+			}
 		}
  		bitDepth = newBitDepth;
  	}
@@ -244,8 +254,9 @@ public class Calibration implements Cloneable {
  	
 	/** Sets the value unit. */
  	public void setValueUnit(String unit) {
- 		if (unit!=null)
- 			valueUnit = unit;
+ 		if (unit!=null) {
+			valueUnit = unit;
+		}
  	}
 
  	/** Returns the calibration function coefficients. */
@@ -267,8 +278,9 @@ public class Calibration implements Cloneable {
 		the table has a length of 256. With 16-bit images,
 		the length is 65536. */
  	public float[] getCTable() {
- 		if (cTable==null)
- 			makeCTable();
+ 		if (cTable==null) {
+			makeCTable();
+		}
  		return cTable;
  	}
  	
@@ -277,107 +289,131 @@ public class Calibration implements Cloneable {
  	public void setCTable(float[] table, String unit) {
  		if (table==null)
  			{disableDensityCalibration(); return;}
- 		if (bitDepth==16 && table.length!=65536)
- 			throw new IllegalArgumentException("Table.length!=65536");
+ 		if (bitDepth==16 && table.length!=65536) {
+			throw new IllegalArgumentException("Table.length!=65536");
+		}
  		cTable = table;
  		function = CUSTOM;
  		coefficients = null;
  		zeroClip = false;
- 		if (unit!=null) valueUnit = unit;
+ 		if (unit!=null) {
+			valueUnit = unit;
+		}
  	}
 
  	void makeCTable() {
  		if (bitDepth==16)
  			{make16BitCTable(); return;}
- 		if (bitDepth!=8)
- 			return;
+ 		if (bitDepth!=8) {
+			return;
+		}
  		if (function==UNCALIBRATED_OD) {
  			cTable = new float[256];
-			for (int i=0; i<256; i++)
+			for (int i=0; i<256; i++) {
 				cTable[i] = (float)od(i);
+			}
 		} else if (function>=STRAIGHT_LINE && function<=RODBARD2 && coefficients!=null) {
  			cTable = new float[256];
  			double value;
  			for (int i=0; i<256; i++) {
 				value = CurveFitter.f(function, coefficients, i);
-				if (zeroClip && value<0.0)
+				if (zeroClip && value<0.0) {
 					cTable[i] = 0f;
-				else
+				} else {
 					cTable[i] = (float)value;
+				}
 			}
-		} else
- 			cTable = null;
+		} else {
+			cTable = null;
+		}
   	}
 
  	void make16BitCTable() {
 		if (function>=STRAIGHT_LINE && function<=RODBARD2 && coefficients!=null) {
  			cTable = new float[65536];
- 			for (int i=0; i<65536; i++)
+ 			for (int i=0; i<65536; i++) {
 				cTable[i] = (float)CurveFitter.f(function, coefficients, i);
-		} else
- 			cTable = null;
+			}
+		} else {
+			cTable = null;
+		}
   	}
 
 	double od(double v) {
 		if (invertedLut) {
-			if (v==255.0) v = 254.5;
+			if (v==255.0) {
+				v = 254.5;
+			}
 			return 0.434294481*Math.log(255.0/(255.0-v));
 		} else {
-			if (v==0.0) v = 0.5;
+			if (v==0.0) {
+				v = 0.5;
+			}
 			return 0.434294481*Math.log(255.0/v);
 		}
 	}
 	
   	/** Converts a raw pixel value to a density calibrated value. */
  	public double getCValue(int value) {
-		if (function==NONE)
+		if (function==NONE) {
 			return value;
+		}
 		if (function>=STRAIGHT_LINE && function<=RODBARD2 && coefficients!=null) {
 			double v = CurveFitter.f(function, coefficients, value);
-			if (zeroClip && v<0.0)
+			if (zeroClip && v<0.0) {
 				return 0.0;
-			else
+			} else {
 				return v;
+			}
 		}
-		if (cTable==null)
+		if (cTable==null) {
 			makeCTable();
- 		if (cTable!=null && value>=0 && value<cTable.length)
- 			return cTable[value];
- 		else
- 			return value;
+		}
+ 		if (cTable!=null && value>=0 && value<cTable.length) {
+			return cTable[value];
+		} else {
+			return value;
+		}
  	}
  	 	
   	/** Converts a raw pixel value to a density calibrated value. */
  	public double getCValue(double value) {
-		if (function==NONE)
+		if (function==NONE) {
 			return value;
-		else {
+		} else {
 			if (function>=STRAIGHT_LINE && function<=RODBARD2 && coefficients!=null) {
 				double 	v = CurveFitter.f(function, coefficients, value);
-				if (zeroClip && v<0.0)
+				if (zeroClip && v<0.0) {
 					return 0.0;
-				else
+				} else {
 					return v;
-			} else
+				}
+			} else {
 				return getCValue((int)value);
+			}
 		}
  	}
  	
   	/** Converts a density calibrated value into a raw pixel value. */
  	public double getRawValue(double value) {
-		if (function==NONE)
+		if (function==NONE) {
 			return value;
-		if (function==STRAIGHT_LINE && coefficients!=null && coefficients.length==2 && coefficients[1]!=0.0)
+		}
+		if (function==STRAIGHT_LINE && coefficients!=null && coefficients.length==2 && coefficients[1]!=0.0) {
 			return (value-coefficients[0])/coefficients[1];
-		if (cTable==null)
+		}
+		if (cTable==null) {
 			makeCTable();
+		}
 		float fvalue = (float)value;
 		float smallestDiff = Float.MAX_VALUE;
 		float diff;
 		int index = 0;
 		for (int i=0; i<cTable.length; i++) {
 			diff = fvalue - cTable[i];
-			if (diff<0f) diff = -diff;
+			if (diff<0f) {
+				diff = -diff;
+			}
 			if (diff<smallestDiff) {
 				smallestDiff = diff;
 				index = i;
@@ -413,6 +449,7 @@ public class Calibration implements Cloneable {
 		return (Calibration)clone();
 	}
 	
+	@Override
 	public synchronized Object clone() {
 		try {return super.clone();}
 		catch (CloneNotSupportedException e) {return null;}
@@ -420,15 +457,19 @@ public class Calibration implements Cloneable {
 
 	/** Compares two Calibration objects for equality. */
  	public boolean equals(Calibration cal) {
- 		if (cal==null)
- 			return false;
+ 		if (cal==null) {
+			return false;
+		}
  		boolean equal = true;
- 		if (cal.pixelWidth!=pixelWidth || cal.pixelHeight!=pixelHeight || cal.pixelDepth!=pixelDepth)
- 			equal = false;
- 		if (!cal.unit.equals(unit))
- 			equal = false;
- 		if (!cal.valueUnit.equals(valueUnit) || cal.function!=function)
- 			equal = false;
+ 		if (cal.pixelWidth!=pixelWidth || cal.pixelHeight!=pixelHeight || cal.pixelDepth!=pixelDepth) {
+			equal = false;
+		}
+ 		if (!cal.unit.equals(unit)) {
+			equal = false;
+		}
+ 		if (!cal.valueUnit.equals(valueUnit) || cal.function!=function) {
+			equal = false;
+		}
  		return equal;
  	}
  	
@@ -448,7 +489,8 @@ public class Calibration implements Cloneable {
  		invertY = invertYCoordinates;
  	}
  	
-    public String toString() {
+    @Override
+	public String toString() {
     	return
     		"w=" + pixelWidth
 			+ ", h=" + pixelHeight

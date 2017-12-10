@@ -3,8 +3,6 @@ import ij.*;
 import ij.gui.*;
 import ij.process.*;
 import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
 
 /**	This plugin continuously plots ImageJ's memory
 	utilization. It could also be used as a starting
@@ -27,7 +25,8 @@ public class MemoryMonitor implements PlugIn {
 	int max = 12*1204*1024; // 12MB
 	long maxMemory = IJ.maxMemory();
 
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		if (IJ.altKeyDown()) {
 			// simulate frame grabber
 			width = 640;
@@ -54,10 +53,11 @@ public class MemoryMonitor implements PlugIn {
 			updatePixels();
          	showValue();
 			imp.updateAndDraw();
-         	if (width==640)
-        		Thread.yield();
-        	else
-        		IJ.wait(100);
+         	if (width==640) {
+                Thread.yield();
+            } else {
+                IJ.wait(100);
+            }
        		frames++;
 		}
 		imp.unlock();
@@ -84,18 +84,28 @@ public class MemoryMonitor implements PlugIn {
 
 	void updatePixels() {
 		long used = IJ.currentMemory();
-		if (frames%10==0) value=used;
-		if (used>0.9*max) max*=2;
+		if (frames%10==0) {
+            value=used;
+        }
+		if (used>0.9*max) {
+            max*=2;
+        }
 		mem[index++] = (float)used;
-		if (index==mem.length) index = 0;
+		if (index==mem.length) {
+            index = 0;
+        }
 		ip.reset();
 		int index2 = index+1;
-		if (index2==mem.length) index2 = 0;
+		if (index2==mem.length) {
+            index2 = 0;
+        }
 		double scale = (double)height/max;
 		ip.moveTo(0, height-(int)(mem[index2]*scale));
 		for (int x=1; x<width; x++) {
 			index2++;
-			if (index2==mem.length) index2 = 0;
+			if (index2==mem.length) {
+                index2 = 0;
+            }
 			ip.lineTo(x, height-(int)(mem[index2]*scale));
 		}
 	}

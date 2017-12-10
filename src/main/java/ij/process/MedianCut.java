@@ -42,8 +42,11 @@ public class MedianCut {
 	
 	int getColorCount() {
 		int count = 0;
-		for (int i=0; i<HSIZE; i++)
-			if (hist[i]>0) count++;
+		for (int i=0; i<HSIZE; i++) {
+            if (hist[i]>0) {
+                count++;
+            }
+        }
 		return count;
 	}
 	
@@ -51,17 +54,18 @@ public class MedianCut {
 	Color getModalColor() {
 		int max=0;
 		int c = 0;
-		for (int i=0; i<HSIZE; i++)
-			if (hist[i]>max) {
-				max = hist[i];
-				c = i;
-			}
+		for (int i=0; i<HSIZE; i++) {
+            if (hist[i]>max) {
+                max = hist[i];
+                c = i;
+            }
+        }
 		return new Color(red(c), green(c), blue(c));
 	}
 	
 
 	// Convert from 24-bit to 15-bit color
-	private final int rgb(int c) {
+	private int rgb(int c) {
 		int r = (c&0xf80000)>>19;
 		int g = (c&0xf800)>>6;
 		int b = (c&0xf8)<<7;
@@ -69,17 +73,17 @@ public class MedianCut {
 	}
 	
 	// Get red component of a 15-bit color
-	private final int red(int x) {
+	private int red(int x) {
 		return (x&31)<<3;
 	}
 	
 	// Get green component of a 15-bit color
-	private final int green(int x) {
+	private int green(int x) {
 		return (x>>2)&0xf8;
 	}
 	
 	// Get blue component of a 15-bit color
-	private final int blue(int x) {
+	private int blue(int x) {
 		return (x>>7)&0xf8;
 	}
 
@@ -126,24 +130,31 @@ public class MedianCut {
 			// Search the list of cubes for next cube to split, the lowest level cube
 			level = 255; splitpos = -1; 
 			for (k=0; k<=ncubes-1; k++) {
-				if (list[k].lower == list[k].upper)  
-					;	// single color; cannot be split
-				else if (list[k].level < level) {
+				if (list[k].lower == list[k].upper) {
+                } else if (list[k].level < level) {
 					level = list[k].level;
 					splitpos = k;
 				}
 			}
 			if (splitpos == -1)	// no more cubes to split
-				break;
+            {
+                break;
+            }
 
 			// Find longest dimension of this cube
 			cube = list[splitpos];
 			lr = cube.rmax - cube.rmin;
 			lg = cube.gmax - cube.gmin;
 			lb = cube.bmax - cube.bmin;
-			if (lr >= lg && lr >= lb) longdim = 0;
-			if (lg >= lr && lg >= lb) longdim = 1;
-			if (lb >= lr && lb >= lg) longdim = 2;
+			if (lr >= lg && lr >= lb) {
+                longdim = 0;
+            }
+			if (lg >= lr && lg >= lb) {
+                longdim = 1;
+            }
+			if (lb >= lr && lb >= lg) {
+                longdim = 2;
+            }
 			
 			// Sort along "longdim"
 			reorderColors(histPtr, cube.lower, cube.upper, longdim);
@@ -153,7 +164,9 @@ public class MedianCut {
 			// Find median
 			count = 0;
 			for (i=cube.lower;i<=cube.upper-1;i++) {
-				if (count >= cube.count/2) break;
+				if (count >= cube.count/2) {
+                    break;
+                }
 				color = histPtr[i];
 				count = count + hist[color];
 			}
@@ -176,8 +189,9 @@ public class MedianCut {
 			cubeB.level = cube.level + 1;
 			Shrink(cubeB);
 			list[ncubes++] = cubeB;				// add in new slot */
-			if (ncubes%15==0)
-				IJ.showProgress(0.3 + (0.6*ncubes)/maxcubes);
+			if (ncubes%15==0) {
+                IJ.showProgress(0.3 + (0.6*ncubes)/maxcubes);
+            }
 		}
 
 		// We have enough cubes, or we have split all we can. Now
@@ -205,12 +219,24 @@ public class MedianCut {
 			r = red(color);
 			g = green(color);
 			b = blue(color);
-			if (r > rmax) rmax = r;
-			if (r < rmin) rmin = r;
-			if (g > gmax) gmax = g;
-			if (g < gmin) gmin = g;
-			if (b > bmax) bmax = b;
-			if (b < bmin) bmin = b;
+			if (r > rmax) {
+                rmax = r;
+            }
+			if (r < rmin) {
+                rmin = r;
+            }
+			if (g > gmax) {
+                gmax = g;
+            }
+			if (g < gmin) {
+                gmin = g;
+            }
+			if (b > bmax) {
+                bmax = b;
+            }
+			if (b < bmin) {
+                bmin = b;
+            }
 		}
 		cube.rmin = rmin; cube.rmax = rmax;
 		cube.gmin = gmin; cube.gmax = gmax;
@@ -250,8 +276,9 @@ public class MedianCut {
 			r = (int)(rsum/(float)cube.count);
 			g = (int)(gsum/(float)cube.count);
 			b = (int)(bsum/(float)cube.count);
-			if (r==248 && g==248 && b==248)
-				r=g=b=255;  // Restore white (255,255,255)
+			if (r==248 && g==248 && b==248) {
+                r=g=b=255;  // Restore white (255,255,255)
+            }
 			rLUT[k] = (byte)r;
 			gLUT[k] = (byte)g;
 			bLUT[k] = (byte)b;
@@ -335,10 +362,12 @@ public class MedianCut {
       if ( hi0 > lo0) {
          mid = a[ ( lo0 + hi0 ) / 2 ];
          while( lo <= hi ) {
-            while( ( lo < hi0 ) && ( a[lo] < mid ) )
-               ++lo;
-            while( ( hi > lo0 ) && ( a[hi] > mid ) )
-               --hi;
+            while( ( lo < hi0 ) && ( a[lo] < mid ) ) {
+                ++lo;
+            }
+            while( ( hi > lo0 ) && ( a[hi] > mid ) ) {
+                --hi;
+            }
             if( lo <= hi ) {
 		      t = a[lo]; 
 		      a[lo] = a[hi];
@@ -347,10 +376,12 @@ public class MedianCut {
                --hi;
             }
          }
-         if( lo0 < hi )
-            quickSort( a, lo0, hi );
-         if( lo < hi0 )
-            quickSort( a, lo, hi0 );
+         if( lo0 < hi ) {
+             quickSort( a, lo0, hi );
+         }
+         if( lo < hi0 ) {
+             quickSort( a, lo, hi0 );
+         }
 
       }
    }
@@ -391,7 +422,8 @@ class Cube {			// structure for a cube in color space
 		count = 0;
 	}   
 
-	public String toString() {
+	@Override
+    public String toString() {
 		String s = "lower=" + lower + " upper=" + upper;
 		s = s + " count=" + count + " level=" + level;
 		s = s + " rmin=" + rmin + " rmax=" + rmax;

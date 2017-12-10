@@ -1,7 +1,5 @@
 package skyview.geometry;
 
-import java.lang.reflect.*;
-
 /** This class implements projection algorithms to/from a projection
   * plane and the unit sphere.  Data on the unit sphere is normally
   * represented as a unit-three vector.  Data in a projection
@@ -61,7 +59,7 @@ public class Projection {
     /** Get the correct projection */
     public Projection(String type) throws TransformationException {
 	
-	if (!type.equals("Car")  && !type.equals("Ait")  &&!type.equals("Csc")) {
+	if (!"Car".equals(type) && !"Ait".equals(type) &&!"Csc".equals(type)) {
 	    throw new TransformationException("Invalid non-parametrized projection:"+type);
 	}
 	String projClass   = "skyview.geometry.projecter."+type+"Projecter";

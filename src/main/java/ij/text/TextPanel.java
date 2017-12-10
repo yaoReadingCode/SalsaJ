@@ -9,7 +9,6 @@ import ij.*;
 import ij.plugin.filter.Analyzer;
 import ij.io.SaveDialog;
 import ij.measure.ResultsTable;
-import ij.util.Tools;
 import ij.plugin.frame.Recorder;
 
 import ij.process.Photometer;
@@ -147,7 +146,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
     public synchronized void setColumnHeadings(String labels) {
         boolean sameLabels = labels.equals(this.labels);
         this.labels = labels;
-        if (labels.equals("")) {
+        if ("".equals(labels)) {
             iColCount = 1;
             sColHead = new String[1];
             sColHead[0] = "";
@@ -245,7 +244,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
             }
             appendWithoutUpdate(data.substring(0, p));
             data = data.substring(p + 1);
-            if (data.equals("")) {
+            if ("".equals(data)) {
                 break;
             }
         }
@@ -339,6 +338,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void adjustmentValueChanged(AdjustmentEvent e) {
         iX = sbHoriz.getValue();
         iY = iRowHeight * sbVert.getValue();
@@ -350,6 +350,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         int x = e.getX();
         int y = e.getY();
@@ -379,7 +380,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
             if (index > -1 && !s.endsWith(": ")) {
                 s = s.substring(index + 2);
             }// remove sequence number added by ListFilesRecursively
-            if (s.indexOf(File.separator) != -1 || s.indexOf(".") != -1) {
+            if (s.contains(File.separator) || s.contains(".")) {
                 filePath = s;
                 Thread thread = new Thread(this, "Open");
                 thread.setPriority(thread.getPriority() - 1);
@@ -392,6 +393,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *  For better performance, open double-clicked files on separate thread
      *  instead of on event dispatch thread.
      */
+    @Override
     public void run() {
         if (filePath != null) {
             IJ.open(filePath);
@@ -403,6 +405,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void mouseExited(MouseEvent e) {
         if (bDrag) {
             setCursor(defaultCursor);
@@ -415,6 +418,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void mouseMoved(MouseEvent e) {
         int x = e.getX();
         int y = e.getY();
@@ -449,6 +453,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void mouseDragged(MouseEvent e) {
         if (e.isPopupTrigger() || e.isMetaDown()) {
             return;
@@ -474,6 +479,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         if (ListenTextPanel) {
             String s = getLine();
@@ -489,6 +495,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
@@ -497,6 +504,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
@@ -512,6 +520,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  event  Description of the Parameter
      */
+    @Override
     public void mouseWheelMoved(MouseWheelEvent event) {
         synchronized (this) {
             int rot = event.getWheelRotation();
@@ -526,6 +535,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  listener  The feature to be added to the KeyListener attribute
      */
+    @Override
     public void addKeyListener(KeyListener listener) {
         keyListener = listener;
     }
@@ -535,6 +545,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void keyPressed(KeyEvent e) {
         //boolean cutCopyOK = (e.isControlDown()||e.isMetaDown())
         //	&& selStart!=-1 && selEnd!=-1;
@@ -557,6 +568,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void keyReleased(KeyEvent e) {
     }
 
@@ -565,6 +577,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void keyTyped(KeyEvent e) {
         if (keyListener != null) {
             keyListener.keyTyped(e);
@@ -576,6 +589,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *
      *@param  e  Description of the Parameter
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         String cmd = e.getActionCommand();
         doCommand(cmd);
@@ -624,6 +638,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      *@param  clip  Description of the Parameter
      *@param  cont  Description of the Parameter
      */
+    @Override
     public void lostOwnership(Clipboard clip, Transferable cont) {
     }
 
@@ -637,7 +652,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
         ResultsTable rt2 = (ResultsTable) rt.clone();
         //EU_HOU Bundle
         String title2 = IJ.getString("Title:", etiq.getString("Results2"));
-        if (!title2.equals("")) {
+        if (!"".equals(title2)) {
             //EU_HOU Bundle
             if (title2.equals(etiq.getString("Results"))) {
                 title2 = etiq.getString("Results") + "2";
@@ -877,7 +892,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      */
     public void save(PrintWriter pw) {
         resetSelection();
-        if (labels != null && !labels.equals("")) {
+        if (labels != null && !"".equals(labels)) {
             pw.println(labels);
         }
         for (int i = 0; i < iRowCount; i++) {
@@ -896,7 +911,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      */
     public boolean saveAs(String path) {
         boolean isResults = IJ.isResultsWindow() && IJ.getTextPanel() == this;
-        if (path.equals("")) {
+        if ("".equals(path)) {
             IJ.wait(10);
             //EU_HOU Bundle
             String ext = ".txt";
@@ -944,7 +959,7 @@ public class TextPanel extends Panel implements AdjustmentListener,
      */
     public String getText() {
         StringBuffer sb = new StringBuffer();
-        if (labels != null && !labels.equals("")) {
+        if (labels != null && !"".equals(labels)) {
             sb.append(labels);
             sb.append('\n');
         }

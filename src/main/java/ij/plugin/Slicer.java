@@ -3,7 +3,6 @@ import ij.*;
 import ij.process.*;
 import ij.gui.*;
 import ij.measure.*;
-import ij.plugin.filter.RGBStackSplitter;
 import ij.util.Tools;
 import java.awt.*;
 import java.awt.event.*;
@@ -53,7 +52,8 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		imp = WindowManager.getCurrentImage();
 		if (imp == null) {
 			IJ.noImage();
@@ -159,7 +159,6 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 			cal.pixelWidth = origCal.pixelDepth / zSpacing;
 			cal.pixelHeight = origCal.pixelHeight;
 			cal.pixelDepth = origCal.pixelWidth * outputZSpacing;
-			;
 		} else {// oblique line, polyLine or freeline
 			if (origCal.pixelHeight == origCal.pixelWidth) {
 				cal.pixelWidth = cal.pixelHeight = origCal.pixelDepth / zSpacing;
@@ -280,54 +279,57 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 			imp.setRoi(0, 0, imp.getWidth(), imp.getHeight());
 			roi = imp.getRoi();
 		}
-		if (roi.getType() == Roi.RECTANGLE) {
-		Rectangle r = roi.getBounds();
-			if (startAt.equals(starts[0])) {// top
-				x1 = r.x;
-				y1 = r.y;
-				x2 = r.x + r.width;
-				y2 = r.y;
-				xInc = 0.0;
-				yInc = outputZSpacing;
-				outputSlices = (int) (r.height / outputZSpacing);
-			} else if (startAt.equals(starts[1])) {// left
-				x1 = r.x;
-				y1 = r.y;
-				x2 = r.x;
-				y2 = r.y + r.height;
-				xInc = outputZSpacing;
-				yInc = 0.0;
-				outputSlices = (int) (r.width / outputZSpacing);
-			} else if (startAt.equals(starts[2])) {// bottom
-				x1 = r.x;
-				y1 = r.y + r.height - 1;
-				x2 = r.x + r.width;
-				y2 = r.y + r.height - 1;
-				xInc = 0.0;
-				yInc = -outputZSpacing;
-				outputSlices = (int) (r.height / outputZSpacing);
-			} else if (startAt.equals(starts[3])) {// right
-				x1 = r.x + r.width - 1;
-				y1 = r.y;
-				x2 = r.x + r.width - 1;
-				y2 = r.y + r.height;
-				xInc = -outputZSpacing;
-				yInc = 0.0;
-				outputSlices = (int) (r.width / outputZSpacing);
-			}
-		} else if (roi.getType() == Roi.LINE) {
-		Line line = (Line) roi;
-			x1 = line.x1;
-			y1 = line.y1;
-			x2 = line.x2;
-			y2 = line.y2;
-		double dx = x2 - x1;
-		double dy = y2 - y1;
-		double nrm = Math.sqrt(dx * dx + dy * dy) / outputZSpacing;
-			xInc = -(dy / nrm);
-			yInc = (dx / nrm);
-		} else {
-			return null;
+		switch (roi.getType()) {
+			case Roi.RECTANGLE:
+				Rectangle r = roi.getBounds();
+				if (startAt.equals(starts[0])) {// top
+					x1 = r.x;
+					y1 = r.y;
+					x2 = r.x + r.width;
+					y2 = r.y;
+					xInc = 0.0;
+					yInc = outputZSpacing;
+					outputSlices = (int) (r.height / outputZSpacing);
+				} else if (startAt.equals(starts[1])) {// left
+					x1 = r.x;
+					y1 = r.y;
+					x2 = r.x;
+					y2 = r.y + r.height;
+					xInc = outputZSpacing;
+					yInc = 0.0;
+					outputSlices = (int) (r.width / outputZSpacing);
+				} else if (startAt.equals(starts[2])) {// bottom
+					x1 = r.x;
+					y1 = r.y + r.height - 1;
+					x2 = r.x + r.width;
+					y2 = r.y + r.height - 1;
+					xInc = 0.0;
+					yInc = -outputZSpacing;
+					outputSlices = (int) (r.height / outputZSpacing);
+				} else if (startAt.equals(starts[3])) {// right
+					x1 = r.x + r.width - 1;
+					y1 = r.y;
+					x2 = r.x + r.width - 1;
+					y2 = r.y + r.height;
+					xInc = -outputZSpacing;
+					yInc = 0.0;
+					outputSlices = (int) (r.width / outputZSpacing);
+				}
+				break;
+			case Roi.LINE:
+				Line line = (Line) roi;
+				x1 = line.x1;
+				y1 = line.y1;
+				x2 = line.x2;
+				y2 = line.y2;
+				double dx = x2 - x1;
+				double dy = y2 - y1;
+				double nrm = Math.sqrt(dx * dx + dy * dy) / outputZSpacing;
+				xInc = -(dy / nrm);
+				yInc = (dx / nrm);
+				break;
+			default:
+				return null;
 		}
 
 		if (outputSlices == 0) {
@@ -665,10 +667,10 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 	int ry = y1;
 		for (int i = 0; i < n; i++) {
 			if (rgb) {
-			int rgbPixel = ((ColorProcessor) ip).getPixel(rx, ry);
+			int rgbPixel = ip.getPixel(rx, ry);
 				data[i] = Float.intBitsToFloat(rgbPixel & 0xffffff);
 			} else {
-				data[i] = (float) ip.getPixelValue(rx, ry);
+				data[i] = ip.getPixelValue(rx, ry);
 			}
 			rx += xinc;
 			ry += yinc;
@@ -703,7 +705,8 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void textValueChanged(TextEvent e) {
+	@Override
+    public void textValueChanged(TextEvent e) {
 		updateSize();
 	}
 
@@ -713,7 +716,8 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 	 *
 	 *@param  e  Description of the Parameter
 	 */
-	public void itemStateChanged(ItemEvent e) {
+	@Override
+    public void itemStateChanged(ItemEvent e) {
 	Checkbox cb = (Checkbox) checkboxes.elementAt(2);
 		nointerpolate = cb.getState();
 		updateSize();

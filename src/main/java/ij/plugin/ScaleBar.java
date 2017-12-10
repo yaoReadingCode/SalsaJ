@@ -52,7 +52,8 @@ public class ScaleBar implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		/*
 		 *  EU_HOU CHANGES
 		 */
@@ -77,9 +78,9 @@ public class ScaleBar implements PlugIn {
 			checkboxLabels[i] = IJ.getPluginBundle().getString(checkboxLabelsKeys[i]);
 		}
 
-		location = new String(locations[1]);
-		color = new String(colors[0]);
-		bcolor = new String(bcolors[0]);
+		location = locations[1];
+		color = colors[0];
+		bcolor = bcolors[0];
 		/*
 		 *  EU_HOU END
 		 */
@@ -139,7 +140,7 @@ public class ScaleBar implements PlugIn {
 		}
 	String units = cal.getUnits();
 		// Handle Digital Micrograph unit microns
-		if (units.equals("micron")) {
+		if ("micron".equals(units)) {
 			units = IJ.micronSymbol + "m";
 		}
 	double pixelWidth = cal.pixelWidth;
@@ -243,7 +244,7 @@ public class ScaleBar implements PlugIn {
 		}
 	// Handle Digital Micrograph unit microns
 	String units = imp.getCalibration().getUnits();
-		if (units.equals("microns")) {
+		if ("microns".equals(units)) {
 			units = IJ.micronSymbol + "m";
 		}
 	String label = IJ.d2s(barWidth, digits) + " " + units;
@@ -415,13 +416,14 @@ public class ScaleBar implements PlugIn {
 		 *
 		 *@param  e  Description of the Parameter
 		 */
-		public void textValueChanged(TextEvent e) {
+		@Override
+        public void textValueChanged(TextEvent e) {
 		TextField widthField = ((TextField) numberField.elementAt(0));
 		Double d = getValue(widthField.getText());
 			if (d == null) {
 				return;
 			}
-			barWidth = d.doubleValue();
+			barWidth = d;
 		TextField heightField = ((TextField) numberField.elementAt(1));
 			d = getValue(heightField.getText());
 			if (d == null) {
@@ -446,7 +448,8 @@ public class ScaleBar implements PlugIn {
 		 *
 		 *@param  e  Description of the Parameter
 		 */
-		public void itemStateChanged(ItemEvent e) {
+		@Override
+        public void itemStateChanged(ItemEvent e) {
 		Choice col = (Choice) (choice.elementAt(0));
 			color = col.getSelectedItem();
 		Choice bcol = (Choice) (choice.elementAt(1));

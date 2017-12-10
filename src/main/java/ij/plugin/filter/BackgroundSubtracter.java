@@ -2,8 +2,6 @@ package ij.plugin.filter;
 import ij.*;
 import ij.gui.*;
 import ij.process.*;
-import ij.measure.*;
-import java.awt.*;
 
 /** Implements ImageJ's Subtract Background command. Based on
 	the NIH Image Pascal version by Michael Castle and Janice 
@@ -21,43 +19,51 @@ public class BackgroundSubtracter implements PlugInFilter {
 	private int slice;
 	private boolean invert;
 	
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		IJ.register(BackgroundSubtracter.class);
 		this.imp = imp;
 		if (imp!=null) {
 			showDialog();
-			if (canceled)
-				return DONE;
+			if (canceled) {
+                return DONE;
+            }
 		}
 		IJ.register(BackgroundSubtracter.class);
 		return IJ.setupDialog(imp, DOES_8G+DOES_16+DOES_RGB);
 	}
 
-	public void run(ImageProcessor ip) {
-		if (canceled)
-			return;
+	@Override
+    public void run(ImageProcessor ip) {
+		if (canceled) {
+            return;
+        }
 		slice++;
-		if (slice>1)
-			IJ.showStatus("Subtract Background: "+slice+"/"+imp.getStackSize());
-		if (ip instanceof ColorProcessor)
-			subtractRGBBackround((ColorProcessor)ip, radius);
-		else
-			subtractBackround(ip, radius);
-		if (slice==1 && ip instanceof ShortProcessor)
-			imp.getProcessor().resetMinAndMax();
+		if (slice>1) {
+            IJ.showStatus("Subtract Background: "+slice+"/"+imp.getStackSize());
+        }
+		if (ip instanceof ColorProcessor) {
+            subtractRGBBackround((ColorProcessor)ip, radius);
+        } else {
+            subtractBackround(ip, radius);
+        }
+		if (slice==1 && ip instanceof ShortProcessor) {
+            imp.getProcessor().resetMinAndMax();
+        }
 	}
 
 	public void showDialog() {
 		String options = Macro.getOptions();
-		if  (options!=null)
-			Macro.setOptions(options.replaceAll("white", "light"));
+		if  (options!=null) {
+            Macro.setOptions(options.replaceAll("white", "light"));
+        }
 		GenericDialog gd = new GenericDialog("Subtract Background");
 		gd.addNumericField("Rolling Ball Radius:", radius, 0);
 		gd.addCheckbox("Light Background", lightBackground);
 		gd.showDialog();
-		if (gd.wasCanceled())
-			canceled = true;
-		else {
+		if (gd.wasCanceled()) {
+            canceled = true;
+        } else {
 			radius = (int)gd.getNextNumber();
 			lightBackground = gd.getNextBoolean();
 			Prefs.set("bs.background", lightBackground);	
@@ -85,21 +91,24 @@ public class BackgroundSubtracter implements PlugInFilter {
 		interpolation and extrapolation to blow the shrunk image to full size.
 	*/
 	public void subtractBackround(ImageProcessor ip, int ballRadius) {
- 		if (imp!=null)
- 			imp.killRoi();
- 		else
- 			ip.resetRoi();
+ 		if (imp!=null) {
+            imp.killRoi();
+        } else {
+            ip.resetRoi();
+        }
  		ip.setProgressBar(null);
  		IJ.showProgress(0.0);
- 		if (invert)
- 			ip.invert();
+ 		if (invert) {
+            ip.invert();
+        }
  		RollingBall ball = new RollingBall(ballRadius);
 		//new ImagePlus("ball", new ByteProcessor(ball.patchwidth+1, ball.patchwidth+1, ball.data, null)).show();
 		//ImageProcessor smallImage = ip.resize(ip.getWidth()/ball.shrinkfactor, ip.getHeight()/ball.shrinkfactor);
 		ImageProcessor smallImage = shrinkImage(ip, ball.shrinkfactor);
 		//new ImagePlus("small image", smallImage).show();
-		if (slice==1)
- 			IJ.showStatus("Rolling ball ("+ball.shrinkfactor+")...");
+		if (slice==1) {
+            IJ.showStatus("Rolling ball ("+ball.shrinkfactor+")...");
+        }
 		ImageProcessor background;
  		if (ip instanceof ShortProcessor) {
 			background = rollBall16(ball, ip, smallImage);
@@ -111,11 +120,13 @@ public class BackgroundSubtracter implements PlugInFilter {
 			extrapolateBackground(background, ball);
 		}
 		IJ.showProgress(0.9);
-		if (IJ.altKeyDown())
-			new ImagePlus("background", background).show();
+		if (IJ.altKeyDown()) {
+            new ImagePlus("background", background).show();
+        }
 		ip.copyBits(background, 0, 0, Blitter.SUBTRACT);
-		if (invert)
-			ip.invert();
+		if (invert) {
+            ip.invert();
+        }
 		IJ.showProgress(1.0);
 	}
 
@@ -196,7 +207,9 @@ public class BackgroundSubtracter implements PlugInFilter {
 							//+" "+p1
 							//);
 							if (zdif<zmin) // keep most negative, since ball should always be below curve
-								zmin = zdif;
+                            {
+                                zmin = zdif;
+                            }
 						} // if xpt2,ypt2
 						ballpt++;
 						xpt2++;
@@ -205,12 +218,14 @@ public class BackgroundSubtracter implements PlugInFilter {
 					ypt2++;
 					imgpt = imgpt - patchwidth - 1 + smallimagewidth;
 				}  // while ypt2
-				if (zmin!=0)
-					zctr += zmin; // move ball up or down if we find a new minimum
-				if (zmin<0)
-					ptsbelowlastpatch = halfpatchwidth; // ignore left half of ball patch when dz < 0
-				else
-					ptsbelowlastpatch = 0;
+				if (zmin!=0) {
+                    zctr += zmin; // move ball up or down if we find a new minimum
+                }
+				if (zmin<0) {
+                    ptsbelowlastpatch = halfpatchwidth; // ignore left half of ball patch when dz < 0
+                } else {
+                    ptsbelowlastpatch = 0;
+                }
 				// now compare every point on ball with background,  and keep highest number
 				yval = ypt - patchwidth;
 				ypt2 = 0;
@@ -228,7 +243,9 @@ public class BackgroundSubtracter implements PlugInFilter {
 							p1 = backgrpt;
 							//if (backgrpt>=backgroundpixels.length) backgrpt = 0; //(debug)
 							if (zadd>(backgroundpixels[p1]&255)) //keep largest adjustment}
-								backgroundpixels[p1] = (byte)zadd;
+                            {
+                                backgroundpixels[p1] = (byte)zadd;
+                            }
 						}
 						ballpt++;
 						xval++;
@@ -240,8 +257,9 @@ public class BackgroundSubtracter implements PlugInFilter {
 					ybackgrpt += ybackgrinc; // move to next point in y
 				} // while ypt2
 			} // for xpt
-			if (ypt%20==0)
-				IJ.showProgress(0.2+0.6*ypt/(bottom+patchwidth));
+			if (ypt%20==0) {
+                IJ.showProgress(0.2+0.6*ypt/(bottom+patchwidth));
+            }
 		} // for ypt
 		return background;
 	}
@@ -265,8 +283,9 @@ public class BackgroundSubtracter implements PlugInFilter {
 				for (int j=0; j<shrinkfactor; j++) {
 					for (int k=0; k<shrinkfactor; k++) {
 						thispixel = ip2.getPixel(xmaskmin+j, ymaskmin+k);
-						if (thispixel<min)
-							min = thispixel;
+						if (thispixel<min) {
+                            min = thispixel;
+                        }
 					}
 				}
 				smallImage.putPixel(x,y,min); // each point in small image is minimum of its neighborhood
@@ -365,12 +384,13 @@ public class BackgroundSubtracter implements PlugInFilter {
 			for (int jj=1; jj<=shrinkfactor; jj++) {
 				p = p-width;
 				pvalue = pvalue-edgeslope;
-				if (pvalue<0)
-					pixels[p] = 0;
-				else if (pvalue>255)
-					pixels[p] = (byte)255;
-				else
-					pixels[p] = (byte)pvalue;
+				if (pvalue<0) {
+                    pixels[p] = 0;
+                } else if (pvalue>255) {
+                    pixels[p] = (byte)255;
+                } else {
+                    pixels[p] = (byte)pvalue;
+                }
 			} // for jj
 			bglastptr = (shrinkfactor*(bottomroll-toproll-1)-1)*width+hloc;
 			bgnextptr = shrinkfactor*(bottomroll-toproll-1)*width+hloc;
@@ -382,12 +402,13 @@ public class BackgroundSubtracter implements PlugInFilter {
 			for (int jj=1; jj<=((height-1)-shrinkfactor*(bottomroll-toproll-1)); jj++) {
 				p += width;
 				pvalue += edgeslope;
-				if (pvalue<0)
-					pixels[p] = 0;
-				else if (pvalue>255)
-					pixels[p] = (byte)255;
-				else
-					pixels[p] = (byte)pvalue;
+				if (pvalue<0) {
+                    pixels[p] = 0;
+                } else if (pvalue>255) {
+                    pixels[p] = (byte)255;
+                } else {
+                    pixels[p] = (byte)pvalue;
+                }
 			} // for jj
 		} // for hloc
 		for (int vloc=0; vloc<height; vloc++) {
@@ -402,12 +423,13 @@ public class BackgroundSubtracter implements PlugInFilter {
 			for (int ii=1; ii<=shrinkfactor; ii++) {
 				p--;
 				pvalue = pvalue - edgeslope;
-				if (pvalue<0)
-					pixels[p] = 0;
-				else if (pvalue>255)
-					pixels[p] = (byte)255;
-				else
-					pixels[p] = (byte)pvalue;
+				if (pvalue<0) {
+                    pixels[p] = 0;
+                } else if (pvalue>255) {
+                    pixels[p] = (byte)255;
+                } else {
+                    pixels[p] = (byte)pvalue;
+                }
 			} // for ii
 			bgnextptr = vloc*width+shrinkfactor*(rightroll-leftroll-1)-1;
 			bglastptr = bgnextptr-1;
@@ -419,12 +441,13 @@ public class BackgroundSubtracter implements PlugInFilter {
 			for (int ii=1; ii<=((width-1)-shrinkfactor*(rightroll-leftroll-1)+1); ii++) {
 				p++;
 				pvalue = pvalue+edgeslope;
-				if (pvalue<0)
-					pixels[p] = 0;
-				else if (pvalue>255)
-					pixels[p] = (byte)255;
-				else
-					pixels[p] = (byte)pvalue;
+				if (pvalue<0) {
+                    pixels[p] = 0;
+                } else if (pvalue>255) {
+                    pixels[p] = (byte)255;
+                } else {
+                    pixels[p] = (byte)pvalue;
+                }
 			} // for ii
 		} // for vloc
 	}
@@ -488,7 +511,9 @@ public class BackgroundSubtracter implements PlugInFilter {
 							p2 = imgpt;
 							zdif = (pixels[p2]&0xffff) - (zctr + (patch[p1]&255));  //curve - circle points
 							if (zdif<zmin) // keep most negative, since ball should always be below curve
-								zmin = zdif;
+                            {
+                                zmin = zdif;
+                            }
 						} // if xpt2,ypt2
 						ballpt++;
 						xpt2++;
@@ -497,12 +522,14 @@ public class BackgroundSubtracter implements PlugInFilter {
 					ypt2++;
 					imgpt = imgpt - patchwidth - 1 + smallimagewidth;
 				}  // while ypt2
-				if (zmin!=0)
-					zctr += zmin; // move ball up or down if we find a new minimum
-				if (zmin<0)
-					ptsbelowlastpatch = halfpatchwidth; // ignore left half of ball patch when dz < 0
-				else
-					ptsbelowlastpatch = 0;
+				if (zmin!=0) {
+                    zctr += zmin; // move ball up or down if we find a new minimum
+                }
+				if (zmin<0) {
+                    ptsbelowlastpatch = halfpatchwidth; // ignore left half of ball patch when dz < 0
+                } else {
+                    ptsbelowlastpatch = 0;
+                }
 				// now compare every point on ball with background,  and keep highest number
 				yval = ypt - patchwidth;
 				ypt2 = 0;
@@ -520,7 +547,9 @@ public class BackgroundSubtracter implements PlugInFilter {
 							p1 = backgrpt;
 							//if (backgrpt>=backgroundpixels.length) backgrpt = 0; //(debug)
 							if (zadd>(backgroundpixels[p1]&0xffff)) //keep largest adjustment}
-								backgroundpixels[p1] = (short)zadd;
+                            {
+                                backgroundpixels[p1] = (short)zadd;
+                            }
 						}
 						ballpt++;
 						xval++;
@@ -532,8 +561,9 @@ public class BackgroundSubtracter implements PlugInFilter {
 					ybackgrpt += ybackgrinc; // move to next point in y
 				} // while ypt2
 			} // for xpt
-			if (ypt%20==0)
-				IJ.showProgress(0.2+0.6*ypt/(bottom+patchwidth));
+			if (ypt%20==0) {
+                IJ.showProgress(0.2+0.6*ypt/(bottom+patchwidth));
+            }
 		} // for ypt
 		return background;
 	}
@@ -615,12 +645,13 @@ public class BackgroundSubtracter implements PlugInFilter {
 			for (int jj=1; jj<=shrinkfactor; jj++) {
 				p = p-width;
 				pvalue = pvalue-edgeslope;
-				if (pvalue<0)
-					pixels[p] = 0;
-				else if (pvalue>65535)
-					pixels[p] = (short)65535;
-				else
-					pixels[p] = (short)pvalue;
+				if (pvalue<0) {
+                    pixels[p] = 0;
+                } else if (pvalue>65535) {
+                    pixels[p] = (short)65535;
+                } else {
+                    pixels[p] = (short)pvalue;
+                }
 			} // for jj
 			bglastptr = (shrinkfactor*(bottomroll-toproll-1)-1)*width+hloc;
 			bgnextptr = shrinkfactor*(bottomroll-toproll-1)*width+hloc;
@@ -632,12 +663,13 @@ public class BackgroundSubtracter implements PlugInFilter {
 			for (int jj=1; jj<=((height-1)-shrinkfactor*(bottomroll-toproll-1)); jj++) {
 				p += width;
 				pvalue += edgeslope;
-				if (pvalue<0)
-					pixels[p] = 0;
-				else if (pvalue>65535)
-					pixels[p] = (short)65535;
-				else
-					pixels[p] = (short)pvalue;
+				if (pvalue<0) {
+                    pixels[p] = 0;
+                } else if (pvalue>65535) {
+                    pixels[p] = (short)65535;
+                } else {
+                    pixels[p] = (short)pvalue;
+                }
 			} // for jj
 		} // for hloc
 		for (int vloc=0; vloc<height; vloc++) {
@@ -652,12 +684,13 @@ public class BackgroundSubtracter implements PlugInFilter {
 			for (int ii=1; ii<=shrinkfactor; ii++) {
 				p--;
 				pvalue = pvalue - edgeslope;
-				if (pvalue<0)
-					pixels[p] = 0;
-				else if (pvalue>65535)
-					pixels[p] = (short)65535;
-				else
-					pixels[p] = (short)pvalue;
+				if (pvalue<0) {
+                    pixels[p] = 0;
+                } else if (pvalue>65535) {
+                    pixels[p] = (short)65535;
+                } else {
+                    pixels[p] = (short)pvalue;
+                }
 			} // for ii
 			bgnextptr = vloc*width+shrinkfactor*(rightroll-leftroll-1)-1;
 			bglastptr = bgnextptr-1;
@@ -669,12 +702,13 @@ public class BackgroundSubtracter implements PlugInFilter {
 			for (int ii=1; ii<=((width-1)-shrinkfactor*(rightroll-leftroll-1)+1); ii++) {
 				p++;
 				pvalue = pvalue+edgeslope;
-				if (pvalue<0)
-					pixels[p] = 0;
-				else if (pvalue>65535)
-					pixels[p] = (short)65535;
-				else
-					pixels[p] = (short)pvalue;
+				if (pvalue<0) {
+                    pixels[p] = 0;
+                } else if (pvalue>65535) {
+                    pixels[p] = (short)65535;
+                } else {
+                    pixels[p] = (short)pvalue;
+                }
 			} // for ii
 		} // for vloc
 	}
@@ -719,11 +753,11 @@ class RollingBall {
 		int temp;			// value must be >=0 to take square root
 		int halfpatchwidth;	// distance in x or y from center of patch to any edge
 		int ballsize;		// size of rolling ball array
-		
-		this.shrinkfactor = shrinkfactor;
-		smallballradius = ballradius/shrinkfactor;
-		if (smallballradius<1)
-			smallballradius = 1;
+
+        smallballradius = ballradius/shrinkfactor;
+		if (smallballradius<1) {
+            smallballradius = 1;
+        }
 		rsquare = smallballradius*smallballradius;
 		diam = smallballradius*2;
 		xtrim = (arcTrimPer*diam)/100; // only use a patch of the rolling ball
@@ -736,10 +770,11 @@ class RollingBall {
 			xval = i % (patchwidth+1) - halfpatchwidth;
 			yval = i / (patchwidth+1) - halfpatchwidth;
 			temp = rsquare - (xval*xval) - (yval*yval);
-			if (temp >= 0)
-				data[i] = (byte)Math.round(Math.sqrt(temp));
-			else
-				data[i] = 0;
+			if (temp >= 0) {
+                data[i] = (byte)Math.round(Math.sqrt(temp));
+            } else {
+                data[i] = 0;
+            }
 		}
 	}
 	

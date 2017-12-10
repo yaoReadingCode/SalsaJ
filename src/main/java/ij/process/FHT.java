@@ -47,7 +47,9 @@ public class FHT extends FloatProcessor {
 	/** Returns true of this FHT contains a square image with a width that is a power of two. */
 	public boolean powerOf2Size() {
 		int i=2;
-		while(i<width) i *= 2;
+		while(i<width) {
+            i *= 2;
+        }
 		return i==width && width==height;
 	}
 
@@ -77,8 +79,9 @@ public class FHT extends FloatProcessor {
 
 	void transform(boolean inverse) {
 		//IJ.log("transform: "+maxN+" "+inverse);
-		if (!powerOf2Size())
-			throw new  IllegalArgumentException("Image not power of 2 size or not square: "+width+"x"+height);
+		if (!powerOf2Size()) {
+            throw new  IllegalArgumentException("Image not power of 2 size or not square: "+width+"x"+height);
+        }
 		maxN = width;
 		if (S==null) {
 			makeSinCosTables(maxN);
@@ -106,20 +109,23 @@ public class FHT extends FloatProcessor {
 	void makeBitReverseTable(int maxN) {
 		bitrev = new int[maxN];
 		int nLog2 = log2(maxN);
-		for (int i=0; i<maxN; i++)
-			bitrev[i] = bitRevX(i, nLog2);
+		for (int i=0; i<maxN; i++) {
+            bitrev[i] = bitRevX(i, nLog2);
+        }
 	}
 
 	/** Performs a 2D FHT (Fast Hartley Transform). */
 	public void rc2DFHT(float[] x, boolean inverse, int maxN) {
 		//IJ.write("FFT: rc2DFHT (row-column Fast Hartley Transform)");
-		for (int row=0; row<maxN; row++)
-			dfht3(x, row*maxN, inverse, maxN);		
+		for (int row=0; row<maxN; row++) {
+            dfht3(x, row*maxN, inverse, maxN);
+        }
 		progress(0.4);
 		transposeR(x, maxN);
 		progress(0.5);
-		for (int row=0; row<maxN; row++)		
-			dfht3(x, row*maxN, inverse, maxN);
+		for (int row=0; row<maxN; row++) {
+            dfht3(x, row*maxN, inverse, maxN);
+        }
 		progress(0.7);
 		transposeR(x, maxN);
 		progress(0.8);
@@ -145,8 +151,9 @@ public class FHT extends FloatProcessor {
 	}
 	
 	void progress(double percent) {
-		if (showProgress)
-			IJ.showProgress(percent);
+		if (showProgress) {
+            IJ.showProgress(percent);
+        }
 	}
 	
 	/** Performs an optimized 1D FHT. */
@@ -219,8 +226,9 @@ public class FHT extends FloatProcessor {
 		} /* end if Nlog2 > 2 */
 
 		if (inverse)  {
-			for (i=0; i<maxN; i++)
-			x[base+i] = x[base+i] / maxN;
+			for (i=0; i<maxN; i++) {
+                x[base+i] = x[base+i] / maxN;
+            }
 		}
 	}
 
@@ -241,8 +249,9 @@ public class FHT extends FloatProcessor {
 	
 	int log2 (int x) {
 		int count = 15;
-		while (!btst(x, count))
-			count--;
+		while (!btst(x, count)) {
+            count--;
+        }
 		return count;
 	}
 
@@ -253,17 +262,19 @@ public class FHT extends FloatProcessor {
 	}
 
 	void BitRevRArr (float[] x, int base, int bitlen, int maxN) {
-		for (int i=0; i<maxN; i++)
-			tempArr[i] = x[base+bitrev[i]];
-		for (int i=0; i<maxN; i++)
-			x[base+i] = tempArr[i];
+		for (int i=0; i<maxN; i++) {
+            tempArr[i] = x[base+bitrev[i]];
+        }
+		System.arraycopy(tempArr, 0, x, base + 0, maxN);
 	}
 
 	private int bitRevX (int  x, int bitlen) {
 		int  temp = 0;
-		for (int i=0; i<=bitlen; i++)
-			if ((x & (1<<i)) !=0)
-				temp  |= (1<<(bitlen-i-1));
+		for (int i=0; i<=bitlen; i++) {
+            if ((x & (1<<i)) !=0) {
+                temp |= (1 << (bitlen - i - 1));
+            }
+        }
 		return temp & 0x0000ffff;
 	}
 
@@ -275,8 +286,9 @@ public class FHT extends FloatProcessor {
 	/** Returns an 8-bit power spectrum, log-scaled to 1-254. The image in this
 		FHT is assumed to be in the frequency domain. */
 	public ImageProcessor getPowerSpectrum () {
-		if (!isFrequencyDomain)
-			throw new  IllegalArgumentException("Frequency domain image required");
+		if (!isFrequencyDomain) {
+            throw new  IllegalArgumentException("Frequency domain image required");
+        }
 		int base;
 		float  r, scale;
 		float min = Float.MAX_VALUE;
@@ -290,15 +302,20 @@ public class FHT extends FloatProcessor {
 			base = row * maxN;
 			for (int col=0; col<maxN; col++) {
 				r = fps[base+col];
-				if (r<min) min = r;
-				if (r>max) max = r;
+				if (r<min) {
+                    min = r;
+                }
+				if (r>max) {
+                    max = r;
+                }
 			}
 		}
 
-		if (min<1.0)
-			min = 0f;
-		else
-			min = (float)Math.log(min);
+		if (min<1.0) {
+            min = 0f;
+        } else {
+            min = (float)Math.log(min);
+        }
 		max = (float)Math.log(max);
 		scale = (float)(253.0/(max-min));
 
@@ -306,10 +323,11 @@ public class FHT extends FloatProcessor {
 			base = row*maxN;
 			for (int col=0; col<maxN; col++) {
 				r = fps[base+col];
-				if (r<1f)
-					r = 0f;
-				else
-					r = (float)Math.log(r);
+				if (r<1f) {
+                    r = 0f;
+                } else {
+                    r = (float)Math.log(r);
+                }
 				ps[base+col] = (byte)(((r-min)*scale+0.5)+1);
 			}
 		}
@@ -351,8 +369,9 @@ public class FHT extends FloatProcessor {
 	*	@author Joachim Wesner
 	*/
 	public ImageStack getComplexTransform() {
-		if (!isFrequencyDomain)
-			throw new  IllegalArgumentException("Frequency domain image required");
+		if (!isFrequencyDomain) {
+            throw new  IllegalArgumentException("Frequency domain image required");
+        }
 		float[] fht = (float[])getPixels();
 		float[] re = new float[maxN*maxN];
 		float[] im = new float[maxN*maxN];
@@ -453,8 +472,9 @@ public class FHT extends FloatProcessor {
 		//IJ.log(v1+" "+v2+" "+v3+" "+pixels.length);
 		for (int i=0; i<pixels.length; i++) {
 			v = pixels[i]&255;
-			if (v>=v1 && v<=v2)
-				pixels[i] = (byte)v3;
+			if (v>=v1 && v<=v2) {
+                pixels[i] = (byte)v3;
+            }
 		}
 	}
 
@@ -486,10 +506,11 @@ public class FHT extends FloatProcessor {
 				colMod = (maxN - c) % maxN;
 				h2e = (h2[r * maxN + c] + h2[rowMod * maxN + colMod]) / 2;
 				h2o = (h2[r * maxN + c] - h2[rowMod * maxN + colMod]) / 2;
-				if (conjugate) 
-					tmp[r * maxN + c] = (float)(h1[r * maxN + c] * h2e - h1[rowMod * maxN + colMod] * h2o);
-				else
-					tmp[r * maxN + c] = (float)(h1[r * maxN + c] * h2e + h1[rowMod * maxN + colMod] * h2o);
+				if (conjugate) {
+                    tmp[r * maxN + c] = (float)(h1[r * maxN + c] * h2e - h1[rowMod * maxN + colMod] * h2o);
+                } else {
+                    tmp[r * maxN + c] = (float)(h1[r * maxN + c] * h2e + h1[rowMod * maxN + colMod] * h2o);
+                }
 			}
 		}
 		FHT fht2 =  new FHT(new FloatProcessor(maxN, maxN, tmp, null));
@@ -512,8 +533,9 @@ public class FHT extends FloatProcessor {
 			for (int c=0; c<maxN; c++) {
 				colMod = (maxN - c) % maxN;
 				mag =h2[r*maxN+c] * h2[r*maxN+c] + h2[rowMod*maxN+colMod] * h2[rowMod*maxN+colMod];
-				if (mag<1e-20)
-					mag = 1e-20;
+				if (mag<1e-20) {
+                    mag = 1e-20;
+                }
 				h2e = (h2[r*maxN+c] + h2[rowMod*maxN+colMod]);
 				h2o = (h2[r*maxN+c] - h2[rowMod*maxN+colMod]);
 				double tmp = (h1[r*maxN+c] * h2e - h1[rowMod*maxN+colMod] * h2o);
@@ -545,6 +567,7 @@ public class FHT extends FloatProcessor {
 	}
 		
 	/** Returns a string containing information about this FHT. */
+	@Override
 	public String toString() {
 		return "FHT, " + getWidth() + "x"+getHeight() + ", fd=" + isFrequencyDomain;
 	}

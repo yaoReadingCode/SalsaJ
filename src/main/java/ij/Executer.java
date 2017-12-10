@@ -56,7 +56,7 @@ public class Executer implements Runnable {
 			IJ.setKeyUp(KeyEvent.VK_SHIFT);
 		} else {
 			command = cmd;
-			if (!(cmd.equals("Undo") || cmd.equals("Close"))) {
+			if (!("Undo".equals(cmd) || "Close".equals(cmd))) {
 				previousCommand = cmd;
 			}
 		}
@@ -77,7 +77,8 @@ public class Executer implements Runnable {
 	/**
 	 *  Main processing method for the Executer object
 	 */
-	public void run() {
+	@Override
+    public void run() {
 		if (command == null) {
 			return;
 		}
@@ -103,8 +104,7 @@ public class Executer implements Runnable {
 			if (e instanceof OutOfMemoryError) {
 				IJ.outOfMemory(command);
 			} else if (e instanceof RuntimeException && msg != null && msg.equals(Macro.MACRO_CANCELED)) {
-				;
-			} //do nothing
+            } //do nothing
 			else {
 				CharArrayWriter caw = new CharArrayWriter();
 				PrintWriter pw = new PrintWriter(caw);
@@ -139,7 +139,7 @@ public class Executer implements Runnable {
 	 *  EU_HOU CHANGES
 	 */
 		Hashtable table = Menus.getCommands();
-		String className = new String();
+		String className = "";
 		String[] cN = new String[2];
 		EuHouToolbar etb = new EuHouToolbar();
 		String PhotometerGood = "";
@@ -153,34 +153,34 @@ public class Executer implements Runnable {
 			System.out.println("Executer 1");
 			//EU_HOU Bundle
 			PhotometerGood = menubun.getString("Photometer");
-		} catch (Exception exp) {}
+		} catch (Exception ignored) {}
 		try {
 			System.out.println("Executer 2");
 			//EU_HOU Bundle
 			ClearPhotometerGood = menubun.getString("ClearPhotometer");
-		} catch (Exception exp) {}
+		} catch (Exception ignored) {}
 		try {
 			System.out.println("Executer 3");
 			//EU_HOU Bundle
 			PhotometrySettingsGood = menubun.getString("PhotometrySettings");
-		} catch (Exception exp) {}
+		} catch (Exception ignored) {}
 		try {
 			System.out.println("Executer 4");
-			addPluginItemGood = etb.addPluginItem(cmd);
+			addPluginItemGood = EuHouToolbar.addPluginItem(cmd);
 			System.out.println("Executer addPluginItemGood: " + addPluginItemGood);
-		} catch (Exception exp) {}
+		} catch (Exception ignored) {}
 		try {
 			System.out.println("Executer 5");
 			//EU_HOU Bundle
 			menubunGood = menubun.getString(cmd);
 			System.out.println("Executer menubunGood: " + menubunGood);
-		} catch (Exception exp) {}
+		} catch (Exception ignored) {}
 
-		if (cmd.equals(PhotometerGood) || cmd.equals("Photometer")) {
+		if (cmd.equals(PhotometerGood) || "Photometer".equals(cmd)) {
 			EuHouToolbar.getInstance().photometerButtonAction();
-		} else if (cmd.equals(ClearPhotometerGood) || cmd.equals("ClearPhotometer")) {
-			EuHouToolbar.getInstance().clearPhotometer();
-		} else if (cmd.equals(PhotometrySettingsGood) || cmd.equals("PhotometrySettings")) {
+		} else if (cmd.equals(ClearPhotometerGood) || "ClearPhotometer".equals(cmd)) {
+			EuHouToolbar.clearPhotometer();
+		} else if (cmd.equals(PhotometrySettingsGood) || "PhotometrySettings".equals(cmd)) {
 			EuHouToolbar.getInstance().settingsAction();
 		} else if (table.get(cmd) != null) {
 			className = (String) table.get(cmd);

@@ -1,8 +1,6 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.gui.*;
 import ij.process.*;
-import java.awt.*;
 
 /** Implements the commands in the Process/Shadows submenu. */
 public class Shadows implements PlugInFilter {
@@ -10,16 +8,18 @@ public class Shadows implements PlugInFilter {
 	String arg;
 	ImagePlus imp;
 
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.arg = arg;
 		this.imp = imp;
-		if (imp!=null && imp.getStackSize()>1 && arg.equals("demo"))
+		if (imp!=null && imp.getStackSize()>1 && "demo".equals(arg))
 			{IJ.error("This demo does not work with stacks."); return DONE;}
 		return IJ.setupDialog(imp, DOES_ALL+SUPPORTS_MASKING);
 	}
 
-	public void run(ImageProcessor ip) {
-		if (arg.equals("demo")) {
+	@Override
+    public void run(ImageProcessor ip) {
+		if ("demo".equals(arg)) {
 			IJ.resetEscape();
 			while (!IJ.escapePressed()) {
 				north(ip); imp.updateAndDraw(); ip.reset();
@@ -32,14 +32,23 @@ public class Shadows implements PlugInFilter {
 				northwest(ip); imp.updateAndDraw(); ip.reset();
 			}
 		}
-		else if (arg.equals("north")) north(ip);
-		else if (arg.equals("northeast")) northeast(ip);
-		else if (arg.equals("east")) east(ip);
-		else if (arg.equals("southeast")) southeast(ip);
-		else if (arg.equals("south")) south(ip);
-		else if (arg.equals("southwest")) southwest(ip);
-		else if (arg.equals("west")) west(ip);
-		else if (arg.equals("northwest")) northwest(ip);
+		else if ("north".equals(arg)) {
+            north(ip);
+        } else if ("northeast".equals(arg)) {
+            northeast(ip);
+        } else if ("east".equals(arg)) {
+            east(ip);
+        } else if ("southeast".equals(arg)) {
+            southeast(ip);
+        } else if ("south".equals(arg)) {
+            south(ip);
+        } else if ("southwest".equals(arg)) {
+            southwest(ip);
+        } else if ("west".equals(arg)) {
+            west(ip);
+        } else if ("northwest".equals(arg)) {
+            northwest(ip);
+        }
 
 	}
 		

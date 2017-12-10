@@ -1,13 +1,10 @@
 package ij.plugin.frame;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.*;
+
 import ij.*;
 import ij.plugin.*;
-import ij.process.*;
 import ij.gui.*;
-import ij.measure.*;
-import ij.plugin.frame.Recorder;
 import ij.util.Tools;
 
 /** Adjusts the width of line selections.  */
@@ -65,17 +62,23 @@ public class LineWidthAdjuster extends PlugInFrame implements PlugIn,
 		setup();
 	}
 	
-	public synchronized void adjustmentValueChanged(AdjustmentEvent e) {
+	@Override
+    public synchronized void adjustmentValueChanged(AdjustmentEvent e) {
 		value = slider.getValue();
 		setText = true;
 		notify();
 	}
 
+    @Override
     public  synchronized void textValueChanged(TextEvent e) {
         int width = (int)Tools.parseDouble(tf.getText(), -1);
 		//IJ.log(""+width);
-        if (width==-1) return;
-        if (width<0) width=1;
+        if (width==-1) {
+            return;
+        }
+        if (width<0) {
+            width=1;
+        }
         if (width!=Line.getWidth()) {
 			slider.setValue(width);
         	value = width;
@@ -88,29 +91,38 @@ public class LineWidthAdjuster extends PlugInFrame implements PlugIn,
 	
 
 	// Separate thread that does the potentially time-consuming processing 
-	public void run() {
+	@Override
+    public void run() {
 		while (!done) {
 			synchronized(this) {
 				try {wait();}
-				catch(InterruptedException e) {}
-				if (done) return;
+				catch(InterruptedException ignored) {}
+				if (done) {
+                    return;
+                }
 				Line.setWidth(value);
-				if (setText) tf.setText(""+value);
+				if (setText) {
+                    tf.setText(""+value);
+                }
 				setText = false;
 				ImagePlus imp = WindowManager.getCurrentImage();
 				if (imp!=null) {
 					Roi roi = imp.getRoi();
-					if (roi!=null) imp.draw();
+					if (roi!=null) {
+                        imp.draw();
+                    }
 				}
 			}
 		}
 	}
 
+    @Override
     public void windowClosing(WindowEvent e) {
     	close();
 	}
 
     /** Overrides close() in PlugInFrame. */
+    @Override
     public void close() {
     	super.close();
 		instance = null;
@@ -118,6 +130,7 @@ public class LineWidthAdjuster extends PlugInFrame implements PlugIn,
 		synchronized(this) {notify();}
 	}
 
+    @Override
     public void windowActivated(WindowEvent e) {
     	super.windowActivated(e);
 	}

@@ -14,11 +14,13 @@ public class BesselianDistorter extends skyview.geometry.SphereDistorter {
     private static final double pmf  = 100.0 * 60 * 60 * 360 / D2PI;
       
     /** Get the inverse distorter */
+    @Override
     public SphereDistorter inverse() {
 	return new BesselianDistorter.BesselianInverseDistorter();
     }
     
     /** Is the the inverse of another transformation */
+    @Override
     public boolean isInverse(Transformer t) {
 	return t instanceof BesselianInverseDistorter;
     }
@@ -32,15 +34,18 @@ public class BesselianDistorter extends skyview.geometry.SphereDistorter {
     private double[] v  = new double[3];
     private double[] t1 = new double[3];
     
+    @Override
     public String getName() {
 	return "Besselian distorter";
     }
     
+    @Override
     public String getDescription() {
 	return "A Besselian (FK4 based) distortion.  Dynamic terms are not included.";
     }
     
 
+    @Override
     public final void transform(double[] x, double[] y) {
 
         double[] a = new double[] { -1.62557E-6,   -0.31919E-6, -0.13843E-6};
@@ -54,10 +59,8 @@ public class BesselianDistorter extends skyview.geometry.SphereDistorter {
         for (int i=0; i<3; i += 1) {
 	    t1[i] = x[0]*emi[i][0] + x[1]*emi[i][1]+x[2]*emi[i][2];
         }
-    
-        for (int i=0; i<3; i += 1) {
-	    y[i] = t1[i];
-        }
+
+        System.arraycopy(t1, 0, y, 0, 3);
     
         double rxyz = sqrt (y[0]*y[0] + y[1]*y[1] + y[2]*y[2]);
 
@@ -96,26 +99,31 @@ public class BesselianDistorter extends skyview.geometry.SphereDistorter {
      */
     public class BesselianInverseDistorter extends skyview.geometry.SphereDistorter {
 	
-	public String getName() {
+	@Override
+    public String getName() {
 	    return "Inv. "+BesselianDistorter.this.getName();
 	}
 	
-	public SphereDistorter inverse() {
+	@Override
+    public SphereDistorter inverse() {
 	    return BesselianDistorter.this;
 	}
 	
         /** Is the the inverse of another transformation */
+        @Override
         public boolean isInverse(Transformer t) {
 	    return t instanceof BesselianDistorter;
         }
 	
-	public String getDescription() {
+	@Override
+    public String getDescription() {
 	    return BesselianDistorter.this.getDescription()+ " (inverse)";
 	}
 	
         /**
          * Convert coordinates from B1950 to J2000 for epoch 1950.
          */
+        @Override
         public final void transform(double[] x, double[] y) {
     
             //  Canonical constants
@@ -143,19 +151,15 @@ public class BesselianDistorter extends skyview.geometry.SphereDistorter {
             for (int i=0; i<3; i += 1) {
                 t1[i] = x[i] - a[i]-w*x[i];
             }
-    
-            for (int i=0; i<3; i += 1) {
-         	y[i] = t1[i];
-            }
+
+            System.arraycopy(t1, 0, y, 0, 3);
     
     
             for (int i=0; i<3; i += 1) {
                 t1[i] = y[0]*em1[i][0] + y[1]*em1[i][1] + y[2]*em1[i][2];
 	        v[i]  = y[0]*em2[i][0] + y[1]*em2[i][1] + y[2]*em2[i][2];
             }
-            for (int i=0; i<3; i += 1) {
-	        y[i] = t1[i];
-            }
+            System.arraycopy(t1, 0, y, 0, 3);
 
             // -50 since this is from 1950-2000
             double tdelta = -50/pmf;

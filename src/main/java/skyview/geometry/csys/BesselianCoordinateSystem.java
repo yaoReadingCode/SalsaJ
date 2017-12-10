@@ -4,8 +4,6 @@ import skyview.geometry.CoordinateSystem;
 import skyview.geometry.Rotater;
 import skyview.geometry.SphereDistorter;
 
-import static java.lang.Math.*;
-
 
 /** This class implements Besselian coordinate systems.
  *  These systems are not simple rotations from the reference
@@ -41,19 +39,23 @@ public class BesselianCoordinateSystem extends CoordinateSystem
 	return false;
     }
     
+    @Override
     public String getName() {
 	return "B"+epoch;
     }
     
+    @Override
     public String getDescription() {
 	return "A Beseelian (FK4 based) equatorial coordinate system.  Dynamic terms are not included.";
     }
     
     
+    @Override
     public Rotater getRotater() {
 	return precession(epoch);
     }
     
+    @Override
     public SphereDistorter getSphereDistorter() {
 	return new skyview.geometry.spheredistorter.BesselianDistorter();
     }

@@ -3,7 +3,7 @@ import ij.*;
 import ij.gui.*;
 import ij.process.*;
 import ij.io.*;
-import ij.plugin.filter.*;
+
 import java.awt.*;
 
 /**
@@ -19,23 +19,19 @@ public class Options implements PlugIn {
 	 *
 	 *@param  arg  Description of the Parameter
 	 */
-	public void run(String arg) {
-		if (arg.equals("misc")) {
+	@Override
+    public void run(String arg) {
+		if ("misc".equals(arg)) {
 			miscOptions();
-			return;
-		} else if (arg.equals("line")) {
+        } else if ("line".equals(arg)) {
 			lineWidth();
-			return;
-		} else if (arg.equals("io")) {
+        } else if ("io".equals(arg)) {
 			io();
-			return;
-		} else if (arg.equals("conv")) {
+        } else if ("conv".equals(arg)) {
 			conversions();
-			return;
-		} else if (arg.equals("display")) {
+        } else if ("display".equals(arg)) {
 			appearance();
-			return;
-		}
+        }
 	}
 
 	// Miscellaneous Options
@@ -59,11 +55,11 @@ public class Options implements PlugIn {
 		}
 
 	String divValue = gd.getNextString();
-		if (divValue.equalsIgnoreCase("infinity") || divValue.equalsIgnoreCase("infinite")) {
+		if ("infinity".equalsIgnoreCase(divValue) || "infinite".equalsIgnoreCase(divValue)) {
 			FloatBlitter.divideByZeroValue = Float.POSITIVE_INFINITY;
-		} else if (divValue.equalsIgnoreCase("NaN")) {
+		} else if ("NaN".equalsIgnoreCase(divValue)) {
 			FloatBlitter.divideByZeroValue = Float.NaN;
-		} else if (divValue.equalsIgnoreCase("max")) {
+		} else if ("max".equalsIgnoreCase(divValue)) {
 			FloatBlitter.divideByZeroValue = Float.MAX_VALUE;
 		} else {
 		Float f;
@@ -73,7 +69,7 @@ public class Options implements PlugIn {
 				f = null;
 			}
 			if (f != null) {
-				FloatBlitter.divideByZeroValue = f.floatValue();
+				FloatBlitter.divideByZeroValue = f;
 			}
 		}
 		IJ.register(FloatBlitter.class);
@@ -145,8 +141,7 @@ public class Options implements PlugIn {
 		Prefs.set("options.ext", extension);
 		Prefs.useJFileChooser = gd.getNextBoolean();
 		Prefs.intelByteOrder = gd.getNextBoolean();
-		return;
-	}
+    }
 
 	// Conversion Options
 	/**
@@ -175,8 +170,7 @@ public class Options implements PlugIn {
 		} else if (Prefs.weightedColor && !weighted) {
 			ColorProcessor.setWeightingFactors(0.299, 0.587, 0.114);
 		}
-		return;
-	}
+    }
 
 
 	/**
@@ -261,26 +255,26 @@ public class Options implements PlugIn {
 		if (list == null) {
 			return;
 		}
-		for (int i = 0; i < list.length; i++) {
-		ImagePlus imp = WindowManager.getImage(list[i]);
-			if (imp == null) {
-				return;
-			}
-		ImageProcessor ip = imp.getProcessor();
-			if (useInvertingLut != ip.isInvertedLut() && !ip.isColorLut()) {
-				ip.invertLut();
-			int nImages = imp.getStackSize();
-				if (nImages == 1) {
-					ip.invert();
-				} else {
-				ImageStack stack2 = imp.getStack();
-					for (int slice = 1; slice <= nImages; slice++) {
-						stack2.getProcessor(slice).invert();
-					}
-					stack2.setColorModel(ip.getColorModel());
-				}
-			}
-		}
+        for (int aList : list) {
+            ImagePlus imp = WindowManager.getImage(aList);
+            if (imp == null) {
+                return;
+            }
+            ImageProcessor ip = imp.getProcessor();
+            if (useInvertingLut != ip.isInvertedLut() && !ip.isColorLut()) {
+                ip.invertLut();
+                int nImages = imp.getStackSize();
+                if (nImages == 1) {
+                    ip.invert();
+                } else {
+                    ImageStack stack2 = imp.getStack();
+                    for (int slice = 1; slice <= nImages; slice++) {
+                        stack2.getProcessor(slice).invert();
+                    }
+                    stack2.setColorModel(ip.getColorModel());
+                }
+            }
+        }
 	}
 
 }

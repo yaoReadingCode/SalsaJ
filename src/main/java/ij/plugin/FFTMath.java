@@ -2,9 +2,6 @@ package ij.plugin;
 import ij.*;
 import ij.gui.*;
 import ij.process.*;
-import ij.text.*;
-import java.awt.*;
-import java.io.*;
 
 /** The class implements the Process/FFT/Math command. */
 public class FFTMath implements PlugIn {
@@ -18,9 +15,11 @@ public class FFTMath implements PlugIn {
     private static String title = "Result";
     private ImagePlus imp1, imp2;
             
+    @Override
     public void run(String arg) {
-        if (showDialog())
+        if (showDialog()) {
             doMath(imp1, imp2);
+        }
     }
     
     public boolean showDialog() {
@@ -32,13 +31,18 @@ public class FFTMath implements PlugIn {
         String[] titles = new String[wList.length];
         for (int i=0; i<wList.length; i++) {
             ImagePlus imp = WindowManager.getImage(wList[i]);
-            if (imp!=null)
+            if (imp!=null) {
                 titles[i] = imp.getTitle();
-            else
+            } else {
                 titles[i] = "";
+            }
         }
-        if (index1>=titles.length)index1 = 0;
-        if (index2>=titles.length)index2 = 0;
+        if (index1>=titles.length) {
+            index1 = 0;
+        }
+        if (index2>=titles.length) {
+            index2 = 0;
+        }
         GenericDialog gd = new GenericDialog("FFT Math");
         gd.addChoice("Image1: ", titles, titles[index1]);
         gd.addChoice("Operation:", ops, ops[operation]);
@@ -46,8 +50,9 @@ public class FFTMath implements PlugIn {
         gd.addStringField("Result:", title);
         gd.addCheckbox("Do Inverse Transform", doInverse);
         gd.showDialog();
-        if (gd.wasCanceled())
+        if (gd.wasCanceled()) {
             return false;
+        }
         index1 = gd.getNextChoiceIndex();
         operation = gd.getNextChoiceIndex();
         index2 = gd.getNextChoiceIndex();
@@ -64,20 +69,21 @@ public class FFTMath implements PlugIn {
     	FHT h1, h2=null;
     	ImageProcessor fht1, fht2;
 		fht1  = (ImageProcessor)imp1.getProperty("FHT");
-		if (fht1!=null)
-			h1 = new FHT(fht1);
-		else {
+		if (fht1!=null) {
+            h1 = new FHT(fht1);
+        } else {
 			IJ.showStatus("Converting to float");
        		ImageProcessor ip1 = imp1.getProcessor();
        	 	h1 = new FHT(ip1);
        	}
 		fht2  = (ImageProcessor)imp2.getProperty("FHT");
-		if (fht2!=null)
-			h2 = new FHT(fht2);
-		else {
+		if (fht2!=null) {
+            h2 = new FHT(fht2);
+        } else {
         	ImageProcessor ip2 = imp2.getProcessor();
-        	if (imp2!=imp1)
-       	 		h2 = new FHT(ip2);
+        	if (imp2!=imp1) {
+                h2 = new FHT(ip2);
+            }
        	}
         if (!h1.powerOf2Size()) {
         	IJ.error("FFT Math", "Images must be a power of 2 size (256x256, 512x512, etc.)");
@@ -92,9 +98,9 @@ public class FFTMath implements PlugIn {
 			h1.transform();
 		}
 		if (fht2==null) {
-			if (h2==null)
-				h2 = new FHT(h1.duplicate());
-				else {
+			if (h2==null) {
+                h2 = new FHT(h1.duplicate());
+            } else {
 					IJ.showStatus("Transform image2");
 					h2.transform();
 				}

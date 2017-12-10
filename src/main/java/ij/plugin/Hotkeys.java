@@ -2,7 +2,7 @@ package ij.plugin;
 import ij.*;
 import ij.gui.*;
 import ij.util.*;
-import java.awt.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -13,12 +13,13 @@ public class Hotkeys implements PlugIn {
 	private static String command = "";
 	private static String shortcut = "";
 
-	public void run(String arg) {
-		if (arg.equals("install"))
-			installHotkey();
-		else if (arg.equals("remove"))
-			removeHotkey();
-		else {
+	@Override
+    public void run(String arg) {
+		if ("install".equals(arg)) {
+            installHotkey();
+        } else if ("remove".equals(arg)) {
+            removeHotkey();
+        } else {
 			Executer e = new Executer(arg);
 			e.run();
 		}
@@ -31,16 +32,18 @@ public class Hotkeys implements PlugIn {
 		gd.addChoice("Command:", commands, command);
 		gd.addStringField("Shortcut:", shortcut, 3);
 		gd.showDialog();
-		if (gd.wasCanceled())
-			return;
+		if (gd.wasCanceled()) {
+            return;
+        }
 		command = gd.getNextChoice();
 		shortcut = gd.getNextString();
-		if (shortcut.equals("")) {
+		if ("".equals(shortcut)) {
 			IJ.showMessage(TITLE, "Shortcut required");
 			return;
 		}
-		if (shortcut.length()>1)
-			shortcut = shortcut.replace('f','F');
+		if (shortcut.length()>1) {
+            shortcut = shortcut.replace('f','F');
+        }
 		String plugin = "ij.plugin.Hotkeys("+"\""+command+"\")";
 		int err = Menus.installPlugin(plugin,Menus.SHORTCUTS_MENU,"*"+command,shortcut,IJ.getInstance());
 		switch (err) {
@@ -66,38 +69,39 @@ public class Hotkeys implements PlugIn {
 		gd.addChoice("Command:", commands, "");
 		gd.addMessage("The command is not removed\nuntil ImageJ is restarted.");
 		gd.showDialog();
-		if (gd.wasCanceled())
-			return;
+		if (gd.wasCanceled()) {
+            return;
+        }
 		command = gd.getNextChoice();
 		int err = Menus.uninstallPlugin(command);
 		boolean removed = true;
-		if(err==Menus.COMMAND_NOT_FOUND)
-			removed = deletePlugin(command);
+		if(err==Menus.COMMAND_NOT_FOUND) {
+            removed = deletePlugin(command);
+        }
 		if (removed) {
 			IJ.showStatus("\""+command + "\" removed; ImageJ restart required");
-		} else
-			IJ.showStatus("\""+command + "\" not removed");
+		} else {
+            IJ.showStatus("\""+command + "\" not removed");
+        }
 	}
 
 	boolean deletePlugin(String command) {
-		String plugin = (String)Menus.getCommands().get(command);
-		String name = plugin+".class";
-		File file = new File(Menus.getPlugInsPath(), name);
-		if (file==null || !file.exists())
-			return false;
-		else
-			return IJ.showMessageWithCancel("Delete Plugin?", "Permanently delete \""+name+"\"?");
-	}
+        String plugin = (String) Menus.getCommands().get(command);
+        String name = plugin + ".class";
+        File file = new File(Menus.getPlugInsPath(), name);
+        return file != null && file.exists() && IJ.showMessageWithCancel("Delete Plugin?", "Permanently delete \"" + name + "\"?");
+    }
 	
 	String[] getAllCommands() {
 		Vector v = new Vector();
 		for (Enumeration en=Menus.getCommands().keys(); en.hasMoreElements();) {
 			String cmd = (String)en.nextElement();
-			if (!cmd.startsWith("*"))
-				v.addElement(cmd);
+			if (!cmd.startsWith("*")) {
+                v.addElement(cmd);
+            }
 		}
 		String[] list = new String[v.size()];
-		v.copyInto((String[])list);
+		v.copyInto(list);
 		StringSorter.sort(list);
 		return list;
 	}
@@ -107,18 +111,20 @@ public class Hotkeys implements PlugIn {
 		Hashtable commandTable = Menus.getCommands();
 		for (Enumeration en=commandTable.keys(); en.hasMoreElements();) {
 			String cmd = (String)en.nextElement();
-			if (cmd.startsWith("*"))
-				v.addElement(cmd);
-			else {
+			if (cmd.startsWith("*")) {
+                v.addElement(cmd);
+            } else {
 				String plugin = (String)commandTable.get(cmd);
-				if (plugin.indexOf("_")>=0 && !plugin.startsWith("ij."))
-					v.addElement(cmd);
+				if (plugin.contains("_") && !plugin.startsWith("ij.")) {
+                    v.addElement(cmd);
+                }
  			}
 		}
-		if (v.size()==0)
-			return null;
+		if (v.size()==0) {
+            return null;
+        }
 		String[] list = new String[v.size()];
-		v.copyInto((String[])list);
+		v.copyInto(list);
 		StringSorter.sort(list);
 		return list;
 	}

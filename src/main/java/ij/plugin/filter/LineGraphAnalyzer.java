@@ -11,12 +11,14 @@ import ij.util.*;
 public class LineGraphAnalyzer implements PlugInFilter, Measurements  {
 	ImagePlus imp;
 
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		return DOES_8G+NO_CHANGES;
 	}
 
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		analyze(imp);
 	}
 	
@@ -42,19 +44,22 @@ public class LineGraphAnalyzer implements PlugInFilter, Measurements  {
 		cal.pixelWidth = ph;
 		cal.pixelHeight = pw;
 		imp2.setCalibration(cal);
-		if (IJ.altKeyDown()) imp2.show();
+		if (IJ.altKeyDown()) {
+            imp2.show();
+        }
 		
 		int options = ParticleAnalyzer.SHOW_PROGRESS;
-		int measurements = CENTROID;
-		int minSize = 1;
+        int minSize = 1;
 		int maxSize = 999999;
 		ResultsTable rt = new ResultsTable();
-		ParticleAnalyzer pa = new ParticleAnalyzer(options, measurements, rt, minSize, maxSize);
-		if (!pa.analyze(imp2))
-			return;
+		ParticleAnalyzer pa = new ParticleAnalyzer(options, CENTROID, rt, minSize, maxSize);
+		if (!pa.analyze(imp2)) {
+            return;
+        }
 		float[] y = rt.getColumn(ResultsTable.X_CENTROID);
-		if (y==null)
-			return;				
+		if (y==null) {
+            return;
+        }
 		float[] x = rt.getColumn(ResultsTable.Y_CENTROID);
 		double[] a = Tools.getMinMax(x);
 		double xmin=a[0], xmax=a[1];

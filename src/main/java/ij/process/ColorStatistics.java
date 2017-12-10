@@ -19,16 +19,20 @@ public class ColorStatistics extends ImageStatistics {
 		histogram = cp.getHistogram();
 		setup(ip, cal);
 		getRawStatistics(0,255);
-		if ((mOptions&MIN_MAX)!=0)
-			getRawMinAndMax(0,255);
-		if ((mOptions&ELLIPSE)!=0)
-			fitEllipse(ip);
-		else if ((mOptions&CENTROID)!=0)
-			getCentroid(ip);
-		if ((mOptions&(CENTER_OF_MASS|SKEWNESS|KURTOSIS))!=0)
-			calculateMoments(ip);
-		if ((mOptions&MEDIAN)!=0)
-			calculateMedian(histogram, 0, cal);
+		if ((mOptions&MIN_MAX)!=0) {
+            getRawMinAndMax(0,255);
+        }
+		if ((mOptions&ELLIPSE)!=0) {
+            fitEllipse(ip);
+        } else if ((mOptions&CENTROID)!=0) {
+            getCentroid(ip);
+        }
+		if ((mOptions&(CENTER_OF_MASS|SKEWNESS|KURTOSIS))!=0) {
+            calculateMoments(ip);
+        }
+		if ((mOptions&MEDIAN)!=0) {
+            calculateMedian(histogram, 0, cal);
+        }
 	}
 
 	void calculateMoments(ImageProcessor ip) {

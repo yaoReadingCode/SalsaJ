@@ -22,7 +22,8 @@ public class Duplicater implements PlugInFilter {
 	 *@param  imp  Description of the Parameter
 	 *@return      Description of the Return Value
 	 */
-	public int setup(String arg, ImagePlus imp) {
+	@Override
+    public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
 		IJ.register(Duplicater.class);
 		return DOES_ALL + NO_CHANGES;
@@ -34,7 +35,8 @@ public class Duplicater implements PlugInFilter {
 	 *
 	 *@param  ip  Description of the Parameter
 	 */
-	public void run(ImageProcessor ip) {
+	@Override
+    public void run(ImageProcessor ip) {
 		duplicate(imp);
 	}
 

@@ -11,23 +11,27 @@ import ij.text.*;
 */
 public class ThreadLister implements PlugIn {
 
-	public void run(String arg) {
-		if (IJ.getApplet()!=null)
-			return;
+	@Override
+    public void run(String arg) {
+		if (IJ.getApplet()!=null) {
+            return;
+        }
 		CharArrayWriter caw = new CharArrayWriter();
 		PrintWriter pw = new PrintWriter(caw);
 		try {
 			listAllThreads(pw);
 			new TextWindow("Threads", caw.toString(), 420, 420);
 		} catch
-			(Exception e) {}
+			(Exception ignored) {}
 	}
 
 
     // Display info about a thread.
     private static void print_thread_info(PrintWriter out, Thread t, 
                           String indent) {
-        if (t == null) return;
+        if (t == null) {
+            return;
+        }
         out.print(indent + "Thread: " + t.getName() +
                 "  Priority: " + t.getPriority() +
                 (t.isDaemon()?" Daemon":"") +
@@ -37,7 +41,9 @@ public class ThreadLister implements PlugIn {
     // Display info about a thread group and its threads and groups
     private static void list_group(PrintWriter out, ThreadGroup g, 
                        String indent) {
-        if (g == null) return;
+        if (g == null) {
+            return;
+        }
         int num_threads = g.activeCount();
         int num_groups = g.activeGroupCount();
         Thread[] threads = new Thread[num_threads];
@@ -50,10 +56,12 @@ public class ThreadLister implements PlugIn {
                 "  Max Priority: " + g.getMaxPriority() +
                 (g.isDaemon()?" Daemon":"") + "\n");
         
-        for(int i = 0; i < num_threads; i++)
+        for(int i = 0; i < num_threads; i++) {
             print_thread_info(out, threads[i], indent + "    ");
-        for(int i = 0; i < num_groups; i++)
+        }
+        for(int i = 0; i < num_groups; i++) {
             list_group(out, groups[i], indent + "    ");
+        }
     }
     
     // Find the root thread group and list it recursively

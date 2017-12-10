@@ -72,7 +72,7 @@ class Lut {
 				byte g = gLUT[i];
 				byte b = bLUT[i];
 				
-				colors[i] = origColors[i] = 0xff000000  | ((int)(r&0xFF) << 16) | ((int)(g&0xFF) <<8) | (int)(b&0xFF);
+				colors[i] = origColors[i] = 0xff000000  | ((r&0xFF) << 16) | ((g&0xFF) <<8) | b&0xFF;
 			}
 		} 
 		else {
@@ -120,9 +120,7 @@ class Lut {
 	
 	
 	void readOriginalColorLut() {
-		for (int i=0; i<256; i++) {
-			colors[i] = origColors[i];
-		}
+        System.arraycopy(origColors, 0, colors, 0, 256);
 	}
 	
 	void spectrum() {

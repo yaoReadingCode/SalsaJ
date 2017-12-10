@@ -1,6 +1,5 @@
 package ij.gui;
 
-import java.awt.*;
 import ij.*;
 import ij.process.*;
 
@@ -26,90 +25,105 @@ public class Wand {
 
 	/** Constructs a Wand object from an ImageProcessor. */
 	public Wand(ImageProcessor ip) {
-		if (ip instanceof ByteProcessor)
-			bpixels = (byte[])ip.getPixels();
-		else if (ip instanceof ColorProcessor)
-			cpixels = (int[])ip.getPixels();
-		else if (ip instanceof ShortProcessor)
-			spixels = (short[])ip.getPixels();
-		else if (ip instanceof FloatProcessor)
-			fpixels = (float[])ip.getPixels();
+		if (ip instanceof ByteProcessor) {
+            bpixels = (byte[])ip.getPixels();
+        } else if (ip instanceof ColorProcessor) {
+            cpixels = (int[])ip.getPixels();
+        } else if (ip instanceof ShortProcessor) {
+            spixels = (short[])ip.getPixels();
+        } else if (ip instanceof FloatProcessor) {
+            fpixels = (float[])ip.getPixels();
+        }
 		width = ip.getWidth();
 		height = ip.getHeight();
 	}
 	
 	private float getColorPixel(int x, int y) {
-		if (x>=0 && x<width && y>=0 && y<height)
-			return cpixels[y*width + x];
-		else
-			return Float.MAX_VALUE;
+		if (x>=0 && x<width && y>=0 && y<height) {
+            return cpixels[y*width + x];
+        } else {
+            return Float.MAX_VALUE;
+        }
 	}
 
 	private float getBytePixel(int x, int y) {
-		if (x>=0 && x<width && y>=0 && y<height)
-			return bpixels[y*width + x] & 0xff;
-		else
-			return Float.MAX_VALUE;
+		if (x>=0 && x<width && y>=0 && y<height) {
+            return bpixels[y*width + x] & 0xff;
+        } else {
+            return Float.MAX_VALUE;
+        }
 	}
 
 	private float getShortPixel(int x, int y) {
-		if (x>=0 && x<width && y>=0 && y<height)
-			return spixels[y*width + x] & 0xffff;
-		else
-			return Float.MAX_VALUE;
+		if (x>=0 && x<width && y>=0 && y<height) {
+            return spixels[y*width + x] & 0xffff;
+        } else {
+            return Float.MAX_VALUE;
+        }
 	}
 
 	private float getFloatPixel(int x, int y) {
-		if (x>=0 && x<width && y>=0 && y<height)
-			return fpixels[y*width + x];
-		else
-			return Float.MAX_VALUE;
+		if (x>=0 && x<width && y>=0 && y<height) {
+            return fpixels[y*width + x];
+        } else {
+            return Float.MAX_VALUE;
+        }
 	}
 
 	private float getPixel(int x, int y) {
-		if (bpixels!=null)
-			return getBytePixel(x,y);
-		else if (spixels!=null)
-			return getShortPixel(x,y);
-		else if (fpixels!=null)
-			return getFloatPixel(x,y);
-		else
-			return getColorPixel(x,y);
+		if (bpixels!=null) {
+            return getBytePixel(x,y);
+        } else if (spixels!=null) {
+            return getShortPixel(x,y);
+        } else if (fpixels!=null) {
+            return getFloatPixel(x,y);
+        } else {
+            return getColorPixel(x,y);
+        }
 	}
 
 	private boolean inside(int x, int y) {
 		float value;
-		if (bpixels!=null)
-			value = getBytePixel(x,y);
-		else if (spixels!=null)
-			value = getShortPixel(x,y);
-		else if (fpixels!=null)
-			value = getFloatPixel(x,y);
-		else
-			value = getColorPixel(x,y);
+		if (bpixels!=null) {
+            value = getBytePixel(x,y);
+        } else if (spixels!=null) {
+            value = getShortPixel(x,y);
+        } else if (fpixels!=null) {
+            value = getFloatPixel(x,y);
+        } else {
+            value = getColorPixel(x,y);
+        }
 		return value>=lowerThreshold && value<=upperThreshold;
 	}
 
 	/* Are we tracing a one pixel wide line? */
 	boolean isLine(int xs, int ys) {
 		int r = 5;
-		int xmin=xs;
-		int xmax=xs+2*r;
-		if (xmax>=width) xmax=width-1;
+        int xmax=xs+2*r;
+		if (xmax>=width) {
+            xmax=width-1;
+        }
 		int ymin=ys-r;
-		if (ymin<0) ymin=0;
+		if (ymin<0) {
+            ymin=0;
+        }
 		int ymax=ys+r;
-		if (ymax>=height) ymax=height-1;
+		if (ymax>=height) {
+            ymax=height-1;
+        }
 		int area = 0;
 		int insideCount = 0;
-		for (int x=xmin; (x<=xmax); x++)
-			for (int y=ymin; y<=ymax; y++) {
-				area++;
-				if (inside(x,y))
-					insideCount++;
-			}
-		if (IJ.debugMode)
-			IJ.log((((double)insideCount)/area>=0.75?"line ":"blob ")+insideCount+" "+area+" "+IJ.d2s(((double)insideCount)/area));
+		for (int x = xs; (x<=xmax); x++) {
+            for (int y = ymin; y<=ymax; y++) {
+                area++;
+                if (inside(x,y)) {
+                    insideCount++;
+                }
+            }
+        }
+		if (IJ.debugMode) {
+            IJ.log((((double)insideCount)/area>=0.75?"line ":"blob ")+insideCount+" "+area+" "+IJ.d2s(((double)insideCount)/area));
+        }
 		return ((double)insideCount)/area>=0.75;
 	}
 	
@@ -122,22 +136,22 @@ public class Wand {
 		works more reliably. */
 	public void autoOutline(int startX, int startY) {
 		int x = startX;
-		int y = startY;
-		int direction;
+        int direction;
 		lowerThreshold = upperThreshold = getPixel(startX, startY);
-		do {x++;} while (inside(x,y));
-		if (isLine(x, y)) {
-			lowerThreshold = upperThreshold = getPixel(x, y);
+		do {x++;} while (inside(x, startY));
+		if (isLine(x, startY)) {
+			lowerThreshold = upperThreshold = getPixel(x, startY);
 			direction = UP;
 		} else {
-			if (!inside(x-1,y-1))
-				direction = RIGHT;
-			else if (inside(x,y-1))
-				direction = LEFT;
-			else
-				direction = DOWN;
+			if (!inside(x-1, startY -1)) {
+                direction = RIGHT;
+            } else if (inside(x, startY -1)) {
+                direction = LEFT;
+            } else {
+                direction = DOWN;
+            }
 		}
-		traceEdge(x, y, direction);
+		traceEdge(x, startY, direction);
 	}
 		
 	/** Traces an object defined by lower and upper threshold values. The
@@ -147,24 +161,26 @@ public class Wand {
 		//IJ.log(startX+"  "+startY+"  "+lower+"  "+upper);
 		npoints = 0;
 		int x = startX;
-		int y = startY;
-		int direction;
+        int direction;
 		lowerThreshold = (float)lower;
 		upperThreshold = (float)upper;
-		if (inside(x,y)) {
-			do {x++;} while (inside(x,y));
-			if (!inside(x-1,y-1))
-				direction = RIGHT;
-			else if (inside(x,y-1))
-				direction = LEFT;
-			else
-				direction = DOWN;
+		if (inside(x, startY)) {
+			do {x++;} while (inside(x, startY));
+			if (!inside(x-1, startY -1)) {
+                direction = RIGHT;
+            } else if (inside(x, startY -1)) {
+                direction = LEFT;
+            } else {
+                direction = DOWN;
+            }
 		} else {
-			do {x++;} while (!inside(x,y) && x<width);
+			do {x++;} while (!inside(x, startY) && x<width);
 				direction = UP;
-			if (x>=width) return;
+			if (x>=width) {
+                return;
+            }
 		}
-		traceEdge(x, y, direction);
+		traceEdge(x, startY, direction);
 	}
 
 	/** This is a variation of autoOutline that uses int threshold arguments. */
@@ -209,22 +225,32 @@ public class Wand {
 	//IJ.write(count + " " + x + " " + y + " " + direction + " " + insideValue);
 		do {
 			index = 0;
-			if (LR) index |= 1;
-			if (LL) index |= 2;
-			if (UR) index |= 4;
-			if (UL) index |= 8;
+			if (LR) {
+                index |= 1;
+            }
+			if (LL) {
+                index |= 2;
+            }
+			if (UR) {
+                index |= 4;
+            }
+			if (UL) {
+                index |= 8;
+            }
 			newDirection = table[index];
 			if (newDirection==UP_OR_DOWN) {
-				if (direction==RIGHT)
-					newDirection = UP;
-				else
-					newDirection = DOWN;
+				if (direction==RIGHT) {
+                    newDirection = UP;
+                } else {
+                    newDirection = DOWN;
+                }
 			}
 			if (newDirection==LEFT_OR_RIGHT) {
-				if (direction==UP)
-					newDirection = LEFT;
-				else
-					newDirection = RIGHT;
+				if (direction==UP) {
+                    newDirection = LEFT;
+                } else {
+                    newDirection = RIGHT;
+                }
 			}
 			if (newDirection!=direction) {
 				xpoints[count] = x;

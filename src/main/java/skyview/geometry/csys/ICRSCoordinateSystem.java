@@ -26,6 +26,7 @@ public class ICRSCoordinateSystem extends CoordinateSystem
     /**
      * Get the name of this object.
      */
+    @Override
     public String getName() {
 	return "ICRS";
     }
@@ -33,6 +34,7 @@ public class ICRSCoordinateSystem extends CoordinateSystem
     /**
      * Get a description of the object.
      */
+    @Override
     public String getDescription() {
 	return "Non-precessing equatorial coordinate system";
     }
@@ -41,6 +43,7 @@ public class ICRSCoordinateSystem extends CoordinateSystem
      * Return the rotation associated with the coordinate system.
      */
       
+    @Override
     public Rotater getRotater() {
 	return new Rotater("XYZ", angles[0], angles[1], angles[2]);
     }

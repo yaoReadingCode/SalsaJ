@@ -1,6 +1,5 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import java.awt.*;
 
@@ -9,18 +8,20 @@ public class WindowOrganizer implements PlugIn {
 	private static final int XSTART=4, YSTART=80, XOFFSET=8, YOFFSET=24,MAXSTEP=200,GAP=2;
 	private int titlebarHeight = IJ.isMacintosh()?40:20;
 
-	public void run(String arg) {
+	@Override
+    public void run(String arg) {
 		int[] wList = WindowManager.getIDList();
-		if (arg.equals("show"))
+		if ("show".equals(arg))
 			{showAll(wList); return;}
 		if (wList==null) {
 			IJ.noImage();
 			return;
 		}
-		if (arg.equals("tile"))
-			tileWindows(wList);
-		else
-			cascadeWindows(wList);
+		if ("tile".equals(arg)) {
+            tileWindows(wList);
+        } else {
+            cascadeWindows(wList);
+        }
 	}
 	
 	void tileWindows(int[] wList) {
@@ -33,8 +34,9 @@ public class WindowOrganizer implements PlugIn {
 		double totalHeight = 0;
 		for (int i=0; i<wList.length; i++) {
 			ImageWindow win = getWindow(wList[i]);
-			if (win==null)
-				continue;
+			if (win==null) {
+                continue;
+            }
 			Dimension d = win.getSize();
 			int w = d.width;
 			int h = d.height + titlebarHeight;
@@ -42,12 +44,15 @@ public class WindowOrganizer implements PlugIn {
 				width = w;
 				height = h;
 			}
-			if (w!=width || h!=height)
-				allSameSize = false;
-			if (w<minWidth)
-				minWidth = w;
-			if (h<minHeight)
-				minHeight = h;
+			if (w!=width || h!=height) {
+                allSameSize = false;
+            }
+			if (w<minWidth) {
+                minWidth = w;
+            }
+			if (h<minHeight) {
+                minHeight = h;
+            }
 			totalWidth += w;
 			totalHeight += h;
 		}
@@ -58,11 +63,13 @@ public class WindowOrganizer implements PlugIn {
 		int tileHeight = (int)averageHeight;
 		//IJ.write("tileWidth, tileHeight: "+tileWidth+" "+tileHeight);
  		int hspace = screen.width - 2 * GAP;
-		if (tileWidth>hspace)
-			tileWidth = hspace;
+		if (tileWidth>hspace) {
+            tileWidth = hspace;
+        }
 		int vspace = screen.height - YSTART;
-		if (tileHeight>vspace)
-			tileHeight = vspace;
+		if (tileHeight>vspace) {
+            tileHeight = vspace;
+        }
 		int hloc, vloc;
 		boolean theyFit;
 		do {
@@ -75,8 +82,9 @@ public class WindowOrganizer implements PlugIn {
 				if (hloc+tileWidth>screen.width) {
 					hloc = XSTART;
 					vloc = vloc + tileHeight;
-					if (vloc+tileHeight> screen.height)
-						theyFit = false;
+					if (vloc+tileHeight> screen.height) {
+                        theyFit = false;
+                    }
 				}
 				hloc = hloc + tileWidth + GAP;
 			} while (theyFit && (i<nPics));
@@ -87,34 +95,37 @@ public class WindowOrganizer implements PlugIn {
 		} while (!theyFit);
 		int nColumns = (screen.width-XSTART)/(tileWidth+GAP);
 		int nRows = nPics/nColumns;
-		if ((nPics%nColumns)!=0)
-			nRows++;
+		if ((nPics%nColumns)!=0) {
+            nRows++;
+        }
 		hloc = XSTART;
 		vloc = YSTART;
-		
-		for (int i=0; i<nPics; i++) {
-			if (hloc+tileWidth>screen.width) {
-				hloc = XSTART;
-				vloc = vloc + tileHeight;
-			}
-			ImageWindow win = getWindow(wList[i]);
-			if (win!=null) {
-				win.setLocation(hloc, vloc);
-				//IJ.write(i+" "+w+" "+tileWidth+" "+mag+" "+IJ.d2s(zoomFactor,2)+" "+zoomCount);
-				ImageCanvas canvas = win.getCanvas();
-				while (win.getSize().width*0.85>=tileWidth && canvas.getMagnification()>0.03125)
-					canvas.zoomOut(0, 0);
-				win.toFront();
-			}
-			hloc += tileWidth + GAP;
-		}
+
+        for (int aWList : wList) {
+            if (hloc + tileWidth > screen.width) {
+                hloc = XSTART;
+                vloc = vloc + tileHeight;
+            }
+            ImageWindow win = getWindow(aWList);
+            if (win != null) {
+                win.setLocation(hloc, vloc);
+                //IJ.write(i+" "+w+" "+tileWidth+" "+mag+" "+IJ.d2s(zoomFactor,2)+" "+zoomCount);
+                ImageCanvas canvas = win.getCanvas();
+                while (win.getSize().width * 0.85 >= tileWidth && canvas.getMagnification() > 0.03125) {
+                    canvas.zoomOut(0, 0);
+                }
+                win.toFront();
+            }
+            hloc += tileWidth + GAP;
+        }
 	}
 
 	ImageWindow getWindow(int id) {
 		ImageWindow win = null;
 		ImagePlus imp = WindowManager.getImage(id);
-		if (imp!=null)
-			win = imp.getWindow();
+		if (imp!=null) {
+            win = imp.getWindow();
+        }
 		return win;
 	}		
 			
@@ -126,18 +137,21 @@ public class WindowOrganizer implements PlugIn {
 		int xstart = XSTART;
 		for (int i=0; i<wList.length; i++) {
 			ImageWindow win = getWindow(wList[i]);
-			if (win==null)
-				continue;
+			if (win==null) {
+                continue;
+            }
 			Dimension d = win.getSize();
 			if (i==0) {
 				xstep = (int)(d.width*0.8);
-				if (xstep>MAXSTEP)
-					xstep = MAXSTEP;
+				if (xstep>MAXSTEP) {
+                    xstep = MAXSTEP;
+                }
 			}
 			if (y+d.height*0.67>screen.height) {
 				xstart += xstep;
-				if (xstart+d.width*0.67>screen.width)
-					xstart = XSTART+XOFFSET;
+				if (xstart+d.width*0.67>screen.width) {
+                    xstart = XSTART+XOFFSET;
+                }
 				x = xstart;
 				y = YSTART;
 			}
@@ -150,16 +164,19 @@ public class WindowOrganizer implements PlugIn {
 	
 	void showAll(int[] wList) {
 		if (wList!=null) {
-			for (int i=0; i<wList.length; i++) {
-				ImageWindow win = getWindow(wList[i]);
-				if (win!=null) win.toFront();
-				
-			}
+            for (int aWList : wList) {
+                ImageWindow win = getWindow(aWList);
+                if (win != null) {
+                    win.toFront();
+                }
+
+            }
 		}
 		Frame[] frames = WindowManager.getNonImageWindows();
 		if (frames!=null) {
-			for (int i=0; i<frames.length; i++)
-				frames[i].toFront();
+            for (Frame frame : frames) {
+                frame.toFront();
+            }
 		}
 		IJ.getInstance().toFront();
 	}
