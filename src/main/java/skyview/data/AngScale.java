@@ -83,11 +83,9 @@ public class AngScale {
     /**
      * Get the desired starting values and scaling interval.
      *
-     * @param min         The minimum coordinate value.
-     * @param max         The maximum coordinate value
-     * @param sexagesimal Do we want sexagesimal coordinates.
-     * @return a two element vector giving the starting value and delta
-     * to be used.  .
+     * @param min The minimum coordinate value.
+     * @param max The maximum coordinate value
+     * @return a two element vector giving the starting value and delta to be used
      */
 
     public double[] scaling(double min, double max) {
